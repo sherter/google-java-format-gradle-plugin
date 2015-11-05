@@ -11,9 +11,10 @@ plugins {
   id 'com.github.sherter.google-java-format' version '0.1'
 }
 
-// The plugin does not add any repositories by itself. You can choose where google-java-format
-// and its transitive dependencies should come from. The following is only an example. You may
-// want to use mavenLocal(), if you compiled google-java-format by yourself.
+// The plugin does not add any repositories by itself. You can choose where
+// google-java-format and its transitive dependencies should come from.
+// The following is only an example. You may want to use mavenLocal(),
+// if you compiled google-java-format by yourself.
 repositories {
   maven {
     url 'https://oss.sonatype.org/content/repositories/snapshots/'
