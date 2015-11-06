@@ -14,7 +14,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 
 group = 'com.github.sherter.googlejavaformat'
-version = '0.1-SNAPSHOT'
+version = '0.2-SNAPSHOT'
 
 repositories {
     jcenter()
