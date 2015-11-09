@@ -51,7 +51,6 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
                 name: GOOGLEJAVAFORMAT_ARTIFACTID,
                 version: this.extension.toolVersion
         )
-        println this.extension.toolVersion
         this.config.dependencies.add(dependency)
     }
 
