@@ -39,7 +39,7 @@ if (version.endsWith('-SNAPSHOT')) {
     publishing {
         publications {
             maven(MavenPublication) {
-                groupId 'com.github.sherter.google-java-format-gradle-plugin'
+                groupId 'com.github.sherter.googlejavaformatgradleplugin'
                 artifactId 'google-java-format-gradle-plugin'
 
                 from components.java
