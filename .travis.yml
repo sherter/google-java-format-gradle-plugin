@@ -11,6 +11,6 @@ env:
   - secure: ZLh3pIVHpOoSKSLtTNzIdDwxS/SvQe64J4AliVr/XBDTbjazQ+rvbmTdVaa/G3+lZovP2dnycwoTeflaemlRTzngcjVnUtK9hJp8VyV+FFmgLgDJRBVoOJFUGlRKEynpszJ+BTgM1zecNoAmUl9BS4vvx1k6iczgEFAqIbXbAQNvKHrNgmRzlLFv9ImflmfbBQ8E65COQCAfqg8CcWjf/cZH74BYOkXNr9To0rZYaxfLA6TGhxYrxryifPHtdBZ1mijUGj8IunnwZrkXOaW4chOBocXaNfdjfyt9c+pmFOrqFcUDwqEO7KqwG5MnCRilNaMJO+pIkDdA6TFS404BBBDiXNVCIFBCJ5Yb4i/zwTuLhX1/gi/9i6ObBMklcgDVgoBR8VEB6yOSqj+OmKsc1F2zlMK2WaibsKi4vomCAR/2KqwrlbklJvtVuQqSgqwmourtEuuCLdXjFHwp7dtgWwPoJe9eH9xzoZ4CeIbu7f4/+/BHhkAcCpfRPkxdj0wKcBS/lqrIemzQEi9wKm9ktS/je/LSlAtz7+/5UIqWCooB1YrGlrn1YU5mYpp8XOcVUqoYVFmH/2J5E99hTL0My/As9m+FkZr7VzQIiWf8h1J42pS0kGSQoSfwo5KlJjTR3TMoRXSuJkasoM4v9Q0Nt83S1XFybm2bImnLvl2GNHQ=
 deploy:
   provider: script
-  script: gradlew publish
+  script: ./gradlew publish
   on:
     all_branches: true
