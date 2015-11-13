@@ -1,19 +1,9 @@
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
-    }
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.9.1'
 }
 
-apply plugin: "com.gradle.plugin-publish"
-apply plugin: 'groovy'
-apply plugin: 'maven'
-
-group = 'com.github.sherter.googlejavaformat'
 version = '0.2-SNAPSHOT'
 
 repositories {
@@ -30,6 +20,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.7'
 }
 
+//TODO(sherter): When ready to release next version configure travis to publish it (secure env)
 pluginBundle {
     website = 'https://github.com/sherter/google-java-format-gradle-plugin'
     vcsUrl = 'https://github.com/sherter/google-java-format-gradle-plugin.git'
@@ -40,6 +31,29 @@ pluginBundle {
         googleJavaFormatGradlePlugin {
             id = 'com.github.sherter.google-java-format'
             displayName = 'google-java-format gradle plugin'
+        }
+    }
+}
+
+if (version.endsWith('-SNAPSHOT')) {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId 'com.github.sherter.google-java-format-gradle-plugin'
+                artifactId 'google-java-format-gradle-plugin'
+
+                from components.java
+            }
+        }
+        repositories {
+            maven {
+                name = 'SonatypeSnapshot'
+                url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                credentials {
+                    username System.env.USERNAME
+                    password System.env.PASSWORD
+                }
+            }
         }
     }
 }
