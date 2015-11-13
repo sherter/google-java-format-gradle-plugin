@@ -1,6 +1,7 @@
 language: groovy
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- find $HOME/.gradle/caches/ -name cache.properties -o -name cache.properties.lock | xargs rm
 cache:
   directories:
   - "$HOME/.gradle/caches/"
