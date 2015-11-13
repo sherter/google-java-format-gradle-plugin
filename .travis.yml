@@ -12,3 +12,5 @@ env:
 deploy:
   provider: script
   script: gradlew publish
+  on:
+    all_branches: true
