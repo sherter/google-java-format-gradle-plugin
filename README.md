@@ -2,6 +2,8 @@
 
 This [gradle](https://github.com/gradle/gradle) plugin uses [google-java-format](https://github.com/google/google-java-format) to reformat the Java source files in your gradle project.
 
+[![Build Status](https://travis-ci.org/sherter/google-java-format-gradle-plugin.svg?branch=master)](https://travis-ci.org/sherter/google-java-format-gradle-plugin)
+
 ## Usage
 [google-java-format](https://github.com/google/google-java-format) is not officially released yet. However, snapshot versions are available on sonatype's snapshot repository.
 
