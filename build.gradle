@@ -34,22 +34,24 @@ pluginBundle {
     }
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId 'com.github.sherter.google-java-format-gradle-plugin'
-            artifactId 'google-java-format-gradle-plugin'
+if (version.endsWith('-SNAPSHOT')) {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId 'com.github.sherter.google-java-format-gradle-plugin'
+                artifactId 'google-java-format-gradle-plugin'
 
-            from components.java
+                from components.java
+            }
         }
-    }
-    repositories {
-        maven {
-            name = 'SonatypeSnapshot'
-            url 'https://oss.sonatype.org/content/repositories/snapshots/'
-            credentials {
-                username System.env.USERNAME
-                password System.env.PASSWORD
+        repositories {
+            maven {
+                name = 'SonatypeSnapshot'
+                url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                credentials {
+                    username System.env.USERNAME
+                    password System.env.PASSWORD
+                }
             }
         }
     }

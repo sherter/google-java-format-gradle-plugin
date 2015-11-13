@@ -12,9 +12,6 @@ env:
 deploy:
   - provider: script
     script: ./gradlew publish
-    on:
-      all_branches: true
-      tags: false
   - provider: script
     script: ./gradlew publishPlugins
     on:
