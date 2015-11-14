@@ -1,10 +1,9 @@
-package com.github.sherter.googlejavaformat
+package com.github.sherter.googlejavaformatgradleplugin
 
-import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 
-class GoogleJavaFormatPlugin implements Plugin<Project> {
+class GoogleJavaFormatPlugin implements org.gradle.api.Plugin<Project> {
     static final String CONFIGURATION_NAME = "googleJavaFormat"
     static final String EXTENSION_NAME = "googleJavaFormat"
     static final String TASK_NAME = "googleJavaFormat"

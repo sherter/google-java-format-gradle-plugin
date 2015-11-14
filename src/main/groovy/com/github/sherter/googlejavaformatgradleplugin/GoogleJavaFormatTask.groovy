@@ -1,4 +1,4 @@
-package com.github.sherter.googlejavaformat
+package com.github.sherter.googlejavaformatgradleplugin
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction

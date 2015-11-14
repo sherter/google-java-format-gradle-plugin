@@ -1,4 +1,4 @@
-package com.github.sherter.googlejavaformat
+package com.github.sherter.googlejavaformatgradleplugin
 
 class GoogleJavaFormatPluginExtension {
 
