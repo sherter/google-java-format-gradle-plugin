@@ -10,6 +10,7 @@ class GoogleJavaFormatPlugin implements org.gradle.api.Plugin<Project> {
 
     static final String GOOGLEJAVAFORMAT_GROUPID = "com.google.googlejavaformat"
     static final String GOOGLEJAVAFORMAT_ARTIFACTID = "google-java-format"
+    static final String GOOGLEJAVAFORMAT_VERSION = "0.1-alpha"
 
     private Project project
     private GoogleJavaFormatPluginExtension extension
