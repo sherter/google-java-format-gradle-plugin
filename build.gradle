@@ -13,11 +13,14 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    testCompile 'org.spockframework:spock-core:1.0-groovy-2.3'
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        // gradle always loads its own groovy version, which leads to conflicts
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.7'
+    gradleVersion = '2.9'
 }
 
 //TODO(sherter): When ready to release next version configure travis to publish it (secure env)
