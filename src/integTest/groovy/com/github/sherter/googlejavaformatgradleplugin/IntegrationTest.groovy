@@ -47,10 +47,15 @@ class IntegrationTest extends Specification {
         when: "format task is run"
         def result = runner.build()
 
-        then: "build is successful and didn't change any files"
+        then: "build is UP-TO-DATE"
+        result.output.contains(":${GoogleJavaFormatPlugin.TASK_NAME} UP-TO-DATE")
         result.output.contains('BUILD SUCCESSFUL')
-        sampleProject.eachFileRecurse(FileType.FILES) {
-            def relativePathInProject = sampleProject.toURI().relativize(it.toURI()).toString()
+        sameFilesExistAndHaveSameContent(sampleProject)
+    }
+
+    void sameFilesExistAndHaveSameContent(File expectedDir) {
+        expectedDir.eachFileRecurse(FileType.FILES) {
+            def relativePathInProject = expectedDir.toURI().relativize(it.toURI()).toString()
             assert it.text == new File(projectDir, relativePathInProject).text
         }
     }
@@ -72,11 +77,7 @@ class IntegrationTest extends Specification {
 
         then: "source files are formatted properly afterwards"
         result.output.contains('BUILD SUCCESSFUL')
-        def resultsDir = new File("src/integTest/resources/results/defaults")
-        resultsDir.eachFileRecurse(FileType.FILES) {
-            def relativePathInProject = resultsDir.toURI().relativize(it.toURI()).toString()
-            assert it.text == new File(projectDir, relativePathInProject).text
-        }
+        sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/defaults"))
 
         where:
         order    | firstPluginApplied                      | secondPluginApplied

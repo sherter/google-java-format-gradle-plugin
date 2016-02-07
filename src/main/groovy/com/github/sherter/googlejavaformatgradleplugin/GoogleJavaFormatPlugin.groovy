@@ -55,21 +55,10 @@ class GoogleJavaFormatPlugin implements org.gradle.api.Plugin<Project> {
     }
 
     private void configureFormatTask() {
-        if (!this.project.properties.containsKey('sourceSets')) {
-            return
-        }
-        this.project.sourceSets.all { sourceSet ->
-            sourceSet.java.files.each { javaFile ->
-                this.task.inputs.file(javaFile)
-                this.task.outputs.file(javaFile)
+        if (this.project.hasProperty('sourceSets')) {
+            this.project.sourceSets.all { sourceSet ->
+                this.task.source(sourceSet.java)
             }
         }
-        // TODO(sherter): add build file to task inputs (rerun if user changes 'toolVersion')
-        def urls = config.files.collect {
-            it.toURI().toURL()
-        }
-        def classLoader = new URLClassLoader(urls as URL[], ClassLoader.getSystemClassLoader())
-        this.task.formatter = classLoader.loadClass('com.google.googlejavaformat.java.Formatter').newInstance()
     }
-
 }
