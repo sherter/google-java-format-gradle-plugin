@@ -10,6 +10,14 @@ repositories {
     jcenter()
 }
 
+sourceSets {
+    integTest
+}
+
+configurations {
+    integTestCompile.extendsFrom testCompile
+}
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
@@ -17,10 +25,29 @@ dependencies {
         // gradle always loads its own groovy version, which leads to conflicts
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
+    integTestCompile gradleTestKit()
+    integTestCompile sourceSets.main.output
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.9'
+}
+
+test {
+    maxParallelForks = 4
+}
+
+task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
+    group 'Verification'
+    testClassesDir = sourceSets.integTest.output.classesDir
+    classpath = sourceSets.integTest.runtimeClasspath
+    systemProperty 'plugin-version', version
+}
+
+check.dependsOn integrationTest
+
+tasks.withType(Test) {
+    reports.html.destination = new File(reportsDir, name)
 }
 
 //TODO(sherter): When ready to release next version configure travis to publish it (secure env)

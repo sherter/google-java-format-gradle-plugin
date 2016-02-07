@@ -6,10 +6,29 @@ cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
+
 env:
   global:
   - secure: N4hWPAcf8mkyHkhxUiHJct8vJ0GXezsLrcykXGGikMwB3chPH4wYJqEeyDx9RtRssl+3/CkmUJwvKShmAJha/0edFJe/kZb5NI+GaAY3g7WUZG7uI5i0XBGDb+B3ijcQWeW2y+YfFs7pzDT/ymBy5m9QjgeIYxbNx9/uddwU/d6xxRAuqzNv5YlEL+yNA7cPhINS8QZlv/BXAaazWEzt1RVXxhviqx4N2dAFlipRnF+5NKovXWwWpmk1xpGun9ULEVNSKnJMz2HN9zxVfTAgfzFRHLH3baY1mLecHvMJSvpRsUXV8Jh7LzxKMTsHC3HvdqfhbMDUv6i4ciygRbw7A2foj0TJ3h8oHEds+Qb3wAIoG3EEvBUDjl/UhOaObJVjmQZjvK1XiGjV5/nRukuRZr8n4+a2JGJiDAQW6rfVJwaHGEwKxZ+nolbhtELAdiKNEdWdBHg/pJjJ/bdWDI8zfGNhkm44f+Bdz9sYy+s6unQluBOZbr2Q8tX/bBYIqGz/AAZFa7oLFH0Deas1oBOhjhFiWUnHjCAMZjhtCAiVA0oUKxpe+4mJBy7WHrfmyxjMR/3mcdCajaY8VwULBfdofc2Ll4WN2l2EVvps3IfKBtS6Q0509jC/jRY9G2mxEBOknZvSdCKfv3aCKLJ39lZoHyIFj/pN1kOjnrIGGlirtAg=
   - secure: ZLh3pIVHpOoSKSLtTNzIdDwxS/SvQe64J4AliVr/XBDTbjazQ+rvbmTdVaa/G3+lZovP2dnycwoTeflaemlRTzngcjVnUtK9hJp8VyV+FFmgLgDJRBVoOJFUGlRKEynpszJ+BTgM1zecNoAmUl9BS4vvx1k6iczgEFAqIbXbAQNvKHrNgmRzlLFv9ImflmfbBQ8E65COQCAfqg8CcWjf/cZH74BYOkXNr9To0rZYaxfLA6TGhxYrxryifPHtdBZ1mijUGj8IunnwZrkXOaW4chOBocXaNfdjfyt9c+pmFOrqFcUDwqEO7KqwG5MnCRilNaMJO+pIkDdA6TFS404BBBDiXNVCIFBCJ5Yb4i/zwTuLhX1/gi/9i6ObBMklcgDVgoBR8VEB6yOSqj+OmKsc1F2zlMK2WaibsKi4vomCAR/2KqwrlbklJvtVuQqSgqwmourtEuuCLdXjFHwp7dtgWwPoJe9eH9xzoZ4CeIbu7f4/+/BHhkAcCpfRPkxdj0wKcBS/lqrIemzQEi9wKm9ktS/je/LSlAtz7+/5UIqWCooB1YrGlrn1YU5mYpp8XOcVUqoYVFmH/2J5E99hTL0My/As9m+FkZr7VzQIiWf8h1J42pS0kGSQoSfwo5KlJjTR3TMoRXSuJkasoM4v9Q0Nt83S1XFybm2bImnLvl2GNHQ=
+
+install:
+  # create plugin artifact and deploy it to local maven repository
+  - jdk_switcher use oraclejdk7
+  - ./gradlew publishToMavenLocal
+
+script:
+  # run tests against multiple jdk variants, but use artifact from install step
+  - ./gradlew check --exclude-task publishToMavenLocal
+  - jdk_switcher use oraclejdk8
+  - ./gradlew check --exclude-task publishToMavenLocal
+  - jdk_switcher use openjdk7
+  - ./gradlew check --exclude-task publishToMavenLocal
+
+before_deploy:
+  # back to oraclejdk7; makes sure we publish what we actually tested
+  - jdk_switcher use oraclejdk7
+
 deploy:
   - provider: script
     script: ./gradlew publish

@@ -31,7 +31,7 @@ class GoogleJavaFormatPluginTest extends Specification {
         def project = ProjectBuilder.builder().build()
         project.with {
             apply plugin: GoogleJavaFormatPlugin
-            googleJavaFormat {
+            "${GoogleJavaFormatPlugin.EXTENSION_NAME}" {
                 toolVersion = expectedVersion
             }
         }
