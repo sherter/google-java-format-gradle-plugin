@@ -33,8 +33,8 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.9'
 }
 
-test {
-    maxParallelForks = 4
+tasks.withType(Test) {
+    maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
 task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
