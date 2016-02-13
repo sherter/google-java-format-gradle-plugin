@@ -36,7 +36,7 @@ class IntegrationTest extends Specification {
         runner = GradleRunner.create()
                 .withGradleVersion('2.0')
                 .withProjectDir(projectDir)
-                .withArguments(GoogleJavaFormatPlugin.TASK_NAME)
+                .withArguments(GoogleJavaFormatPlugin.DEFAULT_TASK_NAME, '--stacktrace')
     }
 
     def "apply plugin to project with no source sets"() {
@@ -47,8 +47,8 @@ class IntegrationTest extends Specification {
         when: "format task is run"
         def result = runner.build()
 
-        then: "build is UP-TO-DATE"
-        result.output.contains(":${GoogleJavaFormatPlugin.TASK_NAME} UP-TO-DATE")
+        then: "no files have changed"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
         result.output.contains('BUILD SUCCESSFUL')
         sameFilesExistAndHaveSameContent(sampleProject)
     }
@@ -83,5 +83,78 @@ class IntegrationTest extends Specification {
         order    | firstPluginApplied                      | secondPluginApplied
         'before' | 'com.github.sherter.google-java-format' | 'java'
         'after'  | 'java'                                  | 'com.github.sherter.google-java-format'
+    }
+
+
+    def "up-to-date checking"() {
+        given:
+        buildFile << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                maven {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                }
+                jcenter()
+            }
+            """
+
+        when: "formatting task is executed on an empty project"
+        def result = runner.build()
+
+        then: "task is up-to-date"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "source files are added"
+        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
+        result = runner.build()
+
+        then: "task is not up-to-date"
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "task is executed again"
+        result = runner.build()
+
+        then: "task is up-to-date"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "new java source file is added and task is executed"
+        def newSource = new File(projectDir, 'src/main/java/NewJavaSource.java')
+        newSource.createNewFile()
+        result = runner.build()
+
+        then: "task is not up-to-date"
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "file was changed"
+        newSource << "class NewJavaSource {}"
+        result = runner.build()
+
+        then: "task is not up-to-date"
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "nothing has changed"
+        result = runner.build()
+
+        then: "task is up-to-date"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "formatter tool version has changed"
+        buildFile << """
+            googleJavaFormat {
+                toolVersion = '0.1-SNAPSHOT'
+            }
+            """
+        result = runner.build()
+
+        then: "task is not up-to-date"
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+
+        when: "nothing has changed"
+        result = runner.build()
+
+        then: "task is up-to-date"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
     }
 }

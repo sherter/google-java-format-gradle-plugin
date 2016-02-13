@@ -4,7 +4,7 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.9.1'
 }
 
-version = '0.2-SNAPSHOT'
+version = file('src/main/resources/VERSION').text.trim()
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7

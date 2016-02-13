@@ -17,13 +17,13 @@ class GoogleJavaFormatPluginTest extends Specification {
         project.extensions.findByType(GoogleJavaFormatPluginExtension) != null
 
         and: "format task exists"
-        project.tasks.findByName(GoogleJavaFormatPlugin.TASK_NAME) != null
+        project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_TASK_NAME) != null
 
         and: "google-java-format dependency exists"
         project.configurations.getByName(GoogleJavaFormatPlugin.CONFIGURATION_NAME).dependencies.find {
             it.group == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_GROUPID
             it.name == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_ARTIFACTID
-            it.version == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_VERSION
+            it.version == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_DEFAULT_VERSION
         } != null
     }
 
