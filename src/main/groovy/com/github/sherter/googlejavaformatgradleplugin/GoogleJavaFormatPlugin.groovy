@@ -70,7 +70,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private void createAndInjectFileStateHandler() {
-        String pluginVersion = getClass().getClassLoader().getResourceAsStream('VERSION').text.trim()
+        String pluginVersion = getClass().getResourceAsStream('/VERSION').text.trim()
         String buildCacheSubdir = "google-java-format/$pluginVersion"
         this.fileStateHandler = new FileStateHandler(
                 this.project.projectDir,
