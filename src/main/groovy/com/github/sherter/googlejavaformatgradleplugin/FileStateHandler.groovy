@@ -1,5 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import groovy.transform.PackageScope
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -11,16 +12,19 @@ import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
+import static groovy.transform.PackageScopeTarget.*
+
+@PackageScope([CLASS, CONSTRUCTORS, FIELDS, METHODS])
 class FileStateHandler {
 
     private static final Logger logger = Logging.getLogger('google-java-format')
     private static final String stateFileName = 'filestates.bin'
 
-    private File projectDir
-    private File buildCacheDir
-    private String currentGoogleJavaFormatVersion
-    private ConcurrentMap<String, FileInfo> fileStates = new ConcurrentHashMap<>()
-    private ConcurrentMap<String, Object> formattedFiles = new ConcurrentHashMap<>()
+    private final File projectDir
+    private final File buildCacheDir
+    private final String currentGoogleJavaFormatVersion
+    private final ConcurrentMap<String, FileInfo> fileStates = new ConcurrentHashMap<>()
+    private final ConcurrentMap<String, Object> formattedFiles = new ConcurrentHashMap<>()
 
     FileStateHandler(File projectDir, File buildCacheDir, String currentGoogleJavaFormatVersion) {
         this.projectDir = projectDir
@@ -109,11 +113,12 @@ class FileStateHandler {
         }
     }
 
+    @PackageScope([CLASS, CONSTRUCTORS])
     static class FileInfo implements Serializable {
-        String googleJavaFormatVersion
-        long fileSize
-        long lastModified
-        byte[] fileHash
+        private final String googleJavaFormatVersion
+        private final long fileSize
+        private final long lastModified
+        private final byte[] fileHash
 
         FileInfo(String googleJavaFormatVersion, long fileSize, long lastModified, byte[] fileHash) {
             this.googleJavaFormatVersion = googleJavaFormatVersion

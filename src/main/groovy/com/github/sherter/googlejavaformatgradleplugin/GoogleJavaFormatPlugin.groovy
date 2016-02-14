@@ -5,13 +5,13 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 
 class GoogleJavaFormatPlugin implements Plugin<Project> {
-    static final String CONFIGURATION_NAME = "googleJavaFormat"
-    static final String EXTENSION_NAME = "googleJavaFormat"
-    static final String DEFAULT_TASK_NAME = "googleJavaFormat"
+    private static final String CONFIGURATION_NAME = "googleJavaFormat"
+    private static final String EXTENSION_NAME = "googleJavaFormat"
+    private static final String DEFAULT_TASK_NAME = "googleJavaFormat"
 
-    static final String GOOGLEJAVAFORMAT_GROUPID = "com.google.googlejavaformat"
-    static final String GOOGLEJAVAFORMAT_ARTIFACTID = "google-java-format"
-    static final String GOOGLEJAVAFORMAT_DEFAULT_VERSION = "0.1-alpha"
+    private static final String GOOGLEJAVAFORMAT_GROUPID = "com.google.googlejavaformat"
+    private static final String GOOGLEJAVAFORMAT_ARTIFACTID = "google-java-format"
+    private static final String GOOGLEJAVAFORMAT_DEFAULT_VERSION = "0.1-alpha"
 
     private Project project
     private GoogleJavaFormatPluginExtension extension
@@ -77,7 +77,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
                 new File(this.project.buildDir, buildCacheSubdir),
                 this.extension.toolVersion)
         this.project.tasks.withType(GoogleJavaFormatTask) { formatTask ->
-            formatTask.fileStateHandler = this.fileStateHandler
+            formatTask.setFileStateHandler(this.fileStateHandler)
         }
     }
 

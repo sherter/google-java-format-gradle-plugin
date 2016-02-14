@@ -1,17 +1,30 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import groovy.transform.PackageScope
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
 class GoogleJavaFormatTask extends SourceTask {
 
-    FileStateHandler fileStateHandler
+    /**
+     * The same instance will be injected into all tasks of this type
+     * (see {@link GoogleJavaFormatPlugin#createAndInjectFileStateHandler}).
+     */
+    private FileStateHandler fileStateHandler
+
+    @PackageScope void setFileStateHandler(FileStateHandler fsh) {
+        this.fileStateHandler = fsh
+    }
+
+    @PackageScope FileStateHandler getFileStateHandler() {
+        return this.fileStateHandler
+    }
 
     @TaskAction
     void formatSources() {
         def formatter = constructFormatter()
         source.each { file ->
-            this.fileStateHandler.formatIfNotUpToDate(file) { fileToFormat ->
+            fileStateHandler.formatIfNotUpToDate(file) { fileToFormat ->
                 fileToFormat.write(formatter.formatSource(fileToFormat.text))
             }
         }
