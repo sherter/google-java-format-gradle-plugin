@@ -4,7 +4,7 @@ import groovy.transform.PackageScope
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
-class GoogleJavaFormatTask extends SourceTask {
+class GoogleJavaFormat extends SourceTask {
 
     /**
      * The same instance will be injected into all tasks of this type

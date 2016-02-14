@@ -16,7 +16,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     private Project project
     private GoogleJavaFormatPluginExtension extension
     private Configuration config
-    private GoogleJavaFormatTask defaultTask
+    private GoogleJavaFormat defaultTask
     private FileStateHandler fileStateHandler
 
     void apply(Project project) {
@@ -49,7 +49,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private void createDefaultFormatTask() {
-        this.defaultTask = this.project.tasks.create(DEFAULT_TASK_NAME, GoogleJavaFormatTask)
+        this.defaultTask = this.project.tasks.create(DEFAULT_TASK_NAME, GoogleJavaFormat)
     }
 
     private void addDependencyForGoogleJavaFormat() {
@@ -76,13 +76,13 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
                 this.project.projectDir,
                 new File(this.project.buildDir, buildCacheSubdir),
                 this.extension.toolVersion)
-        this.project.tasks.withType(GoogleJavaFormatTask) { formatTask ->
+        this.project.tasks.withType(GoogleJavaFormat) { formatTask ->
             formatTask.setFileStateHandler(this.fileStateHandler)
         }
     }
 
     private void excludeUpToDateInputs() {
-        this.project.tasks.withType(GoogleJavaFormatTask) { formatTask ->
+        this.project.tasks.withType(GoogleJavaFormat) { formatTask ->
             formatTask.exclude { fileTreeElement ->
                 return this.fileStateHandler.isUpToDate(fileTreeElement.file)
             }
