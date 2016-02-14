@@ -157,4 +157,53 @@ class IntegrationTest extends Specification {
         then: "task is up-to-date"
         result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
     }
+
+    def "include and exclude sources"() {
+        given:
+        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
+        buildFile << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                jcenter()
+            }
+            tasks.${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} {
+                source 'src'
+                include '**/*.java'
+                exclude '**/Bar.java'
+            }
+            """
+
+        when: "formatting task is executed"
+        def result = runner.build()
+
+        then: "source files are formatted properly afterwards"
+        result.output.contains('BUILD SUCCESSFUL')
+        sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/include-exclude"))
+    }
+
+    def "define additional format task"() {
+        given:
+        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
+        buildFile << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                jcenter()
+            }
+
+            task customFormatTask(type: com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormat) {
+                source 'src/Foo.java'
+            }
+            """
+
+        when: "formatting task is executed"
+        def result = runner.withArguments('customFormatTask').build()
+
+        then: "source files are formatted properly afterwards"
+        result.output.contains('BUILD SUCCESSFUL')
+        sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/custom"))
+    }
 }
