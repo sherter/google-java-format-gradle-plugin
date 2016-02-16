@@ -70,6 +70,16 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private void createAndInjectFileStateHandler() {
+        // workaround; reading resources fails sometimes
+        // see https://discuss.gradle.org/t/getresourceasstream-returns-null-in-plugin-in-daemon-mode/2385
+        new URLConnection(new URL("file:///")) {
+            {
+                setDefaultUseCaches(false)
+            }
+            @Override
+            void connect() throws IOException {
+            }
+        }
         String pluginVersion = getClass().getResourceAsStream('/VERSION').text.trim()
         String buildCacheSubdir = "google-java-format/$pluginVersion"
         this.fileStateHandler = new FileStateHandler(
