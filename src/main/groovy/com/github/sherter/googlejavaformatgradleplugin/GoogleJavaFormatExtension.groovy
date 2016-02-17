@@ -1,6 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-class GoogleJavaFormatPluginExtension {
+class GoogleJavaFormatExtension {
 
     String toolVersion = GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_DEFAULT_VERSION
 

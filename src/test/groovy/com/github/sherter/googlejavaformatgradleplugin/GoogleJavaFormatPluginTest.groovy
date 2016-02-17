@@ -14,7 +14,7 @@ class GoogleJavaFormatPluginTest extends Specification {
         project.evaluate()
 
         then: "plugin extension exists"
-        project.extensions.findByType(GoogleJavaFormatPluginExtension) != null
+        project.extensions.findByType(GoogleJavaFormatExtension) != null
 
         and: "format task exists"
         project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_TASK_NAME) != null

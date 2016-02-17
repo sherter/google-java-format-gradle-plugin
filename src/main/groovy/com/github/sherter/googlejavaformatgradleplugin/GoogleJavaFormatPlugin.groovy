@@ -14,7 +14,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     private static final String GOOGLEJAVAFORMAT_DEFAULT_VERSION = "0.1-alpha"
 
     private Project project
-    private GoogleJavaFormatPluginExtension extension
+    private GoogleJavaFormatExtension extension
     private Configuration config
     private GoogleJavaFormat defaultTask
     private FileStateHandler fileStateHandler
@@ -46,7 +46,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private void createProjectExtension() {
-        this.extension = this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatPluginExtension)
+        this.extension = this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
     }
 
     private void createConfiguration() {
