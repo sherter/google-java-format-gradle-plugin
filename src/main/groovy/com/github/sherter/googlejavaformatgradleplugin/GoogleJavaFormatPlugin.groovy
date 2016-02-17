@@ -7,6 +7,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.SourceSet
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
@@ -24,36 +25,22 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     private GoogleJavaFormatExtension extension
     private Configuration config
     private GoogleJavaFormat defaultTask
-    private FileStateHandler fileStateHandler
 
+    @Override
     void apply(Project project) {
         this.project = project
-        createProjectExtension()
+        createExtension()
         createConfiguration()
         createDefaultFormatTask()
 
         project.afterEvaluate {
-            addDependencyForGoogleJavaFormat()
-            defineInputsForDefaultFormatTask()
-            createAndInjectFileStateHandler()
-            createAndInjectFormatterFactory()
-            this.fileStateHandler.load()
-            excludeUpToDateInputs()
-            project.gradle.buildFinished {
-                this.fileStateHandler.flush()
-            }
+            configureConfiguration()
+            configureTasks()
         }
     }
 
-    private void createAndInjectFormatterFactory() {
-        def formatterFactory = new FormatterFactory(config, extension.toolVersion)
-        this.project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat formatTask ->
-            formatTask.setFormatterFactory(formatterFactory)
-        }
-    }
-
-    private void createProjectExtension() {
-        // TODO (sherter): remove cast when future groovy version correctly infer type
+    private void createExtension() {
+        // TODO (sherter): remove cast when future groovy versions correctly infer type
         this.extension = (GoogleJavaFormatExtension) this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
     }
 
@@ -68,7 +55,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         this.defaultTask = this.project.tasks.create(DEFAULT_TASK_NAME, GoogleJavaFormat)
     }
 
-    private void addDependencyForGoogleJavaFormat() {
+    private void configureConfiguration() {
         def dependency = this.project.dependencies.create(
                 group: GOOGLEJAVAFORMAT_GROUPID,
                 name: GOOGLEJAVAFORMAT_ARTIFACTID,
@@ -77,41 +64,41 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         this.config.dependencies.add(dependency)
     }
 
-    @TypeChecked(SKIP)
-    private void defineInputsForDefaultFormatTask() {
-        if (this.project.hasProperty('sourceSets')) {
-            this.project.sourceSets.all { sourceSet ->
-                this.defaultTask.source(sourceSet.java)
-            }
+    private void configureTasks() {
+        def fileStateHandler = createFileStateHandler()
+        def formatterFactory = new FormatterFactory(config, extension.toolVersion)
+        fileStateHandler.load()
+        project.gradle.buildFinished {
+            fileStateHandler.flush()
         }
+        project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat task ->
+            task.setFileStateHandler(fileStateHandler)
+            task.setFormatterFactory(formatterFactory)
+            task.exclude { FileTreeElement f -> fileStateHandler.isUpToDate(f.file) }
+        }
+        addDefaultInputsToDefaultFormatTask()
     }
 
-    private void createAndInjectFileStateHandler() {
+    private FileStateHandler createFileStateHandler() {
         // workaround; reading resources fails sometimes
         // see https://discuss.gradle.org/t/getresourceasstream-returns-null-in-plugin-in-daemon-mode/2385
         new URLConnection(new URL("file:///")) {
-            {
-                setDefaultUseCaches(false)
-            }
-            @Override
-            void connect() throws IOException {
-            }
+            { setDefaultUseCaches(false) }
+            void connect() throws IOException {}
         }
         String pluginVersion = getClass().getResourceAsStream('/VERSION').text.trim()
-        String buildCacheSubdir = "google-java-format/$pluginVersion"
-        this.fileStateHandler = new FileStateHandler(
+        String buildCacheSubDir = "google-java-format/$pluginVersion"
+        return new FileStateHandler(
                 this.project.projectDir,
-                new File(this.project.buildDir, buildCacheSubdir),
+                new File(this.project.buildDir, buildCacheSubDir),
                 this.extension.toolVersion)
-        this.project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat formatTask ->
-            formatTask.setFileStateHandler(this.fileStateHandler)
-        }
     }
 
-    private void excludeUpToDateInputs() {
-        this.project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat formatTask ->
-            formatTask.exclude { FileTreeElement e ->
-                return this.fileStateHandler.isUpToDate(e.file)
+    @TypeChecked(SKIP)
+    private void addDefaultInputsToDefaultFormatTask() {
+        if (this.project.hasProperty('sourceSets')) {
+            this.project.sourceSets.all { SourceSet sourceSet ->
+                this.defaultTask.source(sourceSet.java)
             }
         }
     }

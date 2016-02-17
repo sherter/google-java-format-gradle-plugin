@@ -1,6 +1,5 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import groovy.transform.PackageScope
 import groovy.transform.TypeChecked
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
@@ -13,18 +12,15 @@ import java.util.concurrent.TimeUnit
 class GoogleJavaFormat extends SourceTask {
 
     private static final int MAX_THREADS = 20;
-    /**
-     * The same instance will be injected into all tasks of this type
-     * (see {@link GoogleJavaFormatPlugin#createAndInjectFileStateHandler}).
-     */
+
     private FileStateHandler fileStateHandler
     private FormatterFactory formatterFactory
 
-    @PackageScope void setFileStateHandler(FileStateHandler fsh) {
+    void setFileStateHandler(FileStateHandler fsh) {
         this.fileStateHandler = fsh
     }
 
-    @PackageScope FileStateHandler getFileStateHandler() {
+    FileStateHandler getFileStateHandler() {
         return this.fileStateHandler
     }
 
@@ -46,7 +42,7 @@ class GoogleJavaFormat extends SourceTask {
         sourceFiles.each { file ->
             executor.execute {
                 try {
-                    fileStateHandler.formatIfNotUpToDate(file) {
+                    fileStateHandler.updateIfNotUpToDateAfter(file) {
                         file.write(formatter.format(file.text))
                     }
                 } catch (FormatterException e) {

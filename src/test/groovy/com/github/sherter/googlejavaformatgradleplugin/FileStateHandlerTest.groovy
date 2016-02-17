@@ -28,22 +28,22 @@ class FileStateHandlerTest extends Specification {
         !statesFile.exists()
     }
 
-    def "second call to formatIfNotUpToDate doesn't re-format"() {
+    def "second call to updateIfNotUpToDateAfter doesn't execute action"() {
         def handler = new FileStateHandler(projectDir, buildCacheDir, 'version')
         def file = new File(projectDir, 'file')
-        file << "put something in there..."
+        file.createNewFile()
+        def changed = false
 
         when:
-        def newContent = "That's how I look like after formatting..."
-        handler.formatIfNotUpToDate(file) {
-            it.text = newContent
+        handler.updateIfNotUpToDateAfter(file) {
+            changed = true
         }
 
         then:
-        handler.formatIfNotUpToDate(file) {
+        changed == true
+        handler.updateIfNotUpToDateAfter(file) {
             assert false
         }
-        file.text == newContent
     }
 
     def "file is up-to-date after formatting"() {
@@ -58,8 +58,8 @@ class FileStateHandlerTest extends Specification {
 
         when:
         def newContent = "That's how I look like after formatting..."
-        handler.formatIfNotUpToDate(file) {
-            it.text = newContent
+        handler.updateIfNotUpToDateAfter(file) {
+            file.text = newContent
         }
 
         then:
@@ -77,7 +77,7 @@ class FileStateHandlerTest extends Specification {
         def file = new File(projectDir, 'file')
         file << "put something in there..."
         def formattedContent = "that's the right style!"
-        handler.formatIfNotUpToDate(file) {
+        handler.updateIfNotUpToDateAfter(file) {
             file.text = formattedContent
         }
         handler.flush()
@@ -101,7 +101,7 @@ class FileStateHandlerTest extends Specification {
         def file = new File(projectDir, 'file')
         file << "put something in there..."
         def formattedContent = "that's the right style!"
-        handler.formatIfNotUpToDate(file) {
+        handler.updateIfNotUpToDateAfter(file) {
             file.text = formattedContent
         }
         handler.flush()

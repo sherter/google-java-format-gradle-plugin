@@ -1,7 +1,7 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import groovy.transform.CompileStatic
-import groovy.transform.PackageScope
+import groovy.transform.Immutable
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -13,10 +13,7 @@ import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
-import static groovy.transform.PackageScopeTarget.*
-
 @CompileStatic
-@PackageScope([CLASS, CONSTRUCTORS, FIELDS, METHODS])
 class FileStateHandler {
 
     private static final Logger logger = Logging.getLogger('google-java-format')
@@ -101,11 +98,11 @@ class FileStateHandler {
         return MessageDigest.getInstance('MD5').digest(Files.readAllBytes(file))
     }
 
-    void formatIfNotUpToDate(File file, Closure formatFunction) {
+    void updateIfNotUpToDateAfter(File file, Closure action) {
         String projectRelativePath = projectRelativePath(file)
         Object putResult = formattedFiles.putIfAbsent(projectRelativePath, this)
         if (putResult == null) {
-            formatFunction.call(file)
+            action()
             Path path = Paths.get(file.absolutePath)
             fileStates.put(projectRelativePath, new FileInfo(
                     currentGoogleJavaFormatVersion,
@@ -115,18 +112,11 @@ class FileStateHandler {
         }
     }
 
-    @PackageScope([CLASS, CONSTRUCTORS])
+    @Immutable
     static class FileInfo implements Serializable {
-        private final String googleJavaFormatVersion
-        private final long fileSize
-        private final long lastModified
-        private final byte[] fileHash
-
-        FileInfo(String googleJavaFormatVersion, long fileSize, long lastModified, byte[] fileHash) {
-            this.googleJavaFormatVersion = googleJavaFormatVersion
-            this.fileSize = fileSize
-            this.lastModified = lastModified
-            this.fileHash = fileHash
-        }
+        String googleJavaFormatVersion
+        long fileSize
+        long lastModified
+        byte[] fileHash
     }
 }
