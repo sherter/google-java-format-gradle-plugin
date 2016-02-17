@@ -1,9 +1,16 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import groovy.transform.CompileStatic
+import groovy.transform.PackageScope
+import groovy.transform.TypeChecked
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.FileTreeElement
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
+@CompileStatic
 class GoogleJavaFormatPlugin implements Plugin<Project> {
     private static final String CONFIGURATION_NAME = "googleJavaFormat"
     private static final String EXTENSION_NAME = "googleJavaFormat"
@@ -11,7 +18,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
     private static final String GOOGLEJAVAFORMAT_GROUPID = "com.google.googlejavaformat"
     private static final String GOOGLEJAVAFORMAT_ARTIFACTID = "google-java-format"
-    private static final String GOOGLEJAVAFORMAT_DEFAULT_VERSION = "0.1-alpha"
+    @PackageScope static final String GOOGLEJAVAFORMAT_DEFAULT_VERSION = "0.1-alpha"
 
     private Project project
     private GoogleJavaFormatExtension extension
@@ -32,7 +39,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
             createAndInjectFormatterFactory()
             this.fileStateHandler.load()
             excludeUpToDateInputs()
-            it.gradle.buildFinished {
+            project.gradle.buildFinished {
                 this.fileStateHandler.flush()
             }
         }
@@ -40,19 +47,20 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
     private void createAndInjectFormatterFactory() {
         def formatterFactory = new FormatterFactory(config, extension.toolVersion)
-        this.project.tasks.withType(GoogleJavaFormat) { formatTask ->
+        this.project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat formatTask ->
             formatTask.setFormatterFactory(formatterFactory)
         }
     }
 
     private void createProjectExtension() {
-        this.extension = this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
+        // TODO (sherter): remove cast when future groovy version correctly infer type
+        this.extension = (GoogleJavaFormatExtension) this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
     }
 
     private void createConfiguration() {
-        this.config = this.project.configurations.create(CONFIGURATION_NAME) {
-            visible = false
-            transitive = true
+        this.config = this.project.configurations.create(CONFIGURATION_NAME) { Configuration c ->
+            c.visible = false
+            c.transitive = true
         }
     }
 
@@ -69,6 +77,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         this.config.dependencies.add(dependency)
     }
 
+    @TypeChecked(SKIP)
     private void defineInputsForDefaultFormatTask() {
         if (this.project.hasProperty('sourceSets')) {
             this.project.sourceSets.all { sourceSet ->
@@ -94,15 +103,15 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
                 this.project.projectDir,
                 new File(this.project.buildDir, buildCacheSubdir),
                 this.extension.toolVersion)
-        this.project.tasks.withType(GoogleJavaFormat) { formatTask ->
+        this.project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat formatTask ->
             formatTask.setFileStateHandler(this.fileStateHandler)
         }
     }
 
     private void excludeUpToDateInputs() {
-        this.project.tasks.withType(GoogleJavaFormat) { formatTask ->
-            formatTask.exclude { fileTreeElement ->
-                return this.fileStateHandler.isUpToDate(fileTreeElement.file)
+        this.project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat formatTask ->
+            formatTask.exclude { FileTreeElement e ->
+                return this.fileStateHandler.isUpToDate(e.file)
             }
         }
     }

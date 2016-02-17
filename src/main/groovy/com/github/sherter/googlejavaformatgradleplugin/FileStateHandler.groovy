@@ -1,5 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentMap
 
 import static groovy.transform.PackageScopeTarget.*
 
+@CompileStatic
 @PackageScope([CLASS, CONSTRUCTORS, FIELDS, METHODS])
 class FileStateHandler {
 
@@ -38,8 +40,8 @@ class FileStateHandler {
             return
         }
         try {
-            statesFile.withObjectInputStream(getClass().classLoader) { ois ->
-                def deserializedObject = ois.readObject()
+            statesFile.withObjectInputStream(getClass().classLoader) { ObjectInputStream ois ->
+                def deserializedObject = (Map<String, FileInfo>) ois.readObject()
                 this.fileStates.putAll(deserializedObject)
             }
         } catch (IOException e) {
