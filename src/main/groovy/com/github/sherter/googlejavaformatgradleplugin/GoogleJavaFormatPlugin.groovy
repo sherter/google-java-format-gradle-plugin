@@ -29,11 +29,19 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
             addDependencyForGoogleJavaFormat()
             defineInputsForDefaultFormatTask()
             createAndInjectFileStateHandler()
+            createAndInjectFormatterFactory()
             this.fileStateHandler.load()
             excludeUpToDateInputs()
             it.gradle.buildFinished {
                 this.fileStateHandler.flush()
             }
+        }
+    }
+
+    private void createAndInjectFormatterFactory() {
+        def formatterFactory = new FormatterFactory(config, extension.toolVersion)
+        this.project.tasks.withType(GoogleJavaFormat) { formatTask ->
+            formatTask.setFormatterFactory(formatterFactory)
         }
     }
 
