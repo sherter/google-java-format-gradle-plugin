@@ -1,0 +1,115 @@
+= google-java-format-gradle-plugin
+:release-version: 0.1
+:default-google-java-format-version: 0.1-SNAPSHOT
+:snapshot-version: 0.2-SNAPSHOT
+
+
+This https://github.com/gradle/gradle[Gradle] plugin uses
+https://github.com/google/google-java-format[google-java-format] to
+reformat the Java source files in your gradle project.
+
+image:https://travis-ci.org/sherter/google-java-format-gradle-plugin.svg?branch=master["Build
+Status",
+link="https://travis-ci.org/sherter/google-java-format-gradle-plugin"]
+
+== Quick Start
+* Apply the plugin in your build script
++
+[source,groovy]
+[subs="attributes"]
+----
+// Gradle version 2.1 and up
+plugins {
+  id 'com.github.sherter.google-java-format' version '{release-version}'
+}
+----
++
+[source,groovy]
+[subs="attributes"]
+----
+// Gradle version 2.0 and up
+buildscript {
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'gradle.plugin.com.github.sherter.googlejavaformat:google-java-format:{release-version}'
+  }
+}
+
+apply plugin: 'com.github.sherter.google-java-format'
+----
++
+
+* Execute the task `googleJavaFormat` to format files which are in a
+  Java source set
++
+[source,shell]
+----
+$ ./gradlew googleJavaFormat
+----
+
+== Snapshots
+On every push to the master branch https://travis-ci.org/[Travis] runs
+the tests and, if all tests pass, publishes the built artifact to
+https://oss.sonatype.org/content/repositories/snapshots/[Sonatype's
+`snapshots` repository]. Use the following build script snippet for
+the current snapshot version:
+
+[source,groovy]
+[subs="attributes"]
+----
+buildscript {
+  repositories {
+    maven {
+      url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+  }
+  dependencies {
+    classpath 'com.github.sherter.googlejavaformatgradleplugin:google-java-format-gradle-plugin:{snapshot-version}'
+  }
+}
+
+apply plugin: 'com.github.sherter.google-java-format'
+----
+
+== Configuration
+* The plugin will add a dependency for google-java-format to your
+  project in a separate configuration. However, it does _not_ define
+  where to look for it. You can choose where `google-java-format` and
+  its transitive dependencies should come from by adding appropriate
+  repositories:
++
+[source,groovy]
+[subs="attributes"]
+----
+repositories {
+  jcenter()
+
+  // if you compiled google-java-format by yourself
+  mavenLocal()
+
+  // if you want to use snapshots from sonatype's snapshots repository
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+  }
+}
+----
+
+* You can specify the version of `google-java-format` that is used to
+format your source files:
++
+[source,groovy]
+[subs="attributes"]
+----
+googleJavaFormat {
+  toolVersion '0.1-alpha'
+}
+----
++
+On every release of this plugin, the default `toolVersion` will be
+updated to the latest version of `google-java-format`. For
+plugin version `{release-version}` the default `toolVersion` is
+`{default-google-java-format-version}`.
