@@ -206,4 +206,32 @@ class IntegrationTest extends Specification {
         result.output.contains('BUILD SUCCESSFUL')
         sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/custom"))
     }
+
+    def "invalid input (incorrect java syntax)"() {
+        given:
+        buildFile << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                maven {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                }
+                jcenter()
+            }
+
+            tasks."${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME}" {
+                source file('Invalid.java')
+            }
+            """
+        def inputFile = new File(projectDir, 'Invalid.java')
+        inputFile.createNewFile()
+        inputFile << "<< -.- \$asd\$This is not a valid java class!"
+
+        when:
+        def result = runner.build()
+
+        then:
+        result.output.contains("$inputFile is not a valid Java source file")
+    }
 }

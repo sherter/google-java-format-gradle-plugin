@@ -60,9 +60,9 @@ class FormatterFactory {
                 } catch(e) {
                     Collection<ErrorInfo> errors = e.diagnostics().collect { diagnostic ->
                         return new ErrorInfo(
-                                line: diagnostic.@lineNumber,
-                                column: diagnostic.@column,
-                                message: diagnostic.@message)
+                                diagnostic.@lineNumber,
+                                diagnostic.@column,
+                                diagnostic.@message)
                     }
                     throw new FormatterException(errors)
                 }
