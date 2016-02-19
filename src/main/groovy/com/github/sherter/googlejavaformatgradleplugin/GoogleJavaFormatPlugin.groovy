@@ -5,8 +5,11 @@ import groovy.transform.PackageScope
 import groovy.transform.TypeChecked
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSet
 
 import static groovy.transform.TypeCheckingMode.SKIP
@@ -35,7 +38,13 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             configureConfiguration()
-            configureTasks()
+        }
+
+        project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+            def formatTasks = graph.allTasks.findResults { Task task ->
+                task instanceof GoogleJavaFormat ? (GoogleJavaFormat) task : null
+            }
+            configureTasks(formatTasks)
         }
     }
 
@@ -64,19 +73,26 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         this.config.dependencies.add(dependency)
     }
 
-    private void configureTasks() {
+    private void configureTasks(Collection<GoogleJavaFormat> formatTasks) {
+        if (formatTasks.size() == 0) {
+            return
+        }
         def fileStateHandler = createFileStateHandler()
         def formatterFactory = new FormatterFactory(config, extension.toolVersion)
         fileStateHandler.load()
         project.gradle.buildFinished {
             fileStateHandler.flush()
         }
-        project.tasks.withType(GoogleJavaFormat) { GoogleJavaFormat task ->
+        for (def task : formatTasks) {
             task.setFileStateHandler(fileStateHandler)
             task.setFormatterFactory(formatterFactory)
             task.exclude { FileTreeElement f -> fileStateHandler.isUpToDate(f.file) }
+            if (task.name == DEFAULT_TASK_NAME) {
+                for (def sourceSet : javaSourceSets()) {
+                    task.source(sourceSet)
+                }
+            }
         }
-        addDefaultInputsToDefaultFormatTask()
     }
 
     private FileStateHandler createFileStateHandler() {
@@ -95,11 +111,12 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     @TypeChecked(SKIP)
-    private void addDefaultInputsToDefaultFormatTask() {
-        if (this.project.hasProperty('sourceSets')) {
-            this.project.sourceSets.all { SourceSet sourceSet ->
-                this.defaultTask.source(sourceSet.java)
-            }
+    private Collection<SourceDirectorySet> javaSourceSets() {
+        if (!this.project.hasProperty('sourceSets')) {
+            return []
+        }
+        return this.project.sourceSets.collect { SourceSet sourceSet ->
+            sourceSet.java
         }
     }
 }
