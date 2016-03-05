@@ -9,34 +9,13 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
-class IntegrationTest extends Specification {
+class IntegrationTest extends AbstractIntegrationTest {
 
     @Shared File sampleProject = new File('src/integTest/resources/project')
 
-    @Rule TemporaryFolder temporaryFolder
-    File projectDir
-    File buildFile
-    GradleRunner runner
-
-    def setup() {
-        projectDir = temporaryFolder.root
-        buildFile = new File(projectDir, 'build.gradle')
-        buildFile << """
-            buildscript {
-                repositories {
-                    mavenLocal()
-                }
-                dependencies {
-                    classpath group:   'com.github.sherter.googlejavaformatgradleplugin',
-                              name:    'google-java-format-gradle-plugin',
-                              version: '${GoogleJavaFormatPlugin.PLUGIN_VERSION}'
-                }
-            }
-            """
-        runner = GradleRunner.create()
-                .withGradleVersion('2.0')
-                .withProjectDir(projectDir)
-                .withArguments(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME, '--stacktrace')
+    @Override
+    void customSetup() {
+        runner.withArguments(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME, '--stacktrace')
     }
 
     def "apply plugin to project with no source sets"() {
