@@ -2,6 +2,7 @@ plugins {
     id 'groovy'
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.1'
+    id 'idea'
 }
 
 version = file('src/main/resources/VERSION').text.trim()
@@ -87,3 +88,5 @@ if (version.endsWith('-SNAPSHOT')) {
         }
     }
 }
+
+idea.module.scopes.TEST.plus += [ configurations.integTestCompile ]
