@@ -60,7 +60,8 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         def result = runner.build()
 
         then:
-        result.output.contains(":$customTaskName\n\nBUILD SUCCESSFUL")
+        result.output.contains(":$customTaskName\n")
+        result.output.contains('BUILD SUCCESSFUL\n')
     }
 
     def 'report badly formatted input source file'() {
