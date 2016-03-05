@@ -1,7 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import groovy.transform.TypeChecked
-import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.Executor
@@ -9,19 +8,10 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 @TypeChecked
-class GoogleJavaFormat extends SourceTask {
+class GoogleJavaFormat extends SourceStateTask {
 
     private static final int MAX_THREADS = 20;
 
-    private FileStateHandler fileStateHandler
-
-    void setFileStateHandler(FileStateHandler fsh) {
-        this.fileStateHandler = fsh
-    }
-
-    FileStateHandler getFileStateHandler() {
-        return this.fileStateHandler
-    }
 
     @TaskAction
     void formatSources() {

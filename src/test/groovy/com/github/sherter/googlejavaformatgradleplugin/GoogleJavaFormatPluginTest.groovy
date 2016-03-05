@@ -17,6 +17,13 @@ class GoogleJavaFormatPluginTest extends Specification {
         project.extensions.findByType(GoogleJavaFormatExtension) != null
 
         and: "format task exists"
-        project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_TASK_NAME) != null
+        def formatTask = project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME)
+        formatTask != null
+        formatTask instanceof GoogleJavaFormat
+
+        and: "verify task exists"
+        def verifyTask = project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_VERIFY_TASK_NAME)
+        verifyTask != null
+        verifyTask instanceof VerifyGoogleJavaFormat
     }
 }

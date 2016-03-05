@@ -36,7 +36,7 @@ class IntegrationTest extends Specification {
         runner = GradleRunner.create()
                 .withGradleVersion('2.0')
                 .withProjectDir(projectDir)
-                .withArguments(GoogleJavaFormatPlugin.DEFAULT_TASK_NAME, '--stacktrace')
+                .withArguments(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME, '--stacktrace')
     }
 
     def "apply plugin to project with no source sets"() {
@@ -48,7 +48,7 @@ class IntegrationTest extends Specification {
         def result = runner.build()
 
         then: "no files have changed"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
         result.output.contains('BUILD SUCCESSFUL')
         sameFilesExistAndHaveSameContent(sampleProject)
     }
@@ -104,20 +104,20 @@ class IntegrationTest extends Specification {
         def result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "source files are added"
         new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "task is executed again"
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "new java source file is added and task is executed"
         def newSource = new File(projectDir, 'src/main/java/NewJavaSource.java')
@@ -125,20 +125,20 @@ class IntegrationTest extends Specification {
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "file was changed"
         newSource << "class NewJavaSource {}"
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "nothing has changed"
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "formatter tool version has changed"
         buildFile << """
@@ -149,13 +149,13 @@ class IntegrationTest extends Specification {
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "nothing has changed"
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
     }
 
     def "include and exclude sources"() {
@@ -168,7 +168,7 @@ class IntegrationTest extends Specification {
             repositories {
                 jcenter()
             }
-            tasks.${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME} {
+            tasks.${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} {
                 source 'src'
                 include '**/*.java'
                 exclude '**/Bar.java'
@@ -220,7 +220,7 @@ class IntegrationTest extends Specification {
                 jcenter()
             }
 
-            tasks."${GoogleJavaFormatPlugin.DEFAULT_TASK_NAME}" {
+            tasks."${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME}" {
                 source file('Invalid.java')
             }
             """
@@ -233,5 +233,25 @@ class IntegrationTest extends Specification {
 
         then:
         result.output.contains("$inputFile is not a valid Java source file")
+    }
+
+    def 'report unformatted java sources'() {
+        given: "a java project with java plugin applied"
+        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
+        buildFile << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                jcenter()
+            }
+            """
+
+        when:
+        def result = runner.withArguments(GoogleJavaFormatPlugin.DEFAULT_VERIFY_TASK_NAME)
+                .buildAndFail()
+
+        then:
+        result.output.contains('Bar.java')
     }
 }

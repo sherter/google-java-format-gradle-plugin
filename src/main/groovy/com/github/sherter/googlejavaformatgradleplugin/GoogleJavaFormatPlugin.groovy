@@ -30,23 +30,25 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private static final String EXTENSION_NAME = 'googleJavaFormat'
-    private static final String DEFAULT_TASK_NAME = 'googleJavaFormat'
+    private static final String DEFAULT_FORMAT_TASK_NAME = 'googleJavaFormat'
+    private static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
 
     private Project project
     private GoogleJavaFormatExtension extension
-    private GoogleJavaFormat defaultTask
+    private GoogleJavaFormat defaultFormatTask
 
     @Override
     void apply(Project project) {
         this.project = project
         createExtension()
         createDefaultFormatTask()
+        createDefaultVerifyTask()
 
         project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-            def formatTasks = graph.allTasks.findResults { Task task ->
-                task instanceof GoogleJavaFormat ? (GoogleJavaFormat) task : null
+            def tasks = graph.allTasks.findResults { Task task ->
+                task instanceof SourceStateTask ? (SourceStateTask) task : null
             }
-            configureTasks(formatTasks)
+            configureTasks(tasks)
         }
     }
 
@@ -57,12 +59,17 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
 
     private void createDefaultFormatTask() {
-        this.defaultTask = this.project.tasks.create(DEFAULT_TASK_NAME, GoogleJavaFormat)
+        this.defaultFormatTask = this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
     }
 
 
-    private void configureTasks(Collection<GoogleJavaFormat> formatTasks) {
-        if (formatTasks.size() == 0) {
+    private void createDefaultVerifyTask() {
+        this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+    }
+
+
+    private void configureTasks(Collection<SourceStateTask> tasks) {
+        if (tasks.size() == 0) {
             return
         }
         def fileStateHandler = createFileStateHandler()
@@ -70,10 +77,10 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         project.gradle.buildFinished {
             fileStateHandler.flush()
         }
-        for (def task : formatTasks) {
+        for (def task : tasks) {
             task.setFileStateHandler(fileStateHandler)
             task.exclude { FileTreeElement f -> fileStateHandler.isUpToDate(f.file) }
-            if (task.name == DEFAULT_TASK_NAME) {
+            if (task.name == DEFAULT_FORMAT_TASK_NAME || task.name == DEFAULT_VERIFY_TASK_NAME) {
                 for (def sourceSet : javaSourceSets()) {
                     task.source(sourceSet)
                 }
