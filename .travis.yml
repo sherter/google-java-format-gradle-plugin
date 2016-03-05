@@ -21,11 +21,11 @@ install:
 
 script:
   # run tests against multiple jdk variants, but use artifact from install step
-  - ./gradlew check --exclude-task publishToMavenLocal
+  - ./gradlew check -i --exclude-task publishToMavenLocal
   - jdk_switcher use oraclejdk8
-  - ./gradlew check --exclude-task publishToMavenLocal
+  - ./gradlew check -i --exclude-task publishToMavenLocal
   - jdk_switcher use openjdk7
-  - ./gradlew check --exclude-task publishToMavenLocal
+  - ./gradlew check -i --exclude-task publishToMavenLocal
 
 before_deploy:
   # back to oraclejdk7; makes sure we publish what we actually tested
