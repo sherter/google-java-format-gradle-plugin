@@ -49,6 +49,7 @@ task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
 }
 
 check.dependsOn integrationTest
+integrationTest.mustRunAfter test
 
 //TODO(sherter): When ready to release next version configure travis to publish it (secure env)
 pluginBundle {
