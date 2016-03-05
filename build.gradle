@@ -46,7 +46,6 @@ task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
     group 'Verification'
     testClassesDir = sourceSets.integTest.output.classesDir
     classpath = sourceSets.integTest.runtimeClasspath
-    systemProperty 'plugin-version', version
 }
 
 check.dependsOn integrationTest

@@ -29,7 +29,7 @@ class IntegrationTest extends Specification {
                 dependencies {
                     classpath group:   'com.github.sherter.googlejavaformatgradleplugin',
                               name:    'google-java-format-gradle-plugin',
-                              version: '${System.getProperty('plugin-version')}'
+                              version: '${GoogleJavaFormatPlugin.PLUGIN_VERSION}'
                 }
             }
             """

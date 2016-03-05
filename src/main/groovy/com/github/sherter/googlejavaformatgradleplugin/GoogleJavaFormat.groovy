@@ -14,7 +14,6 @@ class GoogleJavaFormat extends SourceTask {
     private static final int MAX_THREADS = 20;
 
     private FileStateHandler fileStateHandler
-    private FormatterFactory formatterFactory
 
     void setFileStateHandler(FileStateHandler fsh) {
         this.fileStateHandler = fsh
@@ -24,17 +23,10 @@ class GoogleJavaFormat extends SourceTask {
         return this.fileStateHandler
     }
 
-    void setFormatterFactory(FormatterFactory factory) {
-        formatterFactory = factory
-    }
-
-    FormatterFactory getFormatterFactory() {
-        return formatterFactory
-    }
-
     @TaskAction
     void formatSources() {
-        Formatter formatter = formatterFactory.create()
+        String toolVersion = project.extensions.getByType(GoogleJavaFormatExtension).toolVersion
+        Formatter formatter = new FormatterFactory(project, logger).create(toolVersion)
         Set<File> sourceFiles = getSource().getFiles()
         int numThreads = Math.min(sourceFiles.size(), MAX_THREADS)
         Executor executor = Executors.newFixedThreadPool(numThreads)

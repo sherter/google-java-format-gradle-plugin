@@ -3,55 +3,56 @@ package com.github.sherter.googlejavaformatgradleplugin
 import com.github.sherter.googlejavaformatgradleplugin.FormatterException.ErrorInfo
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
 @CompileStatic
 class FormatterFactory {
 
-    private static final Logger logger = Logging.getLogger(GoogleJavaFormatPlugin.class)
+    static final String GOOGLEJAVAFORMAT_GROUPID = 'com.google.googlejavaformat'
+    static final String GOOGLEJAVAFORMAT_ARTIFACTID = 'google-java-format'
 
-    private final Configuration configuration;
-    private final String toolVersion
-    private ClassLoader classLoader;
-    private final Object lock = new Object();
 
-    FormatterFactory(Configuration configuration, String toolVersion) {
-        this.configuration = configuration
-        this.toolVersion = toolVersion
+    private final Project project
+    private final Logger logger
+
+    FormatterFactory(Project project, Logger logger) {
+        this.project = Objects.requireNonNull(project)
+        this.logger = Objects.requireNonNull(logger)
     }
 
-    private ClassLoader getClassLoader() {
-        synchronized(lock) {
-            if (classLoader == null) {
-                // if not already present, resolve() will also try to download the artifacts
-                Set<File> artifacts = configuration.resolve()
-                List<URL> urls = artifacts.collect { it.toURI().toURL() }
-                this.classLoader = new URLClassLoader(urls as URL[])
-            }
+    Formatter create(String toolVersion) throws ResolveException {
+        Objects.requireNonNull(toolVersion)
+        def configuration = setupConfiguration(toolVersion)
+        def classpath = configuration.resolve()
+        def classLoader = new URLClassLoader(classpath.collect { it.toURI().toURL() } as URL[], (ClassLoader)null)
+        boolean versionIsSupported = toolVersion in GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_VERSIONS
+        if (!versionIsSupported) {
+            logger.warn('Version {} of google-java-format-gradle-plugin is not tested against version {} of ' +
+                    'google-java-format. This should not be a problem if the task is executed without failures.',
+                    GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }
-        return classLoader;
+        return defaultFormatter(classLoader)
     }
 
-
-    Formatter create() {
-        def googleFormatter = getClassLoader().loadClass('com.google.googlejavaformat.java.Formatter').newInstance()
-        switch (toolVersion) {
-            case '0.1-alpha':
-                return defaultFormatter(googleFormatter)
-            default:
-                logger.warn('Version "{}" of google-java-format is not officially supported. ' +
-                        'If the API is the same as in version "{}" everything should be fine though.',
-                        toolVersion, '0.1-alpha')
-                return defaultFormatter(googleFormatter)
-        }
+    private Configuration setupConfiguration(String toolVersion) {
+        def configuration = project.configurations.maybeCreate("googleJavaFormat$toolVersion");
+        def dependency = project.dependencies.create(
+                group: GOOGLEJAVAFORMAT_GROUPID,
+                name: GOOGLEJAVAFORMAT_ARTIFACTID,
+                version: toolVersion
+        )
+        configuration.dependencies.add(dependency)
+        return configuration
     }
 
     @TypeChecked(SKIP)
-    private Formatter defaultFormatter(def formatter) {
+    private Formatter defaultFormatter(ClassLoader classLoader) {
+        def formatter = classLoader.loadClass('com.google.googlejavaformat.java.Formatter').newInstance()
         return new Formatter() {
             @Override
             String format(String source) throws FormatterException {
@@ -59,10 +60,7 @@ class FormatterFactory {
                     return formatter.formatSource(source)
                 } catch(e) {
                     Collection<ErrorInfo> errors = e.diagnostics().collect { diagnostic ->
-                        return new ErrorInfo(
-                                diagnostic.@lineNumber,
-                                diagnostic.@column,
-                                diagnostic.@message)
+                        new ErrorInfo(diagnostic.@lineNumber, diagnostic.@column, diagnostic.@message)
                     }
                     throw new FormatterException(errors)
                 }

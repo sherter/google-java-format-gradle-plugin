@@ -5,6 +5,6 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class GoogleJavaFormatExtension {
 
-    String toolVersion = GoogleJavaFormatPlugin.@GOOGLEJAVAFORMAT_DEFAULT_VERSION
+    String toolVersion = '0.1-alpha'
 
 }

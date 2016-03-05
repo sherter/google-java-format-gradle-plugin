@@ -18,35 +18,5 @@ class GoogleJavaFormatPluginTest extends Specification {
 
         and: "format task exists"
         project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_TASK_NAME) != null
-
-        and: "google-java-format dependency exists"
-        project.configurations.getByName(GoogleJavaFormatPlugin.CONFIGURATION_NAME).dependencies.find {
-            it.group == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_GROUPID
-            it.name == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_ARTIFACTID
-            it.version == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_DEFAULT_VERSION
-        } != null
-    }
-
-    def "define google-java-format tool version"() {
-        def project = ProjectBuilder.builder().build()
-        project.with {
-            apply plugin: GoogleJavaFormatPlugin
-            "${GoogleJavaFormatPlugin.EXTENSION_NAME}" {
-                toolVersion = expectedVersion
-            }
-        }
-
-        when:
-        project.evaluate()
-
-        then:
-        project.configurations.getByName(GoogleJavaFormatPlugin.CONFIGURATION_NAME).dependencies.find {
-            it.group == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_GROUPID
-            it.name == GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_ARTIFACTID
-            it.version == expectedVersion
-        } != null
-
-        where:
-        expectedVersion << ['1.0', '0.1', '0.1-alpha']
     }
 }
