@@ -65,16 +65,17 @@ pluginBundle {
     }
 }
 
-if (version.endsWith('-SNAPSHOT')) {
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                groupId 'com.github.sherter.googlejavaformatgradleplugin'
-                artifactId 'google-java-format-gradle-plugin'
 
-                from components.java
-            }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.github.sherter.googlejavaformatgradleplugin'
+            artifactId 'google-java-format-gradle-plugin'
+
+            from components.java
         }
+    }
+    if (version.endsWith('-SNAPSHOT')) {
         repositories {
             maven {
                 name = 'SonatypeSnapshot'
