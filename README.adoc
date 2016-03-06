@@ -44,8 +44,8 @@ apply plugin: 'com.github.sherter.google-java-format'
 +
 
 * Execute the task `googleJavaFormat` to format all `*.java` files in
-  the project or any sub project (excluding files in
-  `buildDir`s). Execute `verifyGoogleJavaFormat` to check whether the
+  the project or any sub project (excluding files which are in a
+  `buildDir` ). Execute `verifyGoogleJavaFormat` to check whether the
   same set of files are formatted properly.
 +
 [source,shell]
