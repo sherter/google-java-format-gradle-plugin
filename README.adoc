@@ -43,8 +43,10 @@ apply plugin: 'com.github.sherter.google-java-format'
 ----
 +
 
-* Execute the task `googleJavaFormat` to format files which are in a
-  Java source set
+* Execute the task `googleJavaFormat` to format all `*.java` files in
+  the project or any sub project (excluding files in
+  `buildDir`s). Execute `verifyGoogleJavaFormat` to check whether the
+  same set of files are formatted properly.
 +
 [source,shell]
 ----
@@ -91,7 +93,7 @@ repositories {
   // if you compiled google-java-format by yourself
   mavenLocal()
 
-  // if you want to use snapshots from sonatype's snapshots repository
+  // if you want to use snapshots from Sonatype's snapshots repository
   maven {
     url 'https://oss.sonatype.org/content/repositories/snapshots/'
   }

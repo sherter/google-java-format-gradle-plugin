@@ -1,16 +1,12 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import groovy.transform.CompileStatic
-import groovy.transform.TypeChecked
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileTreeElement
-import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.SourceSet
-
-import static groovy.transform.TypeCheckingMode.SKIP
 
 @CompileStatic
 class GoogleJavaFormatPlugin implements Plugin<Project> {
@@ -30,19 +26,23 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private static final String EXTENSION_NAME = 'googleJavaFormat'
-    private static final String DEFAULT_FORMAT_TASK_NAME = 'googleJavaFormat'
-    private static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
+    static final String DEFAULT_FORMAT_TASK_NAME = 'googleJavaFormat'
+    static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
 
     private Project project
     private GoogleJavaFormatExtension extension
     private GoogleJavaFormat defaultFormatTask
+    private VerifyGoogleJavaFormat defaultVerifyTask
 
     @Override
     void apply(Project project) {
         this.project = project
         createExtension()
-        createDefaultFormatTask()
-        createDefaultVerifyTask()
+        createDefaultTasks()
+
+        project.afterEvaluate {
+            addInputsToDefaultTasks()
+        }
 
         project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
             def tasks = graph.allTasks.findResults { Task task ->
@@ -58,13 +58,19 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
 
-    private void createDefaultFormatTask() {
+    private void createDefaultTasks() {
         this.defaultFormatTask = this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
+        this.defaultVerifyTask = this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
     }
 
 
-    private void createDefaultVerifyTask() {
-        this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+    private void addInputsToDefaultTasks() {
+        ConfigurableFileTree javaFiles = project.fileTree(dir: project.projectDir, includes: ['**/*.java'])
+        project.allprojects { Project p ->
+            javaFiles.exclude p.buildDir.path.substring(project.projectDir.path.length() + 1)
+        }
+        defaultFormatTask.source(javaFiles)
+        defaultVerifyTask.source(javaFiles)
     }
 
 
@@ -80,11 +86,6 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         for (def task : tasks) {
             task.setFileStateHandler(fileStateHandler)
             task.exclude { FileTreeElement f -> fileStateHandler.isUpToDate(f.file) }
-            if (task.name == DEFAULT_FORMAT_TASK_NAME || task.name == DEFAULT_VERIFY_TASK_NAME) {
-                for (def sourceSet : javaSourceSets()) {
-                    task.source(sourceSet)
-                }
-            }
         }
     }
 
@@ -94,15 +95,5 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
                 this.project.projectDir,
                 new File(this.project.buildDir, buildCacheSubDir),
                 this.extension.toolVersion)
-    }
-
-    @TypeChecked(SKIP)
-    private Collection<SourceDirectorySet> javaSourceSets() {
-        if (!this.project.hasProperty('sourceSets')) {
-            return []
-        }
-        return this.project.sourceSets.collect { SourceSet sourceSet ->
-            sourceSet.java
-        }
     }
 }

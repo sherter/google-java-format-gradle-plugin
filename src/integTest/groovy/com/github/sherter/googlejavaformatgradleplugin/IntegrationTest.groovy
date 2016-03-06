@@ -18,20 +18,6 @@ class IntegrationTest extends AbstractIntegrationTest {
         runner.withArguments(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME, '--stacktrace')
     }
 
-    def "apply plugin to project with no source sets"() {
-        given: "a project where only our plugin is applied"
-        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
-        buildFile << "apply plugin: 'com.github.sherter.google-java-format'"
-
-        when: "format task is run"
-        def result = runner.build()
-
-        then: "no files have changed"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
-        result.output.contains('BUILD SUCCESSFUL')
-        sameFilesExistAndHaveSameContent(sampleProject)
-    }
-
     void sameFilesExistAndHaveSameContent(File expectedDir) {
         expectedDir.eachFileRecurse(FileType.FILES) {
             def relativePathInProject = expectedDir.toURI().relativize(it.toURI()).toString()
