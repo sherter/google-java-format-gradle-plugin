@@ -1,10 +1,9 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import org.gradle.api.GradleException
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -28,7 +27,7 @@ class VerifyGoogleJavaFormat extends SourceStateTask implements VerificationTask
         sourceFiles.each { file ->
             if (!fileStateHandler.isUpToDate(file)) {
                 executor.execute {
-                    String content = file.text
+                    String content = file.getText(StandardCharsets.UTF_8.name())
                     try {
                         if (formatter.format(content) != content) {
                             success.set(false)

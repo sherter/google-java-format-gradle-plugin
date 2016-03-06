@@ -3,6 +3,7 @@ package com.github.sherter.googlejavaformatgradleplugin
 import groovy.transform.TypeChecked
 import org.gradle.api.tasks.TaskAction
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -25,7 +26,8 @@ class GoogleJavaFormat extends SourceStateTask {
             executor.execute {
                 try {
                     fileStateHandler.updateIfNotUpToDateAfter(file) {
-                        file.write(formatter.format(file.text))
+                        def content = file.getText(StandardCharsets.UTF_8.name())
+                        file.write(formatter.format(content), StandardCharsets.UTF_8.name())
                     }
                 } catch (FormatterException e) {
                     logger.error('{} is not a valid Java source file', file)
