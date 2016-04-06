@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileTreeElement
 
 @CompileStatic
@@ -25,24 +26,18 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         this.PLUGIN_VERSION = GoogleJavaFormatPlugin.class.getResourceAsStream('/VERSION').text.trim()
     }
 
-    private static final String EXTENSION_NAME = 'googleJavaFormat'
+    static final String EXTENSION_NAME = 'googleJavaFormat'
     static final String DEFAULT_FORMAT_TASK_NAME = 'googleJavaFormat'
     static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
 
     private Project project
     private GoogleJavaFormatExtension extension
-    private GoogleJavaFormat defaultFormatTask
-    private VerifyGoogleJavaFormat defaultVerifyTask
 
     @Override
     void apply(Project project) {
         this.project = project
         createExtension()
         createDefaultTasks()
-
-        project.afterEvaluate {
-            addInputsToDefaultTasks()
-        }
 
         project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
             def tasks = graph.allTasks.findResults { Task task ->
@@ -59,18 +54,17 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
 
     private void createDefaultTasks() {
-        this.defaultFormatTask = this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
-        this.defaultVerifyTask = this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+        FileTree defaultInputs = defaultInputs()
+        this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat).setSource(defaultInputs)
+        this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat).setSource(defaultInputs)
     }
 
-
-    private void addInputsToDefaultTasks() {
+    private FileTree defaultInputs() {
         ConfigurableFileTree javaFiles = project.fileTree(dir: project.projectDir, includes: ['**/*.java'])
         project.allprojects { Project p ->
             javaFiles.exclude p.buildDir.path.substring(project.projectDir.path.length() + 1)
         }
-        defaultFormatTask.source(javaFiles)
-        defaultVerifyTask.source(javaFiles)
+        return javaFiles
     }
 
 

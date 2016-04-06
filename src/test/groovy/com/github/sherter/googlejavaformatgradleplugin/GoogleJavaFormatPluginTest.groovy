@@ -10,12 +10,13 @@ class GoogleJavaFormatPluginTest extends Specification {
         given: "a new, empty gradle project"
         def project = ProjectBuilder.builder().build()
 
-        when: "plugin is applied and project is evaluated"
+        when: "plugin is applied"
         project.apply plugin: GoogleJavaFormatPlugin
-        project.evaluate()
 
         then: "plugin extension exists"
-        project.extensions.findByType(GoogleJavaFormatExtension) != null
+        def extension = project.extensions.findByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
+        extension != null
+        extension instanceof GoogleJavaFormatExtension
 
         and: "format task exists"
         def formatTask = project.tasks.findByName(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME)
@@ -28,39 +29,49 @@ class GoogleJavaFormatPluginTest extends Specification {
         verifyTask instanceof VerifyGoogleJavaFormat
     }
 
-    def "predefined tasks' default inputs"() {
+    def 'default tasks are populated with default inputs'() {
         given:
         Project root = ProjectBuilder.builder().build()
         Project sub = ProjectBuilder.builder().withName('sub').withParent(root).build()
         Project subSub = ProjectBuilder.builder().withName('subSub').withParent(sub).build()
 
-        sub.plugins.apply(GoogleJavaFormatPlugin)
-
         sub.buildDir('foo')
         subSub.buildDir('bar')
-        File javaFile = new File('Baz.java')
+        def rootCustomDir = new File(root.projectDir, 'a/b/c')
+        def subCustomDir = new File(sub.projectDir, 'd/e/f/g')
+        def subSubCustomDir = new File(subSub.projectDir, 'h/i')
+        [sub.buildDir, subSub.buildDir, rootCustomDir, subCustomDir, subSubCustomDir].each { it.mkdirs() }
 
-        File inRoot = root.file(javaFile)
-        File inSub = sub.file(javaFile)
-        File inSubBuild = new File(sub.buildDir, javaFile.name)
-        File inSubSub = subSub.file(javaFile)
-        File inSubSubBuild = new File(subSub.buildDir, javaFile.name)
-        [sub.buildDir, subSub.buildDir].each { it.mkdirs() }
-        [inRoot, inSub, inSubBuild, inSubSub, inSubSubBuild].each { it.createNewFile() }
+        def expectedInputs =
+                [ tempJava(sub.projectDir),
+                  tempJava(subCustomDir),
+                  tempJava(subSub.projectDir),
+                  tempJava(subSubCustomDir) ] as Set
+
+        // files that must not appear as input
+        tempJava(root.projectDir)
+        tempJava(rootCustomDir)
+        tempJava(sub.buildDir)
+        tempJava(subSub.buildDir)
+        tempNonJava(root.projectDir)
+        tempNonJava(sub.projectDir)
+        tempNonJava(subCustomDir)
+        tempNonJava(subSub.projectDir)
+        tempNonJava(subSubCustomDir)
 
         when:
-        sub.evaluate()
+        sub.apply plugin: GoogleJavaFormatPlugin
 
         then:
-        def formatInputs = sub.tasks.withType(GoogleJavaFormat).first().inputs.files.files
-        def verifyInputs = sub.tasks.withType(VerifyGoogleJavaFormat).first().inputs.files.files
-        [inRoot, inSubBuild, inSubSubBuild].each {
-            assert !formatInputs.contains(it)
-            assert !verifyInputs.contains(it)
-        }
-        [inSub, inSubSub].each {
-            assert formatInputs.contains(it)
-            assert verifyInputs.contains(it)
-        }
+        expectedInputs.equals(sub.tasks.getByName(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME).inputs.files.files)
+        expectedInputs.equals(sub.tasks.getByName(GoogleJavaFormatPlugin.DEFAULT_VERIFY_TASK_NAME).inputs.files.files)
+    }
+
+    static File tempJava(File directory) {
+        return File.createTempFile('File', '.java', directory)
+    }
+
+    static File tempNonJava(File directory) {
+        return File.createTempFile('File', '.foo', directory)
     }
 }
