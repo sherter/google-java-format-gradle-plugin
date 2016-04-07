@@ -1,6 +1,8 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import groovy.transform.TypeChecked
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.charset.StandardCharsets
@@ -9,18 +11,25 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 @TypeChecked
-class GoogleJavaFormat extends SourceStateTask {
+class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
 
     private static final int MAX_THREADS = 20;
 
+    SharedContext context
+
+    @Override
+    void configure(SharedContext context) {
+        this.context = context
+        exclude { FileTreeElement f -> context.fileStateHandler().isUpToDate(f.file) }
+    }
 
     @TaskAction
     void formatSources() {
-        String toolVersion = project.extensions.getByType(GoogleJavaFormatExtension).toolVersion
-        Formatter formatter = new FormatterFactory(project, logger).create(toolVersion)
+        Formatter formatter = context.formatter()
         Set<File> sourceFiles = getSource().getFiles()
         int numThreads = Math.min(sourceFiles.size(), MAX_THREADS)
         Executor executor = Executors.newFixedThreadPool(numThreads)
+        FileStateHandler fileStateHandler = context.fileStateHandler()
 
         sourceFiles.each { file ->
             executor.execute {

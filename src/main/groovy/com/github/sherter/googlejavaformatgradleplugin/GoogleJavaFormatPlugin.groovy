@@ -29,8 +29,6 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
 
     private Project project
-    private GoogleJavaFormatExtension extension
-    private FileStateHandler fileStateHandler
 
     @Override
     void apply(Project project) {
@@ -38,18 +36,17 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         createExtension()
         createDefaultTasks()
 
-        project.gradle.taskGraph.whenReady {
-            if (graphContainsConfigurableTasks()) {
-                setupFileStateHandler()
-                configureTasksBeforeExecution()
+        SharedContext context = new SharedContext(project)
+        project.gradle.taskGraph.beforeTask { Task task ->
+            if (task instanceof ConfigurableTask) {
+                ((ConfigurableTask) task).configure(context)
             }
         }
     }
 
 
     private void createExtension() {
-        // TODO (sherter): remove cast when future groovy versions correctly infer type
-        this.extension = (GoogleJavaFormatExtension) this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
+        this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
     }
 
 
@@ -65,32 +62,5 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
             javaFiles.exclude p.buildDir.path.substring(project.projectDir.path.length() + 1)
         }
         return javaFiles
-    }
-
-
-    private boolean graphContainsConfigurableTasks() {
-        Task foundTask = project.gradle.taskGraph.allTasks.find { Task task ->
-            task instanceof ConfigurableTask
-        }
-        return foundTask != null
-    }
-
-    private void setupFileStateHandler() {
-        String buildCacheSubDir = "google-java-format/$PLUGIN_VERSION"
-        this.fileStateHandler = new FileStateHandler(
-                this.project.projectDir,
-                new File(this.project.buildDir, buildCacheSubDir),
-                this.extension.toolVersion)
-        fileStateHandler.load()
-        project.gradle.buildFinished { fileStateHandler.flush() }
-    }
-
-    private void configureTasksBeforeExecution() {
-        def context = new SharedContext(fileStateHandler)
-        project.gradle.taskGraph.beforeTask { Task task ->
-            if (task instanceof ConfigurableTask) {
-                ((ConfigurableTask) task).configure(context)
-            }
-        }
     }
 }

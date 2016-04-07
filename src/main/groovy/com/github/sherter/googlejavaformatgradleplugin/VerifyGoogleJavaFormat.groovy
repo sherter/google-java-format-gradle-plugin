@@ -1,5 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
 
@@ -9,19 +10,25 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class VerifyGoogleJavaFormat extends SourceStateTask implements VerificationTask {
+class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, ConfigurableTask {
 
     private static final int MAX_THREADS = 20;
 
     boolean ignoreFailures = false
+    SharedContext context
+
+    @Override
+    void configure(SharedContext context) {
+        this.context = context
+    }
 
     @TaskAction
     void verifySources() {
-        String toolVersion = project.extensions.getByType(GoogleJavaFormatExtension).toolVersion
-        Formatter formatter = new FormatterFactory(project, logger).create(toolVersion)
+        Formatter formatter = context.formatter()
         Set<File> sourceFiles = getSource().getFiles()
         int numThreads = Math.min(sourceFiles.size(), MAX_THREADS)
         Executor executor = Executors.newFixedThreadPool(numThreads)
+        FileStateHandler fileStateHandler = context.fileStateHandler()
 
         AtomicBoolean success = new AtomicBoolean(true)
         sourceFiles.each { file ->
