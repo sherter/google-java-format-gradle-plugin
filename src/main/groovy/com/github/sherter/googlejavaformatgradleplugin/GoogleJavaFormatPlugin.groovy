@@ -86,9 +86,10 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
     private void configureTasksBeforeExecution() {
+        def context = new SharedContext(fileStateHandler)
         project.gradle.taskGraph.beforeTask { Task task ->
             if (task instanceof ConfigurableTask) {
-                ((ConfigurableTask) task).configure(fileStateHandler)
+                ((ConfigurableTask) task).configure(context)
             }
         }
     }

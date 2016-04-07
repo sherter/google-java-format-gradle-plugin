@@ -15,8 +15,8 @@ class SourceStateTask extends SourceTask implements ConfigurableTask {
     }
 
     @Override
-    void configure(FileStateHandler fsh) {
-        setFileStateHandler(fsh)
+    void configure(SharedContext context) {
+        setFileStateHandler(context.fileStateHandler)
         exclude { FileTreeElement f -> fileStateHandler.isUpToDate(f.file) }
     }
 }
