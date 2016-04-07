@@ -4,10 +4,8 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.FileTree
-import org.gradle.api.file.FileTreeElement
 
 @CompileStatic
 class GoogleJavaFormatPlugin implements Plugin<Project> {
@@ -32,6 +30,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
     private Project project
     private GoogleJavaFormatExtension extension
+    private FileStateHandler fileStateHandler
 
     @Override
     void apply(Project project) {
@@ -39,13 +38,14 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         createExtension()
         createDefaultTasks()
 
-        project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-            def tasks = graph.allTasks.findResults { Task task ->
-                task instanceof SourceStateTask ? (SourceStateTask) task : null
+        project.gradle.taskGraph.whenReady {
+            if (graphContainsConfigurableTasks()) {
+                setupFileStateHandler()
+                configureTasksBeforeExecution()
             }
-            configureTasks(tasks)
         }
     }
+
 
     private void createExtension() {
         // TODO (sherter): remove cast when future groovy versions correctly infer type
@@ -68,26 +68,28 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     }
 
 
-    private void configureTasks(Collection<SourceStateTask> tasks) {
-        if (tasks.size() == 0) {
-            return
+    private boolean graphContainsConfigurableTasks() {
+        Task foundTask = project.gradle.taskGraph.allTasks.find { Task task ->
+            task instanceof ConfigurableTask
         }
-        def fileStateHandler = createFileStateHandler()
-        fileStateHandler.load()
-        project.gradle.buildFinished {
-            fileStateHandler.flush()
-        }
-        for (def task : tasks) {
-            task.setFileStateHandler(fileStateHandler)
-            task.exclude { FileTreeElement f -> fileStateHandler.isUpToDate(f.file) }
-        }
+        return foundTask != null
     }
 
-    private FileStateHandler createFileStateHandler() {
+    private void setupFileStateHandler() {
         String buildCacheSubDir = "google-java-format/$PLUGIN_VERSION"
-        return new FileStateHandler(
+        this.fileStateHandler = new FileStateHandler(
                 this.project.projectDir,
                 new File(this.project.buildDir, buildCacheSubDir),
                 this.extension.toolVersion)
+        fileStateHandler.load()
+        project.gradle.buildFinished { fileStateHandler.flush() }
+    }
+
+    private void configureTasksBeforeExecution() {
+        project.gradle.taskGraph.beforeTask { Task task ->
+            if (task instanceof ConfigurableTask) {
+                ((ConfigurableTask) task).configure(fileStateHandler)
+            }
+        }
     }
 }
