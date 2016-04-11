@@ -3,6 +3,8 @@ plugins {
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.1'
     id 'idea'
+    id 'com.github.sherter.google-java-format' version '0.2'
+    id 'net.ltgt.apt' version '0.6'
 }
 
 version = file('src/main/resources/VERSION').text.trim()
@@ -25,10 +27,13 @@ configurations {
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    compileOnly 'com.google.auto.value:auto-value:1.2'
+    apt         'com.google.auto.value:auto-value:1.2'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         // gradle always loads its own groovy version, which leads to conflicts
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
+    testCompile 'com.google.jimfs:jimfs:1.1'
     integTestCompile gradleTestKit()
     integTestCompile sourceSets.main.output
 }
@@ -46,6 +51,10 @@ task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
     group 'Verification'
     testClassesDir = sourceSets.integTest.output.classesDir
     classpath = sourceSets.integTest.runtimeClasspath
+}
+
+tasks.googleJavaFormat {
+    exclude 'src/integTest/resources'
 }
 
 check.dependsOn integrationTest
