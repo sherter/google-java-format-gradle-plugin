@@ -4,6 +4,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOError;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -25,7 +27,8 @@ class FileInfoDecoder {
    *
    * @throws IOError if {@code basePath} is not absolute and {@link Path#toAbsolutePath()} fails
    */
-  FileInfoDecoder(Path basePath) {
+  @Inject
+  FileInfoDecoder(@Named("base path") Path basePath) {
     this.basePath = Objects.requireNonNull(basePath).toAbsolutePath().normalize();
   }
 

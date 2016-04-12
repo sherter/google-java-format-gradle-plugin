@@ -2,7 +2,7 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Multimaps;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -11,12 +11,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Map files to their {@link FileState}. Designed for concurrent use in multiple threads.
  */
-class FileToStateMapper {
+class FileToStateMapper implements Iterable<FileInfo> {
 
   private static final Logger log = Logging.getLogger(FileToStateMapper.class);
 
@@ -100,5 +102,15 @@ class FileToStateMapper {
       }
       return existingResult;
     }
+  }
+
+  /**
+   * Returns a "weakly consistent", unmodifiable iterator that will never throw {@link ConcurrentModificationException},
+   * and guarantees to traverse elements as they existed upon construction of the iterator,
+   * and may (but is not guaranteed to) reflect any modifications subsequent to construction.
+   */
+  @Override
+  public Iterator<FileInfo> iterator() {
+    return Iterators.unmodifiableIterator(infoCache.values().iterator());
   }
 }

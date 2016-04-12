@@ -2,6 +2,8 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.google.common.base.Joiner;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOError;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -23,7 +25,8 @@ class FileInfoEncoder {
    *
    * @throws IOError if {@code basePath} is not absolute and {@link Path#toAbsolutePath()} fails
    */
-  FileInfoEncoder(Path basePath) {
+  @Inject
+  FileInfoEncoder(@Named("base path") Path basePath) {
     this.basePath = Objects.requireNonNull(basePath).toAbsolutePath().normalize();
   }
 

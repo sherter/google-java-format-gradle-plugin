@@ -5,6 +5,7 @@ plugins {
     id 'idea'
     id 'com.github.sherter.google-java-format' version '0.2'
     id 'net.ltgt.apt' version '0.6'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
 version = file('src/main/resources/VERSION').text.trim()
@@ -22,11 +23,16 @@ sourceSets {
 
 configurations {
     integTestCompile.extendsFrom testCompile
+    bundle
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    bundle      'com.google.dagger:dagger:2.3'
+    compile     'com.google.dagger:dagger:2.3'
+    apt         'com.google.guava:guava:19.0' // workaround https://github.com/tbroyer/gradle-apt-plugin/issues/22
+    apt         'com.google.dagger:dagger-compiler:2.3'
     compileOnly 'com.google.auto.value:auto-value:1.2'
     apt         'com.google.auto.value:auto-value:1.2'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
@@ -36,6 +42,14 @@ dependencies {
     testCompile 'com.google.jimfs:jimfs:1.1'
     integTestCompile gradleTestKit()
     integTestCompile sourceSets.main.output
+}
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+task shadedJar(type: ShadowJar) {
+    configurations = [project.configurations.bundle]
+    relocate('dagger', 'com.github.sherter.googlejavaformat.dagger')
+    from(sourceSets.main.output)
+    exclude('META-INF/maven/**/*')
 }
 
 task wrapper(type: Wrapper) {
@@ -81,7 +95,7 @@ publishing {
             groupId 'com.github.sherter.googlejavaformatgradleplugin'
             artifactId 'google-java-format-gradle-plugin'
 
-            from components.java
+            artifact tasks.shadedJar
         }
     }
     if (version.endsWith('-SNAPSHOT')) {

@@ -3,6 +3,8 @@ package com.github.sherter.googlejavaformatgradleplugin;
 import com.google.common.collect.ImmutableSet;
 import org.gradle.api.logging.Logger;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -30,7 +32,12 @@ class FileInfoStore {
   private Map<Path, FileInfo> readCache;
   private FileChannel channel;
 
-  FileInfoStore(Logger logger, Path path, FileInfoEncoder encoder, FileInfoDecoder decoder) {
+  @Inject
+  FileInfoStore(
+      Logger logger,
+      @Named("storage") Path path,
+      FileInfoEncoder encoder,
+      FileInfoDecoder decoder) {
     this.log = Objects.requireNonNull(logger);
     this.path = Objects.requireNonNull(path).toAbsolutePath().normalize();
     this.encoder = Objects.requireNonNull(encoder);
