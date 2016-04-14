@@ -17,17 +17,21 @@ class VerifyFileCallable implements Callable<FileInfo> {
   }
 
   @Override
-  public FileInfo call() throws Exception {
-    byte[] content = Files.readAllBytes(file);
-    String utf8Decoded = new String(content, StandardCharsets.UTF_8.name());
-    String formatted;
-    FileState state;
+  public FileInfo call() throws PathException {
     try {
-      formatted = formatter.format(utf8Decoded);
-      state = formatted.equals(utf8Decoded) ? FileState.FORMATTED : FileState.UNFORMATTED;
-    } catch (FormatterException e) {
-      state = FileState.INVALID;
+      byte[] content = Files.readAllBytes(file);
+      String utf8Decoded = new String(content, StandardCharsets.UTF_8.name());
+      String formatted;
+      FileState state;
+      try {
+        formatted = formatter.format(utf8Decoded);
+        state = formatted.equals(utf8Decoded) ? FileState.FORMATTED : FileState.UNFORMATTED;
+      } catch (FormatterException e) {
+        state = FileState.INVALID;
+      }
+      return FileInfo.create(file, Files.getLastModifiedTime(file), content.length, state);
+    } catch (Throwable t) {
+      throw new PathException(file, t);
     }
-    return FileInfo.create(file, Files.getLastModifiedTime(file), content.length, state);
   }
 }

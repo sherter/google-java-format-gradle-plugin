@@ -18,7 +18,8 @@ class VerifyFileCallableTest extends Specification {
         task.call()
 
         then:
-        NoSuchFileException e = thrown()
+        PathException e = thrown()
+        e.getCause() instanceof NoSuchFileException
         0 * formatter.format(_)
     }
 

@@ -1,6 +1,7 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import com.google.common.collect.ImmutableList
+import com.google.common.base.Joiner
+import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
@@ -8,77 +9,101 @@ import org.gradle.api.tasks.VerificationTask
 
 import java.nio.file.Path
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 
+import static com.github.sherter.googlejavaformatgradleplugin.FileState.*
+import static com.github.sherter.googlejavaformatgradleplugin.Utils.toPaths
+
+@CompileStatic
 class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, ConfigurableTask {
 
     boolean ignoreFailures = false
+
     SharedContext sharedContext
-    List<Path> formattedFiles
-    List<Path> unformattedFiles
-    List<Path> invalidFiles
-    ImmutableList<Path> filteredSources
-    int fileSystemFailures = 0
+
 
     @Override
     void configure(SharedContext context) {
         this.sharedContext = context
-        def sources = getSource().getFiles()
-        if (sources.size() == 0) {
-            return // task will be skipped (@SkipWhenEmpty in SourceTask)
-        }
-        def mapping = context.mapper().reverseMap(Utils.toPaths(sources))
-        formattedFiles = new ArrayList<>(mapping.get(FileState.FORMATTED))
-        unformattedFiles = new ArrayList<>(mapping.get(FileState.UNFORMATTED))
-        invalidFiles = new ArrayList<>(mapping.get(FileState.INVALID))
-        filteredSources = mapping.get(FileState.UNKNOWN)
     }
 
     @TaskAction
     void verifySources() {
-        if (filteredSources.size() > 0) {
-            computeStatesAndAddToLists()
+        def mapping = sharedContext.mapper().reverseMap(toPaths(getSource().files))
+
+        def formatted = new ArrayList<Path>(mapping.get(FORMATTED))
+        def unformatted = new ArrayList<Path>(mapping.get(UNFORMATTED))
+        def invalid = new ArrayList<Path>(mapping.get(INVALID))
+
+        def successful = processUnknown(mapping.get(UNKNOWN), formatted, unformatted, invalid)
+        formatted.each { Path p ->
+            logger.info('{}: verified proper formatting', p)
+        }
+        if (unformatted.size() > 0) {
+            logger.lifecycle('\n\nThe following files are not formatted properly:\n')
+            unformatted.each { Path file ->
+                logger.lifecycle(file.toString())
+            }
+        }
+        if (invalid.size() > 0) {
+            logger.lifecycle('\n\nDetected Java syntax errors in the following files ({} "{}" {}):\n',
+                    'you can configure this task to exclude them, see',
+                    'https://github.com/sherter/google-java-format-gradle-plugin',
+                    'for details')
+            invalid.each { Path file ->
+                logger.lifecycle(file.toString())
+            }
         }
 
-        logger.info('Properly formatted files:\n{}', formattedFiles)
-        invalidFiles.each { Path file ->
-            logger.lifecycle('{}: verification failed, contains syntax errors', file)
+        def problems = [] as List<String>
+        if (!successful) {
+            problems.add('I/O errors')
         }
-        unformattedFiles.each { Path file ->
-            logger.lifecycle('{}: not formatted properly', file)
+        if (invalid.size() > 0) {
+            problems.add('syntax errors')
         }
-        if (unformattedFiles.size() + invalidFiles.size() > 0 && !ignoreFailures) {
-            throw new GradleException("verification failed")
+        if (unformatted.size() > 0) {
+            problems.add('formatting style violations')
+        }
+        if (problems.size() > 0) {
+            def message = 'Problems: ' + Joiner.on(', ').join(problems)
+            if (ignoreFailures) {
+                logger.warn(message)
+            } else {
+                throw new GradleException(message)
+            }
         }
     }
 
-    private void computeStatesAndAddToLists() {
-        Formatter formatter = sharedContext.formatter()
-        FileToStateMapper mapper = sharedContext.mapper()
-        ExecutorService executor = sharedContext.executor()
+    private boolean processUnknown(List<Path> unknown, List<Path> formatted, List<Path> unformatted, List<Path> invalid) {
+        boolean successful = true
+        if (unknown.size() > 0) {
+            def mapper = sharedContext.mapper()
+            def formatter = sharedContext.formatter()
+            def executor = sharedContext.executor()
 
-        filteredSources.collect { Path file ->
-            executor.submit(new VerifyFileCallable(formatter, file))
-        }.each { Future<FileInfo> futureInfo ->
-            try {
-                def info = futureInfo.get()
-                mapper.putIfNewer(info)
-                if (info.state() == FileState.FORMATTED) {
-                    formattedFiles.add(info.path())
-                } else if (info.state() == FileState.UNFORMATTED) {
-                    unformattedFiles.add(info.path())
-                } else if (info.state() == FileState.INVALID) {
-                    invalidFiles.add(info.path())
-                } else {
-                    throw new AssertionError("no other states possible")
+            unknown.collect { Path file ->
+                executor.submit(new VerifyFileCallable(formatter, file))
+            }.each { Future<FileInfo> futureInfo ->
+                try {
+                    def info = futureInfo.get()
+                    mapper.putIfNewer(info)
+                    if (info.state() == FORMATTED) {
+                        formatted.add(info.path())
+                    } else if (info.state() == UNFORMATTED) {
+                        unformatted.add(info.path())
+                    } else if (info.state() == INVALID) {
+                        invalid.add(info.path())
+                    } else {
+                        //throw new AssertionError('no other states possible')
+                    }
+                } catch (ExecutionException e) {
+                    def pathException = e.getCause() as PathException
+                    logger.error('{}: failed to process file', pathException.path(), pathException.getCause())
+                    successful = false
                 }
-            } catch (ExecutionException e) {
-                logger.error("Error occurred while accessing file", e);
-                fileSystemFailures++
-            } catch (InterruptedException e) {
-                throw new AssertionError("Gradle shouldn't interrupt us!", e);
             }
         }
+        return successful
     }
 }
