@@ -3,60 +3,82 @@ package com.github.sherter.googlejavaformatgradleplugin
 import com.google.common.collect.ImmutableSet
 import org.gradle.api.Project
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 class SharedContext {
 
     private final Project project
-    private FileStateHandler fileStateHandler
+    private ExecutorService executor
     private Formatter formatter
     private FileToStateMapper mapper
-    private PersistenceComponent persist
 
     SharedContext(Project project) {
         this.project = Objects.requireNonNull(project)
     }
 
-    synchronized FileStateHandler fileStateHandler() {
-        if (fileStateHandler == null) {
-            String buildCacheSubDir = "google-java-format/${GoogleJavaFormatPlugin.PLUGIN_VERSION}"
-            GoogleJavaFormatExtension extension = project.extensions.findByType(GoogleJavaFormatExtension)
-            fileStateHandler = new FileStateHandler(
-                    project.projectDir,
-                    new File(project.buildDir, buildCacheSubDir),
-                    extension.toolVersion)
-            fileStateHandler.load()
-            project.gradle.buildFinished { fileStateHandler.flush() }
+    synchronized ExecutorService executor() {
+        if (executor == null) {
+            // single threaded for now
+            // further synchronization for FormatFileTasks and VerifyFileTasks
+            // is required if we want to write to files concurrently
+            executor = Executors.newSingleThreadExecutor()
         }
-        return fileStateHandler
+        return executor
     }
 
     synchronized FileToStateMapper mapper() {
         if (mapper == null) {
             mapper = new FileToStateMapper()
-            def persistenceModule = new PersistenceModule(project)
-            def store = DaggerPersistenceComponent.builder().persistenceModule(persistenceModule).build().store()
-            project.gradle.buildFinished {
-                try {
-                    store.update(mapper)
-                } catch (IOException e) {
-                    project.logger.error('Failed to write formatting states to disk: {}', e.message)
-                }
-            }
-            ImmutableSet<FileInfo> states = ImmutableSet.of()
+            PersistenceModule module = new PersistenceModule(project)
+            PersistenceComponent component = DaggerPersistenceComponent.builder().persistenceModule(module).build()
+            def optionsStore = setupOptionsStore(component.optionsStore());
+            def fileInfoStore = setupFileStore(component.fileInfoStore(), mapper)
             try {
-                states = store.read()
+                def options = optionsStore.read()
+                if (options.version() != project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME).toolVersion) {
+                    project.logger.info("Formatter options changed; invalidating saved file states")
+                    fileInfoStore.clear()
+                } else {
+                    ImmutableSet<FileInfo> states = ImmutableSet.of()
+                    try {
+                        states = fileInfoStore.read()
+                    } catch (IOException e) {
+                        project.getLogger().error("Failed to load formatting states from disk", e)
+                    }
+                    for(FileInfo info : states) {
+                        mapper.putIfNewer(info)
+                    }
+                }
             } catch (IOException e) {
-                project.logger.error('Failed to load formatting states from disk: {}', e.message)
-            }
-            states.each {
-                mapper.putIfNewer(it)
+
             }
         }
-        return mapper;
+        return mapper
+    }
+
+    FormatterOptionsStore setupOptionsStore(FormatterOptionsStore optionsStore) {
+        project.gradle.buildFinished {
+            def options = FormatterOptions.create(project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME).toolVersion)
+            optionsStore.write(options);
+        }
+        return optionsStore
+    }
+
+    private FileInfoStore setupFileStore(FileInfoStore store, FileToStateMapper mapper) {
+        project.gradle.buildFinished {
+            try {
+                store.update(mapper)
+            } catch (IOException e) {
+                project.getLogger().error("Failed to write formatting states to disk", e)
+            }
+        }
+        return store
     }
 
     synchronized Formatter formatter() {
         if (formatter == null) {
-            GoogleJavaFormatExtension extension = project.extensions.findByType(GoogleJavaFormatExtension)
+            GoogleJavaFormatExtension extension = (GoogleJavaFormatExtension) project.getExtensions().getByName(GoogleJavaFormatPlugin.getEXTENSION_NAME())
             formatter = new FormatterFactory(project, project.logger).create(extension.toolVersion)
         }
         return formatter

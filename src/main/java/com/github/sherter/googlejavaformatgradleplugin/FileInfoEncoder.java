@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Immutable and therefore thread safe.
@@ -33,7 +34,7 @@ class FileInfoEncoder {
   String encode(FileInfo fileInfo) {
     return encodePath(fileInfo.path())
         + ','
-        + fileInfo.lastModified().toMillis()
+        + fileInfo.lastModified().to(TimeUnit.NANOSECONDS)
         + ','
         + fileInfo.size()
         + ','

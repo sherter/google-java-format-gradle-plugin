@@ -15,6 +15,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Immutable and therefore thread safe.
@@ -45,7 +46,7 @@ class FileInfoDecoder {
     }
     return FileInfo.create(
         decodePath(elements[0]),
-        FileTime.fromMillis(decodeLong(elements[1])),
+        FileTime.from(decodeLong(elements[1]), TimeUnit.NANOSECONDS),
         decodeLong(elements[2]),
         decodeState(elements[3]));
   }

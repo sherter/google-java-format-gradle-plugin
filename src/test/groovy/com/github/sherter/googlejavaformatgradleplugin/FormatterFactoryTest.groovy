@@ -67,9 +67,9 @@ class FormatterFactoryTest extends Specification {
 
         then:
         FormatterException e = thrown()
-        e.errors.first().line == 1
-        e.errors.first().column == 0
-        e.errors.first().message != null
+        e.diagnostics().first().line() == 1
+        e.diagnostics().first().column() == 0
+        e.diagnostics().first().message() != null
 
         where:
         version << GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_VERSIONS

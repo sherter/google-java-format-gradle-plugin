@@ -1,6 +1,5 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import com.github.sherter.googlejavaformatgradleplugin.FormatterException.ErrorInfo
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.gradle.api.Project
@@ -53,17 +52,14 @@ class FormatterFactory {
     @TypeChecked(SKIP)
     private Formatter defaultFormatter(ClassLoader classLoader) {
         def formatter = classLoader.loadClass('com.google.googlejavaformat.java.Formatter').newInstance()
-        return new Formatter() {
-            @Override
-            String format(String source) throws FormatterException {
-                try {
-                    return formatter.formatSource(source)
-                } catch(e) {
-                    Collection<ErrorInfo> errors = e.diagnostics().collect { diagnostic ->
-                        new ErrorInfo(diagnostic.@lineNumber, diagnostic.@column, diagnostic.@message)
-                    }
-                    throw new FormatterException(errors)
+        return { String source ->
+            try {
+                return formatter.formatSource(source)
+            } catch (e) {
+                Collection<FormatterDiagnostic> diagnostics = e.diagnostics().collect { diagnostic ->
+                    FormatterDiagnostic.create(diagnostic.@lineNumber, diagnostic.@column, diagnostic.@message)
                 }
+                throw FormatterException.create(diagnostics)
             }
         }
     }

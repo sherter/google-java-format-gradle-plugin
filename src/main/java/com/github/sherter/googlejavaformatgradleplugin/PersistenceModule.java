@@ -48,4 +48,10 @@ class PersistenceModule {
   Path provideStoragePath(@Named("output path") Path outputPath) {
     return outputPath.resolve("fileStates.txt");
   }
+
+  @Provides
+  @Named("settings")
+  Path provideSettingsPath(@Named("output path") Path outputPath) {
+    return outputPath.resolve("settings.txt");
+  }
 }

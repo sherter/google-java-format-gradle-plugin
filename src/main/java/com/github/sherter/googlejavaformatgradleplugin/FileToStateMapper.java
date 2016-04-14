@@ -67,6 +67,8 @@ class FileToStateMapper implements Iterable<FileInfo> {
       return info.state();
     }
     log.debug("change detected; invalidating cached state for file '{}'", file);
+    log.debug("timestamps (old - new): {} {}", info.lastModified(), currentLastModified);
+    log.debug("sizes (old - new): {} {}", info.size(), currentSize);
     synchronized (replaceRemoveLock) {
       infoCache.remove(file);
     }

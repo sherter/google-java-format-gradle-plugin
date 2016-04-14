@@ -16,16 +16,14 @@ class FileInfoStoreTest extends Specification {
 
     Logger log = Mock()
     FileSystem fs = Jimfs.newFileSystem(
-            Configuration.unix()
-                    .toBuilder()
-                    .setWorkingDirectory('/base')
-                    .build())
-    Path backingFile = fs.getPath('storage.txt')
-    FileInfoStore store = new FileInfoStore(
-            log, backingFile, new FileInfoEncoder(fs.getPath('')), new FileInfoDecoder(fs.getPath('')))
+            Configuration.unix().toBuilder().setWorkingDirectory('/base').build())
+    def encoder = new FileInfoEncoder(fs.getPath(''))
+    def decoder = new FileInfoDecoder(fs.getPath(''))
+    def backingFile = fs.getPath('storage.txt')
 
     def 'read returns expected result and decoding errors are logged'() {
         given:
+        def store = new FileInfoStore(log, backingFile, encoder, decoder)
         Files.write(backingFile,
                 '''foo,0,0,FORMATTED
                   |this-one-errors
@@ -45,6 +43,8 @@ class FileInfoStoreTest extends Specification {
     }
 
     def 'multiple info objects for same file in updates'() {
+        given:
+        def store = new FileInfoStore(log, backingFile, encoder, decoder)
         when:
         store.update([ FileInfo.create(fs.getPath('foo'), FileTime.fromMillis(0), 0, FileState.FORMATTED),
                        FileInfo.create(fs.getPath('baz'), FileTime.fromMillis(0), 0, FileState.UNFORMATTED),
@@ -57,6 +57,7 @@ class FileInfoStoreTest extends Specification {
 
     def 'replace existing info'() {
         given:
+        def store = new FileInfoStore(log, backingFile, encoder, decoder)
         Files.write(backingFile, 'foo,0,0,FORMATTED\n'.getBytes(StandardCharsets.UTF_8))
 
         when:
@@ -64,6 +65,15 @@ class FileInfoStoreTest extends Specification {
 
         then:
         def lines = Files.readAllLines(backingFile, StandardCharsets.UTF_8)
-        (lines as Set).equals([ 'foo,10,10,UNFORMATTED' ] as Set)
+        (lines as Set).equals([ 'foo,10000000,10,UNFORMATTED' ] as Set)
+    }
+
+    def 'create parent directories of backing file if necessary'() {
+        given:
+        backingFile = fs.getPath('/base/project/build/sub/states.txt')
+        def store = new FileInfoStore(log, backingFile, encoder, decoder)
+
+        expect:
+        store.read().equals([] as Set)
     }
 }

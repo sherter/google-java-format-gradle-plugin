@@ -197,7 +197,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         def result = runner.build()
 
         then:
-        result.output.contains("$inputFile is not a valid Java source file")
+        result.output.contains("$inputFile: found syntax errors, skipping")
     }
 
     def 'report unformatted java sources'() {

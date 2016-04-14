@@ -1,55 +1,78 @@
-package com.github.sherter.googlejavaformatgradleplugin
+package com.github.sherter.googlejavaformatgradleplugin;
 
-import groovy.transform.TypeChecked
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.tasks.SourceTask
-import org.gradle.api.tasks.TaskAction
+import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
+import org.gradle.api.tasks.SourceTask;
+import org.gradle.api.tasks.TaskAction;
 
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-@TypeChecked
 class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
 
-    private static final int MAX_THREADS = 20;
+  private SharedContext sharedContext;
+  private Iterable<Path> filteredSources;
 
-    SharedContext context
+  @Override
+  public void configure(SharedContext context) {
+    this.sharedContext = context;
+    Set<File> sources = getSource().getFiles();
+    if (sources.size() == 0) {
+      return; // task will be skipped (@SkipWhenEmpty in SourceTask)
+    }
+    ListMultimap<FileState, Path> mapping = context.mapper().reverseMap(Utils.toPaths(sources));
+    List<Path> formattedFiles = mapping.get(FileState.FORMATTED);
+    if (formattedFiles.size() > 0) {
+      getLogger().info("Skipping formatted files:\n{}", formattedFiles);
+    }
+    List<Path> invalidFiles = mapping.get(FileState.INVALID);
+    if (invalidFiles.size() > 0) {
+      getLogger().info("Skipping invalid Java files:\n{}", invalidFiles);
+    }
+    List<Path> unformattedFiles = mapping.get(FileState.UNFORMATTED);
+    List<Path> unknownFiles = mapping.get(FileState.UNKNOWN);
+    if (unformattedFiles.size() + unknownFiles.size() == 0) {
+      // task is up-to-date, make it skip
+      setSource(Collections.emptyList());
+    } else {
+      filteredSources = Iterables.concat(unformattedFiles, unknownFiles);
+    }
+  }
 
-    @Override
-    void configure(SharedContext context) {
-        this.context = context
-        exclude { FileTreeElement f -> context.fileStateHandler().isUpToDate(f.file) }
+  @TaskAction
+  void formatSources() {
+    Formatter formatter = sharedContext.formatter();
+    FileToStateMapper mapper = sharedContext.mapper();
+    ExecutorService executor = sharedContext.executor();
+
+    List<Future<FileInfo>> futureResults = new ArrayList<>();
+    for (Path file : filteredSources) {
+      futureResults.add(executor.submit(new FormatFileCallable(formatter, file)));
     }
 
-    @TaskAction
-    void formatSources() {
-        Formatter formatter = context.formatter()
-        Set<File> sourceFiles = getSource().getFiles()
-        int numThreads = Math.min(sourceFiles.size(), MAX_THREADS)
-        Executor executor = Executors.newFixedThreadPool(numThreads)
-        FileStateHandler fileStateHandler = context.fileStateHandler()
-
-        sourceFiles.each { file ->
-            executor.execute {
-                try {
-                    fileStateHandler.updateIfNotUpToDateAfter(file) {
-                        def content = file.getText(StandardCharsets.UTF_8.name())
-                        file.write(formatter.format(content), StandardCharsets.UTF_8.name())
-                    }
-                } catch (FormatterException e) {
-                    logger.error('{} is not a valid Java source file', file)
-                    e.errors.each {
-                        logger.info('{}:{}', file, it)
-                    }
-                }
-            }
+    for (Future<FileInfo> futureResult : futureResults) {
+      try {
+        FileInfo info = futureResult.get();
+        mapper.putIfNewer(info);
+        if (info.state() == FileState.INVALID) {
+          getLogger().error("{}: found syntax errors, skipping", info.path());
+        } else if (info.state() == FileState.FORMATTED) {
+          getLogger().info("{}: successfully formatted", info.path());
+        } else {
+          throw new AssertionError("no other states possible");
         }
-        executor.shutdown()
-
-        // blocks forever, unit is ignored if timeout is MAX_VALUE
-        // (see http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/package-summary.html)
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)
+      } catch (ExecutionException e) {
+        getLogger().error("Error occurred while trying to format file", e);
+      } catch (InterruptedException e) {
+        throw new AssertionError("Gradle shouldn't interrupt us!", e);
+      }
     }
+  }
 }

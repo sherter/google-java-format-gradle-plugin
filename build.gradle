@@ -32,6 +32,7 @@ dependencies {
     bundle      'com.google.dagger:dagger:2.3'
     compile     'com.google.dagger:dagger:2.3'
     apt         'com.google.guava:guava:19.0' // workaround https://github.com/tbroyer/gradle-apt-plugin/issues/22
+    bundle      'com.google.guava:guava:19.0'
     apt         'com.google.dagger:dagger-compiler:2.3'
     compileOnly 'com.google.auto.value:auto-value:1.2'
     apt         'com.google.auto.value:auto-value:1.2'
@@ -48,6 +49,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 task shadedJar(type: ShadowJar) {
     configurations = [project.configurations.bundle]
     relocate('dagger', 'com.github.sherter.googlejavaformat.dagger')
+    relocate('com.google.common', 'com.github.sherter.googlejavaformatgradleplugin.com.google.common')
     from(sourceSets.main.output)
     exclude('META-INF/maven/**/*')
 }

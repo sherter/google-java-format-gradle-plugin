@@ -19,8 +19,8 @@ class FileInfoDecoderTest extends Specification {
 
         where:
         encoded | decoded
-        'foo,13,10,UNFORMATTED' | create(Paths.get('foo'), FileTime.fromMillis(13), 10, UNFORMATTED)
-        'b%2Cr,-231,0,INVALID' | create(Paths.get('b,r'), FileTime.fromMillis(-231), 0, INVALID)
+        'foo,13000000,10,UNFORMATTED' | create(Paths.get('foo'), FileTime.fromMillis(13), 10, UNFORMATTED)
+        'b%2Cr,-231000000,0,INVALID' | create(Paths.get('b,r'), FileTime.fromMillis(-231), 0, INVALID)
         '../foo/bar,0,0,FORMATTED' | create(Paths.get('../foo/bar'), FileTime.fromMillis(0), 0, FORMATTED)
     }
 

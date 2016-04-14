@@ -12,6 +12,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Persistent store for {@link FileInfo} objects.
+ * Persistent fileInfoStore for {@link FileInfo} objects.
  *
  * It's not safe to use instances of this class concurrently in multiple threads.
  */
@@ -54,6 +55,7 @@ class FileInfoStore {
    * @throws IOException if an I/O error occurs
    */
   ImmutableSet<FileInfo> read() throws IOException {
+    log.debug("Reading file states from {}", path);
     if (channel == null) {
       init();
     }
@@ -76,19 +78,16 @@ class FileInfoStore {
   }
 
   private void init() throws IOException {
+    Files.createDirectories(path.getParent());
     channel =
         FileChannel.open(
             path, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.WRITE);
-    FileLock lock = channel.tryLock();
-    if (lock == null) {
-      throw new IOException("File " + path + " is locked by another program");
-    }
   }
 
   /**
-   * Insert the given {@link FileInfo}'s into the persistent store.
+   * Insert the given {@link FileInfo}'s into the persistent fileInfoStore.
    *
-   * If the store already contains information about a path that is referenced in an element in {@code updates},
+   * If the fileInfoStore already contains information about a path that is referenced in an element in {@code updates},
    * then this information is replaced. If {@code updates} contain multiple {@link FileInfo} objects for the
    * same path, the last one in iteration order is inserted.
    *
@@ -102,6 +101,7 @@ class FileInfoStore {
     for (FileInfo result : updates) {
       cacheCopy.put(result.path(), result);
     }
+    log.debug("Writing updated file states to {}:\n{}", path, cacheCopy.values());
     channel.truncate(0);
     BufferedWriter writer =
         new BufferedWriter(Channels.newWriter(channel, StandardCharsets.UTF_8.name()));
@@ -111,5 +111,13 @@ class FileInfoStore {
     }
     writer.flush();
     readCache = cacheCopy;
+  }
+
+  void clear() throws IOException {
+    if (channel == null) {
+      init();
+    }
+    channel.truncate(0);
+    channel.force(false);
   }
 }
