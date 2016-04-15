@@ -1,78 +1,86 @@
-package com.github.sherter.googlejavaformatgradleplugin;
+package com.github.sherter.googlejavaformatgradleplugin
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables
+import groovy.transform.CompileStatic
+import org.gradle.api.GradleException;
 import org.gradle.api.tasks.SourceTask;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.TaskAction
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Path
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+@CompileStatic
 class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
 
-  private SharedContext sharedContext;
-  private Iterable<Path> filteredSources;
+  private SharedContext sharedContext
+  private Iterable<Path> filteredSources
+  private List<Path> invalidSources
 
   @Override
   public void configure(SharedContext context) {
-    this.sharedContext = context;
-    Set<File> sources = getSource().getFiles();
-    if (sources.size() == 0) {
-      return; // task will be skipped (@SkipWhenEmpty in SourceTask)
+    this.sharedContext = context
+    def mapping = context.mapper().reverseMap(Utils.toPaths(getSource().files))
+    def formattedFiles = mapping.get(FileState.FORMATTED)
+    for (Path file : formattedFiles) {
+      logger.info("{}: UP-TO-DATE", file)
     }
-    ListMultimap<FileState, Path> mapping = context.mapper().reverseMap(Utils.toPaths(sources));
-    List<Path> formattedFiles = mapping.get(FileState.FORMATTED);
-    if (formattedFiles.size() > 0) {
-      getLogger().info("Skipping formatted files:\n{}", formattedFiles);
-    }
-    List<Path> invalidFiles = mapping.get(FileState.INVALID);
-    if (invalidFiles.size() > 0) {
-      getLogger().info("Skipping invalid Java files:\n{}", invalidFiles);
-    }
-    List<Path> unformattedFiles = mapping.get(FileState.UNFORMATTED);
-    List<Path> unknownFiles = mapping.get(FileState.UNKNOWN);
-    if (unformattedFiles.size() + unknownFiles.size() == 0) {
-      // task is up-to-date, make it skip
-      setSource(Collections.emptyList());
+    invalidSources = new ArrayList<>(mapping.get(FileState.INVALID))
+    def unformatted = mapping.get(FileState.UNFORMATTED)
+    def unknown = mapping.get(FileState.UNKNOWN);
+    if (Iterables.size(invalidSources) + Iterables.size(unformatted) + Iterables.size(unknown) == 0) {
+      // task is up-to-date, make sure it is skipped
+      setSource(Collections.emptyList())
     } else {
-      filteredSources = Iterables.concat(unformattedFiles, unknownFiles);
+      filteredSources = Iterables.concat(unformatted, unknown);
     }
   }
 
   @TaskAction
   void formatSources() {
-    Formatter formatter = sharedContext.formatter();
-    FileToStateMapper mapper = sharedContext.mapper();
-    ExecutorService executor = sharedContext.executor();
+    boolean successful = true
+    if (!Iterables.isEmpty(filteredSources)) {
+      Formatter formatter = sharedContext.formatter()
+      FileToStateMapper mapper = sharedContext.mapper()
+      ExecutorService executor = sharedContext.executor()
 
-    List<Future<FileInfo>> futureResults = new ArrayList<>();
-    for (Path file : filteredSources) {
-      futureResults.add(executor.submit(new FormatFileCallable(formatter, file)));
-    }
-
-    for (Future<FileInfo> futureResult : futureResults) {
-      try {
-        FileInfo info = futureResult.get();
-        mapper.putIfNewer(info);
-        if (info.state() == FileState.INVALID) {
-          getLogger().error("{}: found syntax errors, skipping", info.path());
-        } else if (info.state() == FileState.FORMATTED) {
-          getLogger().info("{}: successfully formatted", info.path());
-        } else {
-          throw new AssertionError("no other states possible");
-        }
-      } catch (ExecutionException e) {
-        getLogger().error("Error occurred while trying to format file", e);
-      } catch (InterruptedException e) {
-        throw new AssertionError("Gradle shouldn't interrupt us!", e);
+      List<Future<FileInfo>> futureResults = new ArrayList<Future<FileInfo>>()
+      for (Path file : filteredSources) {
+        futureResults.add(executor.submit(new FormatFileCallable(formatter, file)))
       }
+
+      for (Future<FileInfo> futureResult : futureResults) {
+        try {
+          FileInfo info = futureResult.get();
+          mapper.putIfNewer(info);
+          if (info.state() == FileState.INVALID) {
+            invalidSources.add(info.path())
+          } else if (info.state() == FileState.FORMATTED) {
+            logger.lifecycle("{}: formatted successfully", info.path());
+          } else {
+            // throw new AssertionError("no other states possible");
+          }
+        } catch (ExecutionException e) {
+          def pathException = e.getCause() as PathException
+          logger.error('{}: failed to process file', pathException.path(), pathException.getCause())
+          successful = false
+        }
+      }
+    }
+    if (Iterables.size(invalidSources) > 0) {
+      successful = false
+      logger.error('\n\nDetected Java syntax errors in the following files ({} "{}" {}):\n',
+              'you can exclude them from this task, see',
+              'https://github.com/sherter/google-java-format-gradle-plugin',
+              'for details')
+      for (Path file : invalidSources) {
+        logger.error(file.toString())
+      }
+    }
+    if (!successful) {
+      throw new GradleException("Not all files were formatted.")
     }
   }
 }

@@ -194,10 +194,11 @@ class IntegrationTest extends AbstractIntegrationTest {
         inputFile << "<< -.- \$asd\$This is not a valid java class!"
 
         when:
-        def result = runner.build()
+        def result = runner.buildAndFail()
 
         then:
-        result.output.contains("$inputFile: found syntax errors, skipping")
+        result.output.contains("Detected Java syntax errors")
+        result.output.contains("Invalid.java")
     }
 
     def 'report unformatted java sources'() {

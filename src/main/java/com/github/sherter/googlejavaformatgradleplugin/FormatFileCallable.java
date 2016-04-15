@@ -24,23 +24,27 @@ class FormatFileCallable implements Callable<FileInfo> {
    * @throws Exception if and only if file system access fails at some point
    */
   @Override
-  public FileInfo call() throws Exception {
-    byte[] content = Files.readAllBytes(file);
-    String utf8Decoded = new String(content, StandardCharsets.UTF_8.name());
-    String formatted;
+  public FileInfo call() throws PathException {
     try {
-      formatted = formatter.format(utf8Decoded);
-    } catch (FormatterException e) {
+      byte[] content = Files.readAllBytes(file);
+      String utf8Decoded = new String(content, StandardCharsets.UTF_8.name());
+      String formatted;
+      try {
+        formatted = formatter.format(utf8Decoded);
+      } catch (FormatterException e) {
+        return FileInfo.create(
+                file, Files.getLastModifiedTime(file), content.length, FileState.INVALID);
+      }
+      if (utf8Decoded.equals(formatted)) {
+        return FileInfo.create(
+                file, Files.getLastModifiedTime(file), content.length, FileState.FORMATTED);
+      }
+      byte[] utf8Encoded = formatted.getBytes(StandardCharsets.UTF_8.name());
+      Files.write(file, utf8Encoded);
       return FileInfo.create(
-          file, Files.getLastModifiedTime(file), content.length, FileState.INVALID);
+              file, Files.getLastModifiedTime(file), utf8Encoded.length, FileState.FORMATTED);
+    } catch(Throwable t) {
+      throw new PathException(file, t);
     }
-    if (utf8Decoded.equals(formatted)) {
-      return FileInfo.create(
-          file, Files.getLastModifiedTime(file), content.length, FileState.FORMATTED);
-    }
-    byte[] utf8Encoded = formatted.getBytes(StandardCharsets.UTF_8.name());
-    Files.write(file, utf8Encoded);
-    return FileInfo.create(
-        file, Files.getLastModifiedTime(file), utf8Encoded.length, FileState.FORMATTED);
   }
 }
