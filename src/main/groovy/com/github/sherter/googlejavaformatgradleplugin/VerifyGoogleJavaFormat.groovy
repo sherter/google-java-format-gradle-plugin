@@ -36,12 +36,12 @@ class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, Con
         def invalid = new ArrayList<Path>(mapping.get(INVALID))
 
         def successful = processUnknown(mapping.get(UNKNOWN), formatted, unformatted, invalid)
-        formatted.each { Path p ->
+        for(Path p : formatted) {
             logger.info('{}: verified proper formatting', p)
         }
         if (unformatted.size() > 0) {
             logger.lifecycle('\n\nThe following files are not formatted properly:\n')
-            unformatted.each { Path file ->
+            for(Path file : unformatted) {
                 logger.lifecycle(file.toString())
             }
         }
@@ -50,7 +50,7 @@ class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, Con
                     'you can configure this task to exclude them, see',
                     'https://github.com/sherter/google-java-format-gradle-plugin',
                     'for details')
-            invalid.each { Path file ->
+            for (Path file : invalid) {
                 logger.lifecycle(file.toString())
             }
         }
@@ -82,9 +82,10 @@ class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, Con
             def formatter = sharedContext.formatter()
             def executor = sharedContext.executor()
 
-            unknown.collect { Path file ->
+            def futures = unknown.collect { Path file ->
                 executor.submit(new VerifyFileCallable(formatter, file))
-            }.each { Future<FileInfo> futureInfo ->
+            }
+            for (Future<FileInfo> futureInfo : futures) {
                 try {
                     def info = futureInfo.get()
                     mapper.putIfNewer(info)
