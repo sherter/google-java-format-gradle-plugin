@@ -53,7 +53,22 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     private void createDefaultTasks() {
         FileTree defaultInputs = defaultInputs()
         this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat).setSource(defaultInputs)
-        this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat).setSource(defaultInputs)
+        def defaultVerifyTask = this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+        defaultVerifyTask.setSource(defaultInputs)
+        makeCheckTaskDependOn(defaultVerifyTask)
+    }
+
+    private void makeCheckTaskDependOn(Task task) {
+        def checkTask = project.tasks.findByName('check')
+        if (checkTask != null) {
+            checkTask.dependsOn(task)
+        } else {
+            project.tasks.whenTaskAdded { Task t ->
+                if (t.name == 'check') {
+                    t.dependsOn(task)
+                }
+            }
+        }
     }
 
     private FileTree defaultInputs() {

@@ -113,4 +113,35 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         result.output.contains("${sourceFile.path}")
     }
 
+    def 'check task (if present) depends on default verification task'() {
+        when:
+        def result = runner.withArguments('tasks').build()
+
+        then:
+        result.output.readLines().find { s -> s.matches(~/^verifyGoogleJavaFormat$/) }
+        !result.output.contains('check')
+
+        when: 'after base plugin'
+        buildFile.text = buildScriptBlock
+        buildFile << '''\
+            apply plugin: JavaBasePlugin
+            apply plugin: 'com.github.sherter.google-java-format'
+            '''.stripIndent()
+        result = runner.withArguments('tasks', '--all').build()
+
+        then:
+        result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
+
+        when: 'before base plugin'
+        buildFile.text = buildScriptBlock
+        buildFile << '''\
+            apply plugin: 'com.github.sherter.google-java-format'
+            apply plugin: JavaBasePlugin
+            '''.stripIndent()
+        result = runner.withArguments('tasks', '--all').build()
+
+        then:
+        result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
+    }
+
 }
