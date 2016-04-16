@@ -54,10 +54,6 @@ task shadedJar(type: ShadowJar) {
     exclude('META-INF/maven/**/*')
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
-}
-
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
     reports.html.destination = new File(reportsDir, name)
