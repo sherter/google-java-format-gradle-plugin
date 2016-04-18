@@ -2,7 +2,6 @@ plugins {
     id 'groovy'
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.1'
-    id 'idea'
     id 'com.github.sherter.google-java-format' version '0.2'
     id 'net.ltgt.apt' version '0.6'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
@@ -109,5 +108,3 @@ publishing {
         }
     }
 }
-
-idea.module.scopes.TEST.plus += [ configurations.integTestCompile ]
