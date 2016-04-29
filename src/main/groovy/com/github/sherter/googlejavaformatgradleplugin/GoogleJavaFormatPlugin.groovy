@@ -10,9 +10,6 @@ import org.gradle.api.file.FileTree
 @CompileStatic
 class GoogleJavaFormatPlugin implements Plugin<Project> {
 
-    /** Supported versions of google-java-format in <em>descending order</em>. */
-    static final List<String> GOOGLEJAVAFORMAT_VERSIONS = ['0.1-alpha'].asImmutable()
-
     static final String PLUGIN_VERSION
     static {
         // workaround; reading resources fails sometimes

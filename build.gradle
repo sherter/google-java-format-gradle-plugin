@@ -28,6 +28,9 @@ configurations {
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    compile (project(':format')) {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
     bundle      'com.google.dagger:dagger:2.3'
     compile     'com.google.dagger:dagger:2.3'
     apt         'com.google.guava:guava:19.0' // workaround https://github.com/tbroyer/gradle-apt-plugin/issues/22
@@ -49,7 +52,7 @@ task shadedJar(type: ShadowJar) {
     configurations = [project.configurations.bundle]
     relocate('dagger', 'com.github.sherter.googlejavaformat.dagger')
     relocate('com.google.common', 'com.github.sherter.googlejavaformatgradleplugin.com.google.common')
-    from(sourceSets.main.output)
+    from(sourceSets.main.output, 'subprojects/format/build/classes/main')
     exclude('META-INF/maven/**/*')
 }
 

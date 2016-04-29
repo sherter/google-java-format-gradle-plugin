@@ -1,0 +1,14 @@
+plugins {
+  id 'groovy'
+}
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile 'org.codehaus.groovy:groovy-all:2.3.2' // 2.3.2 ships with Gradle 2.0
+  compile 'com.google.guava:guava:19.0'
+  testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+  testCompile 'org.apache.ivy:ivy:2.4.0' // required by Grape (in Resolver)
+}

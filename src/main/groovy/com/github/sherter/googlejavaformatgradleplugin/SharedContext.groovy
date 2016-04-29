@@ -1,5 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
 import com.google.common.collect.ImmutableSet
 import org.gradle.api.Project
 

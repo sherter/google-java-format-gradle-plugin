@@ -1,0 +1,2 @@
+include 'format'
+project(':format').projectDir = new File(settingsDir, 'subprojects/format')

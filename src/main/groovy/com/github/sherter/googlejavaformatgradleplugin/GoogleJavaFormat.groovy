@@ -1,6 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import com.google.common.collect.ImmutableList;
+import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
 import com.google.common.collect.Iterables
 import groovy.transform.CompileStatic
 import org.gradle.api.GradleException;

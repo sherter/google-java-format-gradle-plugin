@@ -1,5 +1,7 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException
+import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.logging.Logger
@@ -67,12 +69,9 @@ class FormatterFactoryTest extends Specification {
 
         then:
         FormatterException e = thrown()
-        e.diagnostics().first().line() == 1
-        e.diagnostics().first().column() == 0
-        e.diagnostics().first().message() != null
 
         where:
-        version << GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_VERSIONS
+        version << Gjf.SUPPORTED_VERSIONS
     }
 
     def 'log tool version support'() {
@@ -89,7 +88,7 @@ class FormatterFactoryTest extends Specification {
         def factory = new FormatterFactory(project, logger)
 
         when:
-        factory.create(GoogleJavaFormatPlugin.GOOGLEJAVAFORMAT_VERSIONS.first())
+        factory.create(Gjf.SUPPORTED_VERSIONS.first())
 
         then:
         0 * logger._

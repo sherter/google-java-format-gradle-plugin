@@ -1,5 +1,7 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
+import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException
 import com.google.common.jimfs.Jimfs
 import spock.lang.Specification
 
@@ -33,7 +35,7 @@ class FormatFileCallableTest extends Specification {
         def result = task.call()
 
         then:
-        1 * formatter.format('Hello World!') >> { throw FormatterException.create([]) }
+        1 * formatter.format('Hello World!') >> { throw new FormatterException() }
         result.path() == file
         result.state() == FileState.INVALID
         result.lastModified() == modifiedTime
