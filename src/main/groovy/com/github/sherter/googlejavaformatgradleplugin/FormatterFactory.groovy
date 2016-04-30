@@ -1,7 +1,9 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
+import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption
 import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
+import com.google.common.collect.ImmutableTable
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -10,6 +12,15 @@ import org.gradle.api.logging.Logger
 
 @CompileStatic
 class FormatterFactory {
+
+    static final ImmutableTable<String, Object, FormatterOption> optionMapping =
+            ImmutableTable.<String, Object, FormatterOption>builder()
+                    .put('style', 'GOOGLE', FormatterOption.GOOGLE_STYLE)
+                    .put('style', 'AOSP', FormatterOption.AOSP_STYLE)
+                    .put('javadoc', Boolean.FALSE, FormatterOption.NO_JAVADOC_FORMATTER)
+                    .put('javadoc', Boolean.TRUE, FormatterOption.ECLIPSE_JAVADOC_FORMATTER)
+                    .build()
+
 
     private final Project project
     private final Logger logger
