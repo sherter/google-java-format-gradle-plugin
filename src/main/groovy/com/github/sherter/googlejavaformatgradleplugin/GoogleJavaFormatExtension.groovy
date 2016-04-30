@@ -52,16 +52,17 @@ class GoogleJavaFormatExtension {
         }
         for (Map.Entry entry : newOptions.entrySet()) {
             if(!FormatterFactory.optionMapping.containsRow(entry.key)) {
-                throw new ConfigurationException("Unsupported option type: '${entry.key}'")
+                throw new ConfigurationException("Unsupported option '${entry.key}'")
             }
             FormatterOption option = (FormatterOption) FormatterFactory.optionMapping.get(entry.key, entry.value)
             if (option == null) {
-                throw new ConfigurationException("Unsupported value for option '${entry.key}': '${entry.value}'")
+                throw new ConfigurationException("Unsupported value '${entry.value}' for option '${entry.key}'")
             }
             // if toolVersion is officially supported we can do further validation and
             // check if specific options are available for that version
             if (toolVersion in Gjf.SUPPORTED_VERSIONS && !(toolVersion in option.supportedVersions)) {
-                throw new ConfigurationException("Option '$entry' is not supported by googel-java-format v$toolVersion")
+                throw new ConfigurationException("Option '${entry.key}: ${entry.value}' is not supported " +
+                        "by version '$toolVersion' of googel-java-format")
             }
         }
         options.putAll(newOptions)

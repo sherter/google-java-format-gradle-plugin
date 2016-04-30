@@ -85,4 +85,51 @@ class ExtensionSpec extends Specification {
         ConfigurationException e = thrown()
         e.message.matches(/.*style.*twice.*/)
     }
+
+    def 'unknown option type'() {
+        when:
+        extClosure {
+            options foo: 'bar'
+        }
+
+        then:
+        ConfigurationException e = thrown()
+        e.message.contains("Unsupported option 'foo'")
+    }
+
+    def 'unknown option value'() {
+        when:
+        extClosure {
+            options style: 'FOO'
+        }
+
+        then:
+        ConfigurationException e = thrown()
+        e.message.contains('Unsupported value')
+        e.message.contains("option 'style'")
+        e.message.contains("value 'FOO'")
+    }
+
+    def 'option not supported by toolVersion'() {
+        when:
+        extClosure {
+            toolVersion = '0.1-alpha'
+            options style: 'GOOGLE'
+        }
+
+        then:
+        ConfigurationException e = thrown()
+        e.message.matches(/.*style.*GOOGLE.*not supported.*0.1-alpha.*/)
+    }
+
+    def 'options are accepted for unsupported toolVersion'() {
+        when:
+        extClosure {
+            toolVersion = '12345'
+            options style: 'GOOGLE', javadoc: false
+        }
+
+        then:
+        notThrown(ConfigurationException)
+    }
 }
