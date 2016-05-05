@@ -25,12 +25,12 @@ plugins {
 ----
 +
 
-* Make sure you have defined a repository that contains `google-java-format`
+* Make sure you have defined a repository that contains version `{default-google-java-format-version}` of `google-java-format`
 +
 [source,groovy]
 ----
 repositories {
-  jcenter()
+  jcenter()  // or mavenCentral()
 }
 ----
 
