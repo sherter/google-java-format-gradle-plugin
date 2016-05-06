@@ -3,8 +3,11 @@ package com.github.sherter.googlejavaformatgradleplugin
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption
 import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import groovy.transform.CompileStatic
+import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolveException
@@ -42,6 +45,19 @@ class FormatterFactory {
                     GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }
         return Gjf.newFormatter(classLoader, toolVersion)
+    }
+
+    @PackageScope
+    static ImmutableSet<FormatterOption> mapOptions(Map<String, Object> optionsInDsl) {
+        Set<FormatterOption> mapped = new HashSet<>(optionsInDsl.size())
+        for (Map.Entry<String, Object> entry : optionsInDsl) {
+            def option = optionMapping.get(entry.key, entry.value)
+            if (option == null) {
+                throw new IllegalArgumentException("invalid option: $entry")
+            }
+            mapped.add(option)
+        }
+        return ImmutableSet.copyOf(mapped);
     }
 
     private Configuration setupConfiguration(String toolVersion) {

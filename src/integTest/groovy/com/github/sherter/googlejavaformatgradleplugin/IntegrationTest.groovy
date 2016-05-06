@@ -121,6 +121,23 @@ class IntegrationTest extends AbstractIntegrationTest {
 
         then: "task is up-to-date"
         result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+
+        when: "an option has changed"
+        buildFile << """
+            googleJavaFormat {
+                options style: 'AOSP'
+            }
+        """
+        result = runner.build()
+
+        then:
+        !result.output.contains("UP-TO-DATE")
+
+        when: "nothing has changed"
+        result = runner.build()
+
+        then: "task is up-to-date"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
     }
 
     def "include and exclude sources"() {

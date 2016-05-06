@@ -37,7 +37,9 @@ class SharedContext {
             def fileInfoStore = setupFileStore(component.fileInfoStore(), mapper)
             try {
                 def options = optionsStore.read()
-                if (options.version() != project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME).toolVersion) {
+                def extension = project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
+                if ((options.version() != extension.toolVersion) ||
+                        (!options.options().equals(FormatterFactory.mapOptions(extension.getOptions())))) {
                     project.logger.info("Formatter options changed; invalidating saved file states")
                     fileInfoStore.clear()
                 } else {
@@ -59,8 +61,10 @@ class SharedContext {
     }
 
     FormatterOptionsStore setupOptionsStore(FormatterOptionsStore optionsStore) {
-        project.gradle.buildFinished {
-            def options = FormatterOptions.create(project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME).toolVersion)
+         project.gradle.buildFinished {
+            def extension = project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
+            def options = FormatterOptions.create(extension.toolVersion,
+                    FormatterFactory.mapOptions(extension.getOptions()))
             optionsStore.write(options);
         }
         return optionsStore
