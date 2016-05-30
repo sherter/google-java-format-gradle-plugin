@@ -58,13 +58,19 @@ task shadedJar(type: ShadowJar) {
 
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
-    reports.html.destination = new File(reportsDir, name)
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
 }
+
+def integTestGradleVersion = System.getenv('GRADLE_VERSION') ?: '2.0'
 
 task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
     group 'Verification'
     testClassesDir = sourceSets.integTest.output.classesDir
     classpath = sourceSets.integTest.runtimeClasspath
+    systemProperty 'GRADLE_VERSION', integTestGradleVersion
+    reports.html.destination = new File(reportsDir, 'integrationTest' + File.separator + integTestGradleVersion)
 }
 
 tasks.googleJavaFormat {
@@ -104,8 +110,8 @@ publishing {
                 name = 'SonatypeSnapshot'
                 url 'https://oss.sonatype.org/content/repositories/snapshots/'
                 credentials {
-                    username System.env.USERNAME
-                    password System.env.PASSWORD
+                    username System.env.SONATYPE_SNAPSHOTS_USERNAME
+                    password System.env.SONATYPE_SNAPSHOTS_PASSWORD
                 }
             }
         }

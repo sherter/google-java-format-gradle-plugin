@@ -29,7 +29,7 @@ abstract class AbstractIntegrationTest extends Specification {
         projectDir = temporaryFolder.root
         buildFile = new File(projectDir, 'build.gradle')
         buildFile << buildScriptBlock
-        runner = GradleRunner.create().withProjectDir(projectDir).withGradleVersion('2.0')
+        runner = GradleRunner.create().withProjectDir(projectDir).withGradleVersion(System.properties['GRADLE_VERSION'])
         customSetup()
     }
 
