@@ -63,6 +63,9 @@ class IntegrationTest extends AbstractIntegrationTest {
                 }
                 jcenter()
             }
+            googleJavaFormat {
+                toolVersion = '0.1-alpha'
+            }
             """
 
         when: "formatting task is executed on an empty project"
@@ -106,15 +109,54 @@ class IntegrationTest extends AbstractIntegrationTest {
         result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
 
         when: "formatter tool version has changed"
-        buildFile << """
+        buildFile.text = """
+            $buildScriptBlock
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                maven {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                }
+                jcenter()
+            }
             googleJavaFormat {
-                toolVersion = '0.1-SNAPSHOT'
+                toolVersion = '1.0'
             }
             """
         result = runner.build()
 
         then: "task is not up-to-date"
         !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+
+        when: "nothing has changed"
+        result = runner.build()
+
+        then: "task is up-to-date"
+        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+
+        when: "an option has changed"
+        buildFile.text = """
+            $buildScriptBlock
+            apply plugin: 'java'
+            apply plugin: 'com.github.sherter.google-java-format'
+
+            repositories {
+                maven {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                }
+                jcenter()
+            }
+            googleJavaFormat {
+                toolVersion = '1.0'
+                options style: 'GOOGLE'
+            }
+            """
+
+        result = runner.build()
+
+        then:
+        !result.output.contains("UP-TO-DATE")
 
         when: "nothing has changed"
         result = runner.build()
