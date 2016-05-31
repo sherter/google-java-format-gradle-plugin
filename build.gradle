@@ -59,8 +59,11 @@ task shadedJar(type: ShadowJar) {
 
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
-    testLogging {
-        events 'passed', 'skipped', 'failed'
+    if (System.env.TRAVIS == 'true') {
+        maxParallelForks = 1 // seems to prevent Travis from killing processes
+        testLogging {
+            events 'passed', 'skipped', 'failed'
+        }
     }
 }
 
