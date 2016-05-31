@@ -60,9 +60,9 @@ class GoogleJavaFormatExtension {
             }
             // if toolVersion is officially supported we can do further validation and
             // check if specific options are available for that version
-            if (toolVersion in Gjf.SUPPORTED_VERSIONS && !(toolVersion in option.supportedVersions)) {
+            if (getToolVersion() in Gjf.SUPPORTED_VERSIONS && !(getToolVersion() in option.supportedVersions)) {
                 throw new ConfigurationException("Option '${entry.key}: ${entry.value}' is not supported " +
-                        "by version '$toolVersion' of googel-java-format")
+                        "by version '${getToolVersion()}' of googel-java-format")
             }
         }
         options.putAll(newOptions)

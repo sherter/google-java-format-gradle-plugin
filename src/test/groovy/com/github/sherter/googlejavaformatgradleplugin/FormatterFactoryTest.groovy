@@ -2,6 +2,7 @@ package com.github.sherter.googlejavaformatgradleplugin
 
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException
 import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
+import com.google.common.collect.ImmutableSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.logging.Logger
@@ -17,19 +18,19 @@ class FormatterFactoryTest extends Specification {
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
         when:
-        factory.create(null)
+        factory.create(null, ImmutableSet.of())
 
         then:
         thrown NullPointerException
 
         when:
-        factory.create('this-version-is-not-in-any-repository')
+        factory.create('this-version-is-not-in-any-repository', ImmutableSet.of())
 
         then:
         thrown ResolveException
 
         when: 'a version is used that was actually released'
-        factory.create('0.1-alpha')
+        factory.create('0.1-alpha', ImmutableSet.of())
 
         then: 'resolution fails nevertheless since no repository was defined'
         thrown ResolveException
@@ -53,7 +54,7 @@ class FormatterFactoryTest extends Specification {
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
         when:
-        def formatter = factory.create(version)
+        def formatter = factory.create(version, ImmutableSet.of())
 
         then:
         formatter != null
@@ -88,13 +89,13 @@ class FormatterFactoryTest extends Specification {
         def factory = new FormatterFactory(project, logger)
 
         when:
-        factory.create(Gjf.SUPPORTED_VERSIONS.first())
+        factory.create(Gjf.SUPPORTED_VERSIONS.first(), ImmutableSet.of())
 
         then:
         0 * logger._
 
         when:
-        factory.create(unsupportedVersion)
+        factory.create(unsupportedVersion, ImmutableSet.of())
 
         then:
         1 * logger.warn(*_)

@@ -33,7 +33,7 @@ class FormatterFactory {
         this.logger = Objects.requireNonNull(logger)
     }
 
-    Formatter create(String toolVersion) throws ResolveException {
+    Formatter create(String toolVersion, ImmutableSet<FormatterOption> options) throws ResolveException {
         Objects.requireNonNull(toolVersion)
         def configuration = setupConfiguration(toolVersion)
         def classpath = configuration.resolve()
@@ -44,7 +44,7 @@ class FormatterFactory {
                     'google-java-format. This should not be a problem if the task is executed without failures.',
                     GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }
-        return Gjf.newFormatter(classLoader, toolVersion)
+        return Gjf.newFormatter(classLoader, toolVersion, options as FormatterOption[])
     }
 
     @PackageScope

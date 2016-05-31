@@ -28,11 +28,11 @@ class ExtensionSpec extends Specification {
 
         when:
         extClosure {
-            options javadoc: true
+            options style: 'GOOGLE'
         }
 
         then:
-        ext.options.containsKey('javadoc')
+        ext.options.containsKey('style')
 
         when:
         ext.options.put('baz', 'foo')
@@ -65,7 +65,7 @@ class ExtensionSpec extends Specification {
     def 'set tool version after adding options throws'() {
         when:
         extClosure {
-            options style: 'GOOGLE', javadoc: false
+            options style: 'GOOGLE'
             toolVersion = '1.0'
         }
 

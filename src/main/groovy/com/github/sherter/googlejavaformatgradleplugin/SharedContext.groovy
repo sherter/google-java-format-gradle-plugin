@@ -84,7 +84,8 @@ class SharedContext {
     synchronized Formatter formatter() {
         if (formatter == null) {
             GoogleJavaFormatExtension extension = (GoogleJavaFormatExtension) project.getExtensions().getByName(GoogleJavaFormatPlugin.getEXTENSION_NAME())
-            formatter = new FormatterFactory(project, project.logger).create(extension.toolVersion)
+            formatter = new FormatterFactory(project, project.logger).create(extension.toolVersion,
+                    FormatterFactory.mapOptions(extension.getOptions()))
         }
         return formatter
     }

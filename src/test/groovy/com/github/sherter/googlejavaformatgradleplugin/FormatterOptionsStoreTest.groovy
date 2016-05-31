@@ -1,5 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import com.google.common.collect.ImmutableSet
 import com.google.common.jimfs.Jimfs
 import spock.lang.Specification
 
@@ -45,9 +46,9 @@ class FormatterOptionsStoreTest extends Specification {
         store.read() == option
 
         where:
-        option << [FormatterOptions.create('0.1-alpha'),
-                    FormatterOptions.create('1.0'),
-                    FormatterOptions.create('-123')]
+        option << [FormatterOptions.create('0.1-alpha', ImmutableSet.of()),
+                   FormatterOptions.create('1.0', ImmutableSet.of()),
+                   FormatterOptions.create('-123', ImmutableSet.of())]
     }
 
 }
