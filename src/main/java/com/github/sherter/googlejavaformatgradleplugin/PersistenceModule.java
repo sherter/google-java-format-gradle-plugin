@@ -1,11 +1,17 @@
 package com.github.sherter.googlejavaformatgradleplugin;
 
+import com.google.common.base.Throwables;
+import com.google.common.io.CharStreams;
 import dagger.Module;
 import dagger.Provides;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
 import javax.inject.Named;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -26,8 +32,11 @@ class PersistenceModule {
   @Provides
   @Named("plugin version")
   String providePluginVersion() {
-    // TODO(sherter): compute this dynamically
-    return "0.3";
+    try (InputStream is = getClass().getResourceAsStream("/VERSION")) {
+      return CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Provides
