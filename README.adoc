@@ -115,4 +115,18 @@ buildscript {
 apply plugin: 'com.github.sherter.google-java-format'
 ----
 
+=== New Features
+* Support for options:
++
+[source,groovy]
+----
+googleJavaFormat {
+  options <type>: <value>, <type>: <value>, ... // e.g. options style: 'AOSP'
+}
+----
+|===
+|option | possible values
 
+|style
+|'GOOGLE', 'AOSP'
+|===
