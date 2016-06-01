@@ -20,7 +20,7 @@ class OptionsSpec extends Specification {
         create = new FileWithStateFactory(temporaryFolder.root)
     }
 
-    def 'style option'() {
+    def 'format and verify using different styles'() {
         given:
         def buildfile = create.file(['build.gradle'], """\
             |${AbstractIntegrationTest.buildScriptBlock}
@@ -29,12 +29,9 @@ class OptionsSpec extends Specification {
             |repositories {
             |  jcenter()
             |}
-            |
-            |googleJavaFormat {
-            |  options style: 'GOOGLE'
-            |}
+            |$options
             |""".stripMargin())
-        def foo = create.file(['Foo.java'], 'class   Foo   { public static void main(String[] args)   {}}')
+        def foo = create.file(['Foo.java'], 'class   Foo   { void bar()  {}}')
 
         when:
         runner.withArguments('verGJF').build()
@@ -43,37 +40,21 @@ class OptionsSpec extends Specification {
         thrown(UnexpectedBuildFailure)
 
         when:
-        runner.withArguments('goJF').build()
+        def result = runner.withArguments('goJF').build()
+
+        then:
+        new String(foo.content(), StandardCharsets.UTF_8) == expected
+
+        when:
         runner.withArguments('verGJF').build()
 
         then:
         notThrown(UnexpectedBuildFailure)
-        println new String(foo.content(), StandardCharsets.UTF_8)
 
-        when:
-        buildfile.write("""\
-            |${AbstractIntegrationTest.buildScriptBlock}
-            |apply plugin: 'com.github.sherter.google-java-format'
-            |
-            |repositories {
-            |  jcenter()
-            |}
-            |
-            |googleJavaFormat {
-            |  options style: 'AOSP'
-            |}
-            |""".stripMargin())
-        runner.withArguments('verGJF').build()
-
-        then:
-        thrown(UnexpectedBuildFailure)
-
-        when:
-        runner.withArguments('goJF').build()
-        runner.withArguments('verGJF').build()
-        println new String(foo.content(), StandardCharsets.UTF_8)
-
-        then:
-        notThrown(UnexpectedBuildFailure)
+        where:
+        options                                        | expected
+        ""                                             | "class Foo {\n  void bar() {}\n}\n"
+        "googleJavaFormat { options style: 'GOOGLE' }" | "class Foo {\n  void bar() {}\n}\n"
+        "googleJavaFormat { options style: 'AOSP' }"   | "class Foo {\n    void bar() {}\n}\n"
     }
 }

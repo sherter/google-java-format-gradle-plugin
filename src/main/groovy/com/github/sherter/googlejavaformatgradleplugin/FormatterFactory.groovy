@@ -20,8 +20,6 @@ class FormatterFactory {
             ImmutableTable.<String, Object, FormatterOption>builder()
                     .put('style', 'GOOGLE', FormatterOption.GOOGLE_STYLE)
                     .put('style', 'AOSP', FormatterOption.AOSP_STYLE)
-                    .put('javadoc', Boolean.FALSE, FormatterOption.NO_JAVADOC_FORMATTER)
-                    .put('javadoc', Boolean.TRUE, FormatterOption.ECLIPSE_JAVADOC_FORMATTER)
                     .build()
 
 

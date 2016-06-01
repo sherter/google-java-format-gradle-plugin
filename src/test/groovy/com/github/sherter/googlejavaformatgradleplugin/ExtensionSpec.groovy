@@ -126,7 +126,7 @@ class ExtensionSpec extends Specification {
         when:
         extClosure {
             toolVersion = '12345'
-            options style: 'GOOGLE', javadoc: false
+            options style: 'GOOGLE'
         }
 
         then:
