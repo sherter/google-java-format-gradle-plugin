@@ -33,7 +33,7 @@ class PersistenceModule {
   @Named("plugin version")
   String providePluginVersion() {
     try (InputStream is = getClass().getResourceAsStream("/VERSION")) {
-      return CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8));
+      return CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8)).trim();
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
