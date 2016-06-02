@@ -95,7 +95,9 @@ class FormatterFactoryTest extends Specification {
         0 * logger._
 
         when:
-        factory.create(unsupportedVersion, ImmutableSet.of())
+        try {
+            factory.create(unsupportedVersion, ImmutableSet.of())
+        } catch (any) {}
 
         then:
         1 * logger.warn(*_)
