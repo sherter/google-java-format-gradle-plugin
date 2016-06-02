@@ -2,8 +2,17 @@ plugins {
     id 'groovy'
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile localGroovy()
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        // gradle always loads its own groovy version, which leads to conflicts
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    testCompile 'com.google.jimfs:jimfs:1.1'
 }
 
 targetCompatibility = 1.7
