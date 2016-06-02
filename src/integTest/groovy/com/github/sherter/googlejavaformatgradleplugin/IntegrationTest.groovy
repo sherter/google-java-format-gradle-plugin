@@ -1,158 +1,131 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import groovy.io.FileType
-import org.gradle.testkit.runner.GradleRunner
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Unroll
+
+import static com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME
+import static com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormatPlugin.DEFAULT_VERIFY_TASK_NAME
 
 @Unroll
 class IntegrationTest extends AbstractIntegrationTest {
 
-    @Shared File sampleProject = new File('src/integTest/resources/project')
+    def 'run default format task on a simple java project and validate files and log output'() {
+        given:
+        def buildFile = project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |""".stripMargin())
+        def unformattedJavaFile = project.createFile(['src', 'main', 'java', 'Foo.java'], 'class    Foo  {  }')
+        def formattedJavaFile = project.createFile(['src', 'main', 'java', 'Bar.java'], 'class Bar {}\n')
 
-    @Override
-    void customSetup() {
-        runner.withArguments(GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME, '--stacktrace')
-    }
+        when:
+        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
-    void sameFilesExistAndHaveSameContent(File expectedDir) {
-        expectedDir.eachFileRecurse(FileType.FILES) {
-            def relativePathInProject = expectedDir.toURI().relativize(it.toURI()).toString()
-            assert it.text == new File(projectDir, relativePathInProject).text
-        }
-    }
+        then: 'files are in expected state'
+        unformattedJavaFile.read() == 'class Foo {}\n'
+        !formattedJavaFile.contentHasChanged()
+        !formattedJavaFile.lastModifiedTimeHasChanged()
+        !buildFile.contentHasChanged()
+        !buildFile.lastModifiedTimeHasChanged()
 
-    def "format with default settings and plugin applied #order java plugin"() {
-        given: "a java project with java plugin applied"
-        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
-        buildFile << """
-            apply plugin: '${firstPluginApplied}'
-            apply plugin: '${secondPluginApplied}'
-
-            repositories {
-                jcenter()
-            }
-            """
-
-        when: "formatting task is executed"
-        def result = runner.build()
-
-        then: "source files are formatted properly afterwards"
+        and: 'build log is as expected'
         result.output.contains('BUILD SUCCESSFUL')
-        sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/defaults"))
-
-        where:
-        order    | firstPluginApplied                      | secondPluginApplied
-        'before' | 'com.github.sherter.google-java-format' | 'java'
-        'after'  | 'java'                                  | 'com.github.sherter.google-java-format'
+        result.output.contains('Foo.java: formatted successfully')
+        result.output.contains('Bar.java: formatted successfully')
+        // TODO(sherter): the output for Bar.java is misleading
+        // We didn't actually touch the file, we only added it's current
+        // state to the build cache so it appears as UP-TO-DATE in the next invocation.
+        // better: result.output.contains('Bar.java: already formatted correctly')
+        !result.output.contains('Baz.cpp')
     }
 
 
     def "up-to-date checking"() {
         given:
-        buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                maven {
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                }
-                jcenter()
-            }
-            googleJavaFormat {
-                toolVersion = '0.1-alpha'
-            }
-            """
+        runner.withArguments(DEFAULT_FORMAT_TASK_NAME)
+        def buildFile = project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |googleJavaFormat {
+            |  toolVersion = '0.1-alpha'
+            |}
+            |""".stripMargin())
 
         when: "formatting task is executed on an empty project"
         def result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "source files are added"
-        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
+        project.createFile(['Foo.java'], 'class    Foo  {  }')
+        project.createFile(['Bar.java'], 'class Bar {}\n')
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "task is executed again"
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "new java source file is added and task is executed"
-        def newSource = new File(projectDir, 'src/main/java/NewJavaSource.java')
-        newSource.createNewFile()
+        def baz = project.createFile(['Baz.java'])
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "file was changed"
-        newSource << "class NewJavaSource {}"
+        baz.write('class Baz {}\n')
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "nothing has changed"
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "formatter tool version has changed"
-        buildFile.text = """
-            $buildScriptBlock
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                maven {
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                }
-                jcenter()
-            }
-            googleJavaFormat {
-                toolVersion = '1.0'
-            }
-            """
+        buildFile.write("""\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |googleJavaFormat {
+            |  toolVersion = '1.0'
+            |}
+            |""".stripMargin())
         result = runner.build()
 
         then: "task is not up-to-date"
-        !result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        !result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "nothing has changed"
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
 
         when: "an option has changed"
-        buildFile.text = """
-            $buildScriptBlock
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                maven {
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                }
-                jcenter()
-            }
-            googleJavaFormat {
-                toolVersion = '1.0'
-                options style: 'GOOGLE'
-            }
-            """
-
+        buildFile.write("""\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |googleJavaFormat {
+            |  toolVersion = '1.0'
+            |  options style: 'GOOGLE'
+            |}
+            |""".stripMargin())
         result = runner.build()
 
         then:
@@ -162,81 +135,71 @@ class IntegrationTest extends AbstractIntegrationTest {
         result = runner.build()
 
         then: "task is up-to-date"
-        result.output.contains(":${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} UP-TO-DATE")
+        result.output.contains(":$DEFAULT_FORMAT_TASK_NAME UP-TO-DATE")
     }
 
-    def "include and exclude sources"() {
+    def "exclude a file from the default format task"() {
         given:
-        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
-        buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                jcenter()
-            }
-            tasks.${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME} {
-                source 'src'
-                include '**/*.java'
-                exclude '**/Bar.java'
-            }
-            """
+        project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |tasks.$DEFAULT_FORMAT_TASK_NAME {
+            |  exclude '**/Bar.java'
+            |}
+            |""".stripMargin())
+        def foo = project.createFile(['Foo.java'], 'class  Foo  {   }')
+        def bar = project.createFile(['Bar.java'], 'class  Bar  {   }')
 
         when: "formatting task is executed"
-        def result = runner.build()
+        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then: "source files are formatted properly afterwards"
+        foo.contentHasChanged()
+        foo.lastModifiedTimeHasChanged()
+        !bar.contentHasChanged()
+        !bar.lastModifiedTimeHasChanged()
         result.output.contains('BUILD SUCCESSFUL')
-        sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/include-exclude"))
     }
 
     def "define additional format task"() {
         given:
-        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
-        buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                jcenter()
-            }
-
-            task customFormatTask(type: com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormat) {
-                source 'src/Foo.java'
-            }
-            """
+        project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |import com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormat
+            |task customFormatTask(type: GoogleJavaFormat) {
+            |  source 'src/Foo.java'
+            |}
+            |""".stripMargin())
+        def foo = project.createFile(['src', 'Foo.java'], 'class  Foo  {   }')
+        def bar = project.createFile(['Bar.java'], 'class   Bar {  }')
 
         when: "formatting task is executed"
         def result = runner.withArguments('customFormatTask').build()
 
         then: "source files are formatted properly afterwards"
+        foo.read() == 'class Foo {}\n'
+        !bar.contentHasChanged()
+        !bar.lastModifiedTimeHasChanged()
         result.output.contains('BUILD SUCCESSFUL')
-        sameFilesExistAndHaveSameContent(new File("src/integTest/resources/results/custom"))
     }
 
     def "invalid input (incorrect java syntax)"() {
         given:
-        buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                maven {
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                }
-                jcenter()
-            }
-
-            tasks."${GoogleJavaFormatPlugin.DEFAULT_FORMAT_TASK_NAME}" {
-                source file('Invalid.java')
-            }
-            """
-        def inputFile = new File(projectDir, 'Invalid.java')
-        inputFile.createNewFile()
-        inputFile << "<< -.- \$asd\$This is not a valid java class!"
+        project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |""".stripMargin())
+        project.createFile(['Invalid.java'], 'this is not valid java syntax')
 
         when:
-        def result = runner.buildAndFail()
+        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).buildAndFail()
 
         then:
         result.output.contains("Detected Java syntax errors")
@@ -245,21 +208,20 @@ class IntegrationTest extends AbstractIntegrationTest {
 
     def 'report unformatted java sources'() {
         given: "a java project with java plugin applied"
-        new AntBuilder().copy(todir: projectDir) { fileset(dir: sampleProject) }
-        buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.sherter.google-java-format'
-
-            repositories {
-                jcenter()
-            }
-            """
+        project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |repositories {
+            |  jcenter()
+            |}
+            |""".stripMargin())
+        project.createFile(['Foo.java'], 'class Foo {}\n')
+        project.createFile(['Bar.java'], 'class    Bar   {  }')
 
         when:
-        def result = runner.withArguments(GoogleJavaFormatPlugin.DEFAULT_VERIFY_TASK_NAME)
-                .buildAndFail()
+        def result = runner.withArguments(DEFAULT_VERIFY_TASK_NAME).buildAndFail()
 
         then:
+        !result.output.contains('Foo.java')
         result.output.contains('Bar.java')
     }
 }

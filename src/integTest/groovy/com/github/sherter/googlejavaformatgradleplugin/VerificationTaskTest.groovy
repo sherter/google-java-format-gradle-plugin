@@ -8,17 +8,16 @@ class VerificationTaskTest extends AbstractIntegrationTest {
 
     @Override
     void customSetup() {
-        buildFile << """
-        apply plugin: 'com.github.sherter.google-java-format'
-        """
         runner.withArguments(customTaskName)
     }
 
     def 'no inputs results in UP-TO-DATE task'() {
         given:
-        buildFile << """
-        task $customTaskName(type: ${VerifyGoogleJavaFormat.name})
-        """
+        buildFile.text = """\
+            |$applyPlugin
+            |
+            |task $customTaskName(type: ${VerifyGoogleJavaFormat.name})
+            |""".stripMargin()
 
         when:
         def result = runner.build()
@@ -29,11 +28,13 @@ class VerificationTaskTest extends AbstractIntegrationTest {
 
     def 'dependency resolution failure'() {
         given:
-        buildFile << """
-        task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            source '${buildFile.name}'
-        }
-        """
+        buildFile.text = """\
+            |$applyPlugin
+            |
+            |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
+            |  source '${buildFile.name}'
+            |}
+            |""".stripMargin()
 
         when:
         def result = runner.buildAndFail()
@@ -46,15 +47,18 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         given:
         File sourceFile = new File(projectDir, 'File.java')
         sourceFile << 'class HelloWorld {}\n'
-        buildFile << """
-        repositories {
-            mavenLocal()
-            jcenter()
-        }
-        task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            source '${sourceFile.name}'
-        }
-        """
+        buildFile.text = """\
+            |$applyPlugin
+            |
+            |repositories {
+            |  mavenLocal()
+            |  jcenter()
+            |}
+            |
+            |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
+            |  source '${sourceFile.name}'
+            |}
+            |""".stripMargin()
 
         when:
         def result = runner.build()
@@ -71,15 +75,18 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         class       HelloWorld {
                 }
         """
-        buildFile << """
-        repositories {
-            mavenLocal()
-            jcenter()
-        }
-        task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            source '${sourceFile.name}'
-        }
-        """
+        buildFile.text = """\
+            |$applyPlugin
+            |
+            |repositories {
+            |  mavenLocal()
+            |  jcenter()
+            |}
+            |
+            |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
+            |  source '${sourceFile.name}'
+            |}
+            |""".stripMargin()
 
         when:
         def result = runner.buildAndFail()
@@ -95,16 +102,19 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         class       HelloWorld {
                 }
         """
-        buildFile << """
-        repositories {
-            mavenLocal()
-            jcenter()
-        }
-        task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            source '${sourceFile.name}'
-            ignoreFailures true
-        }
-        """
+        buildFile.text = """\
+            |$applyPlugin
+            |
+            |repositories {
+            |  mavenLocal()
+            |  jcenter()
+            |}
+            |
+            |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
+            |  source '${sourceFile.name}'
+            |  ignoreFailures true
+            |}
+            |""".stripMargin()
 
         when:
         def result = runner.build()
@@ -115,6 +125,7 @@ class VerificationTaskTest extends AbstractIntegrationTest {
 
     def 'check task (if present) depends on default verification task'() {
         when:
+        buildFile.text = applyPlugin
         def result = runner.withArguments('tasks').build()
 
         then:
@@ -122,22 +133,22 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         !result.output.contains('check')
 
         when: 'after base plugin'
-        buildFile.text = buildScriptBlock
-        buildFile << '''\
-            apply plugin: JavaBasePlugin
-            apply plugin: 'com.github.sherter.google-java-format'
-            '''.stripIndent()
+        buildFile.text = """\
+            |$buildScriptBlock
+            |apply plugin: JavaBasePlugin
+            |apply plugin: 'com.github.sherter.google-java-format'
+            |""".stripMargin()
         result = runner.withArguments('tasks', '--all').build()
 
         then:
         result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
 
         when: 'before base plugin'
-        buildFile.text = buildScriptBlock
-        buildFile << '''\
-            apply plugin: 'com.github.sherter.google-java-format'
-            apply plugin: JavaBasePlugin
-            '''.stripIndent()
+        buildFile.text = """\
+            |$buildScriptBlock
+            |apply plugin: 'com.github.sherter.google-java-format'
+            |apply plugin: JavaBasePlugin
+            |""".stripMargin()
         result = runner.withArguments('tasks', '--all').build()
 
         then:
