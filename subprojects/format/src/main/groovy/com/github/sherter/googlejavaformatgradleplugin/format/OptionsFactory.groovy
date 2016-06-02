@@ -21,6 +21,7 @@ class OptionsFactory implements FormatterFactory {
                     .put(GOOGLE_STYLE, ImmutableSet.of(AOSP_STYLE))
                     .put(NO_JAVADOC_FORMATTER, ImmutableSet.of(ECLIPSE_JAVADOC_FORMATTER))
                     .put(ECLIPSE_JAVADOC_FORMATTER, ImmutableSet.of(NO_JAVADOC_FORMATTER))
+                    .put(SORT_IMPORTS, ImmutableSet.of())
                     .build()
 
     private final ClassLoader classLoader
@@ -36,7 +37,7 @@ class OptionsFactory implements FormatterFactory {
         def formatterClass = classLoader.loadClass('com.google.googlejavaformat.java.Formatter')
         def javaFormatterOptionsClass = classLoader.loadClass('com.google.googlejavaformat.java.JavaFormatterOptions')
         def optionsObject = javaFormatterOptionsClass.newInstance(
-                getJavadocFormatter(options), getStyle(options), getSortImports())
+                getJavadocFormatter(options), getStyle(options), getSortImports(options))
         def formatter = formatterClass.newInstance(optionsObject)
         return { String source ->
             try {
@@ -76,8 +77,11 @@ class OptionsFactory implements FormatterFactory {
         return Enum.valueOf(styleEnum, 'GOOGLE')
     }
 
-    private getSortImports() {
+    private getSortImports(FormatterOption[] options) {
         def sortImportsEnum = classLoader.loadClass('com.google.googlejavaformat.java.JavaFormatterOptions$SortImports')
+        if (options.contains(SORT_IMPORTS)) {
+            return Enum.valueOf(sortImportsEnum, 'ALSO')
+        }
         return Enum.valueOf(sortImportsEnum, 'NO')
     }
 }

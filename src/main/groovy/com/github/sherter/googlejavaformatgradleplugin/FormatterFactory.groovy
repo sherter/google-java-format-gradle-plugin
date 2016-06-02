@@ -46,7 +46,8 @@ class FormatterFactory {
             return Gjf.newFormatter(classLoader, toolVersion, options as FormatterOption[])
         } else {
             return Gjf.newFormatter(classLoader, toolVersion,
-                    (options as FormatterOption[]) + FormatterOption.ECLIPSE_JAVADOC_FORMATTER)
+                    (options as FormatterOption[]) + [FormatterOption.ECLIPSE_JAVADOC_FORMATTER,
+                            FormatterOption.SORT_IMPORTS])
         }
     }
 

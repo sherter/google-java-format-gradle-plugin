@@ -67,6 +67,22 @@ class OneDotZeroSpec extends Specification {
         formatterWithout.format(javadoc) != formatterEclipse.format(javadoc)
     }
 
+    def 'test sort imports formatter option'() {
+        given:
+        def sortingFormatter = Gjf.newFormatter(resolve(version), version, SORT_IMPORTS)
+        def nonSortingFormatter = Gjf.newFormatter(resolve(version), version)
+        def source = '''\
+            |import second.Foo;
+            |import first.Bar;
+            |
+            |class Foo {}
+            |'''.stripMargin()
+
+        expect:
+        // sorting doesn't work in 1.0, see https://github.com/google/google-java-format/issues/42
+        sortingFormatter.format(source) == nonSortingFormatter.format(source)
+    }
+
     def 'construct formatter with conflicting options throws'() {
         when:
         Gjf.newFormatter(resolve(version), version, NO_JAVADOC_FORMATTER, ECLIPSE_JAVADOC_FORMATTER)

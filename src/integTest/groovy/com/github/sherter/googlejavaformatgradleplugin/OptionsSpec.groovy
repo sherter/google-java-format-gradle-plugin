@@ -91,4 +91,38 @@ class OptionsSpec extends Specification {
         '0.1-alpha' | '/**\n * foo\n * bar\n */\nclass Foo {}\n' // no javadoc formatting
         '1.0'       | '/**\n * foo bar\n */\nclass Foo {}\n' // EclipseJavadocFormatter
     }
+
+    def 'imports are sorted if supported by tool version'() {
+        given:
+        def buildfile = create.file(['build.gradle'], """\
+            |${AbstractIntegrationTest.buildScriptBlock}
+            |apply plugin: 'com.github.sherter.google-java-format'
+            |
+            |repositories {
+            |  jcenter()
+            |}
+            |
+            |googleJavaFormat {
+            |  toolVersion = '$toolVersion'
+            |}
+            |""".stripMargin())
+        def foo = create.file(['Foo.java'], '''\
+            |import second.Foo;
+            |import first.Bar;
+            |
+            |class Foo {}
+            |'''.stripMargin())
+
+        when:
+        runner.withArguments('goJF', '--stacktrace').build()
+
+        then:
+        new String(foo.content(), StandardCharsets.UTF_8) == expected
+
+        where:
+        // TODO(sherter): add another row as soon as a version is released that actually supports it
+        toolVersion    | expected
+        '0.1-alpha'    | 'import second.Foo;\nimport first.Bar;\n\nclass Foo {}\n' // no sorting
+        '1.0'          | 'import second.Foo;\nimport first.Bar;\n\nclass Foo {}\n' // no sorting (google-java-format issue #42)
+    }
 }

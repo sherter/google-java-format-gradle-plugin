@@ -19,7 +19,8 @@ public enum FormatterOption {
   /** Supported by {@code google-java-format} version {@code 1.0}. */
   GOOGLE_STYLE("1.0"),
   NO_JAVADOC_FORMATTER("1.0"),
-  ECLIPSE_JAVADOC_FORMATTER("1.0");
+  ECLIPSE_JAVADOC_FORMATTER("1.0"),
+  SORT_IMPORTS("1.0");
 
   public final ImmutableList<String> supportedVersions;
 
