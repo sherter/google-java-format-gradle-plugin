@@ -57,4 +57,38 @@ class OptionsSpec extends Specification {
         "googleJavaFormat { options style: 'GOOGLE' }" | "class Foo {\n  void bar() {}\n}\n"
         "googleJavaFormat { options style: 'AOSP' }"   | "class Foo {\n    void bar() {}\n}\n"
     }
+
+    def 'javadoc is formatted with expected javadoc formatter'() {
+        given:
+        def buildfile = create.file(['build.gradle'], """\
+            |${AbstractIntegrationTest.buildScriptBlock}
+            |apply plugin: 'com.github.sherter.google-java-format'
+            |
+            |repositories {
+            |  jcenter()
+            |}
+            |
+            |googleJavaFormat {
+            |  toolVersion = '$toolVersion'
+            |}
+            |""".stripMargin())
+        def foo = create.file(['Foo.java'], '''\
+            |/**
+            | * foo
+            | * bar
+            | */
+            |class Foo {}
+            |'''.stripMargin())
+
+        when:
+        runner.withArguments('goJF').build()
+
+        then:
+        new String(foo.content(), StandardCharsets.UTF_8) == expected
+
+        where:
+        toolVersion | expected
+        '0.1-alpha' | '/**\n * foo\n * bar\n */\nclass Foo {}\n' // no javadoc formatting
+        '1.0'       | '/**\n * foo bar\n */\nclass Foo {}\n' // EclipseJavadocFormatter
+    }
 }

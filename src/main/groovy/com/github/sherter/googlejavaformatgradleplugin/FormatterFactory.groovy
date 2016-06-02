@@ -42,7 +42,12 @@ class FormatterFactory {
                     'google-java-format. This should not be a problem if the task is executed without failures.',
                     GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }
-        return Gjf.newFormatter(classLoader, toolVersion, options as FormatterOption[])
+        if (toolVersion.equals('0.1-alpha')) {
+            return Gjf.newFormatter(classLoader, toolVersion, options as FormatterOption[])
+        } else {
+            return Gjf.newFormatter(classLoader, toolVersion,
+                    (options as FormatterOption[]) + FormatterOption.ECLIPSE_JAVADOC_FORMATTER)
+        }
     }
 
     @PackageScope
