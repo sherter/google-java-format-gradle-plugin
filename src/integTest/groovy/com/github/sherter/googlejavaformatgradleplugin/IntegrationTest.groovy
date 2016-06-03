@@ -18,7 +18,7 @@ class IntegrationTest extends AbstractIntegrationSpec {
         def formattedJavaFile = project.createFile(['src', 'main', 'java', 'Bar.java'], 'class Bar {}\n')
 
         when:
-        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
+        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME, '--debug').build()
 
         then: 'files are in expected state'
         unformattedJavaFile.read() == 'class Foo {}\n'
@@ -29,13 +29,8 @@ class IntegrationTest extends AbstractIntegrationSpec {
 
         and: 'build log is as expected'
         result.output.contains('BUILD SUCCESSFUL')
-        result.output.contains('Foo.java: formatted successfully')
-        result.output.contains('Bar.java: formatted successfully')
-        // TODO(sherter): the output for Bar.java is misleading
-        // We didn't actually touch the file, we only added it's current
-        // state to the build cache so it appears as UP-TO-DATE in the next invocation.
-        // better: result.output.contains('Bar.java: already formatted correctly')
-        !result.output.contains('Baz.cpp')
+        result.output =~ /\[LIFECYCLE\].*Foo\.java: formatted successfully/
+        result.output =~ /\[INFO\].*Bar\.java: UP-TO-DATE/
     }
 
 

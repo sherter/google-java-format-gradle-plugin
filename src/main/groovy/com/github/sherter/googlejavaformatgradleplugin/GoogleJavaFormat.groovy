@@ -4,6 +4,8 @@ import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
 import com.google.common.collect.Iterables
 import groovy.transform.CompileStatic
 import org.gradle.api.GradleException;
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction
 
@@ -14,6 +16,8 @@ import java.util.concurrent.Future;
 
 @CompileStatic
 class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
+
+  private static final Logger logger = Logging.getLogger(GoogleJavaFormat.class)
 
   private SharedContext sharedContext
   private Iterable<Path> filteredSources
@@ -57,10 +61,6 @@ class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
           mapper.putIfNewer(info);
           if (info.state() == FileState.INVALID) {
             invalidSources.add(info.path())
-          } else if (info.state() == FileState.FORMATTED) {
-            logger.lifecycle("{}: formatted successfully", info.path());
-          } else {
-            // throw new AssertionError("no other states possible");
           }
         } catch (ExecutionException e) {
           def pathException = e.getCause() as PathException

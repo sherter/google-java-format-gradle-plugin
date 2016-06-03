@@ -2,6 +2,8 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter;
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,6 +12,8 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 
 class FormatFileCallable implements Callable<FileInfo> {
+
+  private static final Logger logger = Logging.getLogger(FormatFileCallable.class);
 
   private final Formatter formatter;
   private final Path file;
@@ -39,11 +43,13 @@ class FormatFileCallable implements Callable<FileInfo> {
                 file, Files.getLastModifiedTime(file), content.length, FileState.INVALID);
       }
       if (utf8Decoded.equals(formatted)) {
+        logger.info("{}: UP-TO-DATE", file);
         return FileInfo.create(
                 file, Files.getLastModifiedTime(file), content.length, FileState.FORMATTED);
       }
       byte[] utf8Encoded = formatted.getBytes(StandardCharsets.UTF_8.name());
       Files.write(file, utf8Encoded);
+      logger.lifecycle("{}: formatted successfully", file);
       return FileInfo.create(
               file, Files.getLastModifiedTime(file), utf8Encoded.length, FileState.FORMATTED);
     } catch(Throwable t) {
