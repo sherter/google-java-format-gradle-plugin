@@ -6,7 +6,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-abstract class AbstractIntegrationTest extends Specification {
+abstract class AbstractIntegrationSpec extends Specification {
 
     static final String buildScriptBlock = """\
         |buildscript {
@@ -26,19 +26,23 @@ abstract class AbstractIntegrationTest extends Specification {
         |apply plugin: 'com.github.sherter.google-java-format'
         |""".stripMargin()
 
+    // if a dependency is not in teskit's dependency cache, try to load it from
+    // the local repository first, before reaching out to the web
+    static final String defaultRepositories = '''\
+        |repositories {
+        |  mavenLocal()
+        |  jcenter()
+        |}
+        |'''.stripMargin()
+
     @Rule TemporaryFolder temporaryFolder
-    File projectDir
-    File buildFile
     GradleRunner runner
     Project project
 
     def setup() {
-        projectDir = temporaryFolder.root
-        buildFile = new File(projectDir, 'build.gradle')
-        runner = GradleRunner.create().withProjectDir(projectDir).withGradleVersion(System.properties['GRADLE_VERSION'])
-        project = new Project(projectDir)
-        customSetup()
+        runner = GradleRunner.create()
+                .withGradleVersion(System.properties['GRADLE_VERSION'])
+                .withProjectDir(temporaryFolder.root)
+        project = new Project(temporaryFolder.root)
     }
-
-    void customSetup() {}
 }

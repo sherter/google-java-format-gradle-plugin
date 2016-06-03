@@ -6,15 +6,13 @@ import static com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormatPl
 import static com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormatPlugin.DEFAULT_VERIFY_TASK_NAME
 
 @Unroll
-class IntegrationTest extends AbstractIntegrationTest {
+class IntegrationTest extends AbstractIntegrationSpec {
 
-    def 'run default format task on a simple java project and validate files and log output'() {
+    def 'verify behaviour of default format task with default settings'() {
         given:
         def buildFile = project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |""".stripMargin())
         def unformattedJavaFile = project.createFile(['src', 'main', 'java', 'Foo.java'], 'class    Foo  {  }')
         def formattedJavaFile = project.createFile(['src', 'main', 'java', 'Bar.java'], 'class Bar {}\n')
@@ -46,9 +44,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         runner.withArguments(DEFAULT_FORMAT_TASK_NAME)
         def buildFile = project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |googleJavaFormat {
             |  toolVersion = '0.1-alpha'
             |}
@@ -97,9 +93,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         when: "formatter tool version has changed"
         buildFile.write("""\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |googleJavaFormat {
             |  toolVersion = '1.0'
             |}
@@ -118,9 +112,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         when: "an option has changed"
         buildFile.write("""\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |googleJavaFormat {
             |  toolVersion = '1.0'
             |  options style: 'GOOGLE'
@@ -142,9 +134,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         given:
         project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |tasks.$DEFAULT_FORMAT_TASK_NAME {
             |  exclude '**/Bar.java'
             |}
@@ -167,11 +157,8 @@ class IntegrationTest extends AbstractIntegrationTest {
         given:
         project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
-            |import com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormat
-            |task customFormatTask(type: GoogleJavaFormat) {
+            |$defaultRepositories
+            |task customFormatTask(type: $GoogleJavaFormat.name) {
             |  source 'src/Foo.java'
             |}
             |""".stripMargin())
@@ -192,9 +179,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         given:
         project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |""".stripMargin())
         project.createFile(['Invalid.java'], 'this is not valid java syntax')
 
@@ -210,9 +195,7 @@ class IntegrationTest extends AbstractIntegrationTest {
         given: "a java project with java plugin applied"
         project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |repositories {
-            |  jcenter()
-            |}
+            |$defaultRepositories
             |""".stripMargin())
         project.createFile(['Foo.java'], 'class Foo {}\n')
         project.createFile(['Bar.java'], 'class    Bar   {  }')

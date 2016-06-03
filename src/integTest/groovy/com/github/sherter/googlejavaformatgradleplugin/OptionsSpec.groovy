@@ -1,35 +1,17 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import com.github.sherter.googlejavaformatgradleplugin.test.Project
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import spock.lang.Specification
 
-class OptionsSpec extends Specification {
-
-    @Rule TemporaryFolder temporaryFolder
-    GradleRunner runner
-    Project project
-
-    def setup() {
-        runner = GradleRunner.create().withProjectDir(temporaryFolder.root).withGradleVersion(System.properties['GRADLE_VERSION'])
-        project = new Project(temporaryFolder.root)
-    }
+class OptionsSpec extends AbstractIntegrationSpec {
 
     def 'format and verify using different styles'() {
         given:
-        project.createFile(['build.gradle'], """\
-            |${AbstractIntegrationTest.buildScriptBlock}
-            |apply plugin: 'com.github.sherter.google-java-format'
-            |
-            |repositories {
-            |  jcenter()
-            |}
-            |$options
-            |""".stripMargin())
         def foo = project.createFile(['Foo.java'], 'class   Foo   { void bar()  {}}')
+        project.createFile(['build.gradle'], """\
+            |$applyPlugin
+            |$defaultRepositories
+            |$extension
+            |""".stripMargin())
 
         when:
         runner.withArguments('verGJF').build()
@@ -52,7 +34,7 @@ class OptionsSpec extends Specification {
         notThrown(UnexpectedBuildFailure)
 
         where:
-        options                                        | expected
+        extension                                      | expected
         ""                                             | "class Foo {\n  void bar() {}\n}\n"
         "googleJavaFormat { options style: 'GOOGLE' }" | "class Foo {\n  void bar() {}\n}\n"
         "googleJavaFormat { options style: 'AOSP' }"   | "class Foo {\n    void bar() {}\n}\n"
@@ -61,13 +43,8 @@ class OptionsSpec extends Specification {
     def 'javadoc is formatted with expected javadoc formatter'() {
         given:
         project.createFile(['build.gradle'], """\
-            |${AbstractIntegrationTest.buildScriptBlock}
-            |apply plugin: 'com.github.sherter.google-java-format'
-            |
-            |repositories {
-            |  jcenter()
-            |}
-            |
+            |$applyPlugin
+            |$defaultRepositories
             |googleJavaFormat {
             |  toolVersion = '$toolVersion'
             |}
@@ -95,13 +72,8 @@ class OptionsSpec extends Specification {
     def 'imports are sorted if supported by tool version'() {
         given:
         project.createFile(['build.gradle'], """\
-            |${AbstractIntegrationTest.buildScriptBlock}
-            |apply plugin: 'com.github.sherter.google-java-format'
-            |
-            |repositories {
-            |  jcenter()
-            |}
-            |
+            |$applyPlugin
+            |$defaultRepositories
             |googleJavaFormat {
             |  toolVersion = '$toolVersion'
             |}
@@ -114,7 +86,7 @@ class OptionsSpec extends Specification {
             |'''.stripMargin())
 
         when:
-        runner.withArguments('goJF', '--stacktrace').build()
+        runner.withArguments('goJF').build()
 
         then:
         foo.read() == expected

@@ -1,26 +1,18 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import spock.lang.Shared
+class VerificationTaskTest extends AbstractIntegrationSpec {
 
-class VerificationTaskTest extends AbstractIntegrationTest {
-
-    @Shared String customTaskName = 'verifyCustom'
-
-    @Override
-    void customSetup() {
-        runner.withArguments(customTaskName)
-    }
+    final static String customTaskName = 'verifyCustom'
 
     def 'no inputs results in UP-TO-DATE task'() {
         given:
-        buildFile.text = """\
+        project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name})
-            |""".stripMargin()
+            |""".stripMargin())
 
         when:
-        def result = runner.build()
+        def result = runner.withArguments(customTaskName).build()
 
         then:
         result.output.contains(":$customTaskName UP-TO-DATE")
@@ -28,16 +20,15 @@ class VerificationTaskTest extends AbstractIntegrationTest {
 
     def 'dependency resolution failure'() {
         given:
-        buildFile.text = """\
+        project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            |  source '${buildFile.name}'
+            |  source 'build.gradle'
             |}
-            |""".stripMargin()
+            |""".stripMargin())
 
         when:
-        def result = runner.buildAndFail()
+        def result = runner.withArguments(customTaskName).buildAndFail()
 
         then:
         result.output.contains("Could not resolve all dependencies for configuration ':googleJavaFormat")
@@ -45,23 +36,18 @@ class VerificationTaskTest extends AbstractIntegrationTest {
 
     def 'no reports for correctly formatted input source file'() {
         given:
-        File sourceFile = new File(projectDir, 'File.java')
-        sourceFile << 'class HelloWorld {}\n'
-        buildFile.text = """\
+        project.createFile(['Foo.java'], 'class Foo {}\n')
+        project.createFile(['build.gradle'],  """\
             |$applyPlugin
-            |
-            |repositories {
-            |  mavenLocal()
-            |  jcenter()
-            |}
-            |
+            |$defaultRepositories
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            |  source '${sourceFile.name}'
+            |  source 'Foo.java'
             |}
-            |""".stripMargin()
+            |""".stripMargin())
+
 
         when:
-        def result = runner.build()
+        def result = runner.withArguments(customTaskName).build()
 
         then:
         result.output.contains(":$customTaskName\n")
@@ -70,62 +56,44 @@ class VerificationTaskTest extends AbstractIntegrationTest {
 
     def 'report badly formatted input source file'() {
         given:
-        File sourceFile = new File(projectDir, 'File.java')
-        sourceFile << """
-        class       HelloWorld {
-                }
-        """
-        buildFile.text = """\
+        project.createFile(['Foo.java'], '  class  Foo {   }')
+        project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |
-            |repositories {
-            |  mavenLocal()
-            |  jcenter()
-            |}
-            |
+            |$defaultRepositories
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            |  source '${sourceFile.name}'
+            |  source 'Foo.java'
             |}
-            |""".stripMargin()
+            |""".stripMargin())
 
         when:
-        def result = runner.buildAndFail()
+        def result = runner.withArguments(customTaskName).buildAndFail()
 
         then:
-        result.output.contains("${sourceFile.path}")
+        result.output.contains('Foo.java')
     }
 
     def 'ignore verification failures'() {
         given:
-        File sourceFile = new File(projectDir, 'File.java')
-        sourceFile << """
-        class       HelloWorld {
-                }
-        """
-        buildFile.text = """\
+        project.createFile(['Foo.java'], '  class  Foo {   }')
+        project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |
-            |repositories {
-            |  mavenLocal()
-            |  jcenter()
-            |}
-            |
+            |$defaultRepositories            |
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
-            |  source '${sourceFile.name}'
+            |  source 'Foo.java'
             |  ignoreFailures true
             |}
-            |""".stripMargin()
+            |""".stripMargin())
 
         when:
-        def result = runner.build()
+        def result = runner.withArguments(customTaskName).build()
 
         then:
-        result.output.contains("${sourceFile.path}")
+        result.output.contains('Foo.java')
     }
 
     def 'check task (if present) depends on default verification task'() {
         when:
-        buildFile.text = applyPlugin
+        def buildFile = project.createFile(['build.gradle'], applyPlugin)
         def result = runner.withArguments('tasks').build()
 
         then:
@@ -133,26 +101,25 @@ class VerificationTaskTest extends AbstractIntegrationTest {
         !result.output.contains('check')
 
         when: 'after base plugin'
-        buildFile.text = """\
+        buildFile.write("""\
             |$buildScriptBlock
             |apply plugin: JavaBasePlugin
             |apply plugin: 'com.github.sherter.google-java-format'
-            |""".stripMargin()
+            |""".stripMargin())
         result = runner.withArguments('tasks', '--all').build()
 
         then:
         result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
 
         when: 'before base plugin'
-        buildFile.text = """\
+        buildFile.write("""\
             |$buildScriptBlock
             |apply plugin: 'com.github.sherter.google-java-format'
             |apply plugin: JavaBasePlugin
-            |""".stripMargin()
+            |""".stripMargin())
         result = runner.withArguments('tasks', '--all').build()
 
         then:
         result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
     }
-
 }
