@@ -62,4 +62,14 @@ class FileWithStateTest extends Specification {
         file.contentHasChanged()
         file.lastModifiedTimeHasChanged()
     }
+
+    def 'file is deleted after calling delete'() {
+        def file = FileWithState.create(foo)
+
+        when:
+        file.delete()
+
+        then:
+        !Files.exists(foo)
+    }
 }

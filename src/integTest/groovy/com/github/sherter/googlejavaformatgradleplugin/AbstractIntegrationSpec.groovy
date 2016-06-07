@@ -44,5 +44,8 @@ abstract class AbstractIntegrationSpec extends Specification {
                 .withGradleVersion(System.properties['GRADLE_VERSION'])
                 .withProjectDir(temporaryFolder.root)
         project = new Project(temporaryFolder.root)
+        additionalSetup()
     }
+
+    void additionalSetup() {};
 }

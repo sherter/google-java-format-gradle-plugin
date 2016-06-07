@@ -71,4 +71,11 @@ class FileWithState {
     void write(String newContent) {
         write(newContent.getBytes(StandardCharsets.UTF_8))
     }
+
+    /**
+     * Deletes the file from the file system.
+     */
+    void delete() {
+        Files.delete(file)
+    }
 }
