@@ -20,8 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
-
 class FormatterOptionsStore {
 
   private final Path backingFile;
