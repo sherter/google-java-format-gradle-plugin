@@ -77,7 +77,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         project.createFile(['Foo.java'], '  class  Foo {   }')
         project.createFile(['build.gradle'], """\
             |$applyPlugin
-            |$defaultRepositories            |
+            |$defaultRepositories
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
             |  source 'Foo.java'
             |  ignoreFailures true
