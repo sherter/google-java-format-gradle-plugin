@@ -184,4 +184,16 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         then:
         !(result.output =~ /UP-TO-DATE/)
     }
+
+    def "format task doesn't modify a file, if it is already formatted correctly"() {
+        def foo = project.createFile(['Foo.java'], 'class Foo {}\n')
+
+        when:
+        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME, '--info').build()
+
+        then:
+        result.output =~ /Foo\.java: UP-TO-DATE/
+        !foo.lastModifiedTimeHasChanged()
+        !foo.contentHasChanged()
+    }
 }
