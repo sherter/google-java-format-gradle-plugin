@@ -44,6 +44,7 @@ abstract class AbstractIntegrationSpec extends Specification {
                 .withGradleVersion(System.properties['GRADLE_VERSION'])
                 .withProjectDir(temporaryFolder.root)
         project = new Project(temporaryFolder.root)
+        project.createFile(['gradle.properties'], 'org.gradle.jvmargs=-Xmx2048m\n')
         additionalSetup()
     }
 
