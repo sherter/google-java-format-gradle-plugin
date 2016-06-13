@@ -24,9 +24,9 @@ class FormatFileCallable implements Callable<FileInfo> {
   }
 
   /**
-   * Returns a {@link FileInfo} object that describes the state of the file after trying to format it (in place).
-   * The {@link FileInfo#state() state} will either be {@link FileState#FORMATTED} or {@link FileState#INVALID},
-   * if Java syntax errors where found.
+   * Returns a {@link FileInfo} object that describes the state of the file after trying to format
+   * it (in place). The {@link FileInfo#state() state} will either be {@link FileState#FORMATTED} or
+   * {@link FileState#INVALID}, if Java syntax errors where found.
    *
    * @throws Exception if and only if file system access fails at some point
    */
@@ -40,19 +40,19 @@ class FormatFileCallable implements Callable<FileInfo> {
         formatted = formatter.format(utf8Decoded);
       } catch (FormatterException e) {
         return FileInfo.create(
-                file, Files.getLastModifiedTime(file), content.length, FileState.INVALID);
+            file, Files.getLastModifiedTime(file), content.length, FileState.INVALID);
       }
       if (utf8Decoded.equals(formatted)) {
         logger.info("{}: UP-TO-DATE", file);
         return FileInfo.create(
-                file, Files.getLastModifiedTime(file), content.length, FileState.FORMATTED);
+            file, Files.getLastModifiedTime(file), content.length, FileState.FORMATTED);
       }
       byte[] utf8Encoded = formatted.getBytes(StandardCharsets.UTF_8.name());
       Files.write(file, utf8Encoded);
       logger.lifecycle("{}: formatted successfully", file);
       return FileInfo.create(
-              file, Files.getLastModifiedTime(file), utf8Encoded.length, FileState.FORMATTED);
-    } catch(Throwable t) {
+          file, Files.getLastModifiedTime(file), utf8Encoded.length, FileState.FORMATTED);
+    } catch (Throwable t) {
       throw new PathException(file, t);
     }
   }

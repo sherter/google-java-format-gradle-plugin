@@ -38,7 +38,8 @@ class FormatterOptionsStore {
     Reader reader = Channels.newReader(channel, StandardCharsets.UTF_8.name());
     Properties properties = new Properties();
     properties.load(reader);
-    return FormatterOptions.create(properties.getProperty("toolVersion"), parseOptions(properties.getProperty("options")));
+    return FormatterOptions.create(
+        properties.getProperty("toolVersion"), parseOptions(properties.getProperty("options")));
   }
 
   private ImmutableSet<FormatterOption> parseOptions(String optionList) {
@@ -46,12 +47,15 @@ class FormatterOptionsStore {
       return ImmutableSet.of();
     }
     Iterable<String> options = Splitter.on(',').split(optionList);
-    Iterable<FormatterOption> parsed = Iterables.transform(options, new Function<String, FormatterOption>() {
-      @Override
-      public FormatterOption apply(String s) {
-        return Enum.valueOf(FormatterOption.class, s);
-      }
-    });
+    Iterable<FormatterOption> parsed =
+        Iterables.transform(
+            options,
+            new Function<String, FormatterOption>() {
+              @Override
+              public FormatterOption apply(String s) {
+                return Enum.valueOf(FormatterOption.class, s);
+              }
+            });
     return ImmutableSet.copyOf(parsed);
   }
 
@@ -78,12 +82,15 @@ class FormatterOptionsStore {
   }
 
   private String serialize(ImmutableSet<FormatterOption> options) {
-    Iterable<String> names = Iterables.transform(options, new Function<FormatterOption, String>() {
-      @Override
-      public String apply(FormatterOption formatterOption) {
-        return formatterOption.name();
-      }
-    });
+    Iterable<String> names =
+        Iterables.transform(
+            options,
+            new Function<FormatterOption, String>() {
+              @Override
+              public String apply(FormatterOption formatterOption) {
+                return formatterOption.name();
+              }
+            });
     return Joiner.on(",").join(names);
   }
 }

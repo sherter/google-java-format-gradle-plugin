@@ -35,6 +35,7 @@ class FileToStateMapper implements Iterable<FileInfo> {
 
   /**
    * Associate {@code files} with their {@link FileState}.
+   *
    * @see #map(Path)
    */
   ImmutableListMultimap<FileState, Path> reverseMap(Iterable<Path> files) {
@@ -42,12 +43,14 @@ class FileToStateMapper implements Iterable<FileInfo> {
   }
 
   /**
-   * Checks if we have information about the given {@code file} and returns the associated {@link FileState}
-   * if this information is still valid. Otherwise returns {@link FileState#UNKNOWN}.
+   * Checks if we have information about the given {@code file} and returns the associated
+   * {@link FileState} if this information is still valid. Otherwise returns
+   * {@link FileState#UNKNOWN}.
    *
    * The information is valid if {@link FileInfo#lastModified()} and {@link FileInfo#size()} equals
-   * the {@code file}'s current size and last modified time. This method always tries to access
-   * the file system to verify this. Returns {@link FileState#UNKNOWN} if accessing the file system fails.
+   * the {@code file}'s current size and last modified time. This method always tries to access the
+   * file system to verify this. Returns {@link FileState#UNKNOWN} if accessing the file system
+   * fails.
    */
   FileState map(Path file) {
     file = file.toAbsolutePath().normalize();
@@ -81,10 +84,10 @@ class FileToStateMapper implements Iterable<FileInfo> {
   }
 
   /**
-   * Returns the {@code FileInfo} that is currently associated with the given {@code fileInfo}'s path.
-   * If the given {@code fileInfo} is more recent than the currently associated one
-   * (according to {@link FileInfo#isMoreRecentThan(FileInfo)}) than the old one
-   * is replaced by the given {@code fileInfo}
+   * Returns the {@code FileInfo} that is currently associated with the given {@code fileInfo}'s
+   * path. If the given {@code fileInfo} is more recent than the currently associated one (according
+   * to {@link FileInfo#isMoreRecentThan(FileInfo)}) than the old one is replaced by the given
+   * {@code fileInfo}
    */
   FileInfo putIfNewer(FileInfo fileInfo) {
     // handle the case where no info was previously associated with the file
@@ -107,9 +110,10 @@ class FileToStateMapper implements Iterable<FileInfo> {
   }
 
   /**
-   * Returns a "weakly consistent", unmodifiable iterator that will never throw {@link ConcurrentModificationException},
-   * and guarantees to traverse elements as they existed upon construction of the iterator,
-   * and may (but is not guaranteed to) reflect any modifications subsequent to construction.
+   * Returns a "weakly consistent", unmodifiable iterator that will never throw
+   * {@link ConcurrentModificationException}, and guarantees to traverse elements as they existed
+   * upon construction of the iterator, and may (but is not guaranteed to) reflect any modifications
+   * subsequent to construction.
    */
   @Override
   public Iterator<FileInfo> iterator() {

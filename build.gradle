@@ -1,11 +1,24 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+    dependencies {
+        classpath 'com.github.sherter.googlejavaformatgradleplugin:google-java-format-gradle-plugin:0.3-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'groovy'
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.1'
-    id 'com.github.sherter.google-java-format' version '0.2'
     id 'net.ltgt.apt' version '0.6'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
+
+apply plugin: 'com.github.sherter.google-java-format'
 
 version = file('src/main/resources/VERSION').text.trim()
 

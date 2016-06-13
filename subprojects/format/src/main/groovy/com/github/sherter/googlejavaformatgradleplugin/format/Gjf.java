@@ -18,21 +18,23 @@ public class Gjf {
       ImmutableList.of("0.1-alpha", "1.0");
 
   /**
-   * Constructs a new formatter that delegates to
-   * <a href="https://github.com/google/google-java-format">google-java-format</a>.
+   * Constructs a new formatter that delegates to <a
+   * href="https://github.com/google/google-java-format">google-java-format</a>.
    *
    * @param classLoader load {@code google-java-format} classes from this {@code ClassLoader}
    * @param version load this version of {@code google-java-format}
    * @param options configure the returned {@code Formatter} with these options
    *
    * @throws IllegalArgumentException if the requested {@code Formatter} cannot be constructed
-   * <p>Possible reasons are:</p>
+   * <p>
+   * Possible reasons are:
+   * </p>
    * <ul>
-   *     <li>The provided {@code classLoader} fails to provide a required class</li>
-   *     <li>A provided class is incompatible with the requested {@code version}</li>
-   *     <li>One or multiple {@code options} are not supported by the given {@code version}
-   *     of {@code google-java-format}</li>
-   *     <li>Options are conflicting</li>
+   * <li>The provided {@code classLoader} fails to provide a required class</li>
+   * <li>A provided class is incompatible with the requested {@code version}</li>
+   * <li>One or multiple {@code options} are not supported by the given {@code version} of
+   * {@code google-java-format}</li>
+   * <li>Options are conflicting</li>
    * </ul>
    * @throws NullPointerException if any of the given parameters is {@code null}
    */

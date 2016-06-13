@@ -5,10 +5,13 @@ import com.google.common.collect.ImmutableList;
 /**
  * A {@code FormatterOption} configures a {@link Formatter} to behave in a certain way.
  *
- * <p>Different versions of <a href="https://github.com/google/google-java-format">google-java-format</a>
- * are configured differently. In order to provide a unified configuration interface for all versions,
- * this class contains (an abstraction) of every option that is supported by at least one version of
- * {@code google-java-format}.</p>
+ * <p>
+ * Different versions of <a
+ * href="https://github.com/google/google-java-format">google-java-format</a> are configured
+ * differently. In order to provide a unified configuration interface for all versions, this class
+ * contains (an abstraction) of every option that is supported by at least one version of
+ * {@code google-java-format}.
+ * </p>
  *
  */
 public enum FormatterOption {

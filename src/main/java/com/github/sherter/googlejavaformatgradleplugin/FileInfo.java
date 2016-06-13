@@ -6,7 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 
 /**
- * Immutable value type that associates a file at a specific point in time with its formatting state.
+ * Immutable value type that associates a file at a specific point in time with its formatting
+ * state.
  */
 @AutoValue
 abstract class FileInfo {
@@ -14,8 +15,8 @@ abstract class FileInfo {
   /**
    * Constructs a new object of type {@link FileInfo} storing the given values.
    *
-   * If {@code path} is not already absolute and normalized, an absolute and normalized path
-   * that is equivalent to {@code path} is stored instead.
+   * If {@code path} is not already absolute and normalized, an absolute and normalized path that is
+   * equivalent to {@code path} is stored instead.
    *
    * @throws IllegalArgumentException if {@code state} == {@link FileState#UNKNOWN}
    */
@@ -29,8 +30,8 @@ abstract class FileInfo {
   }
 
   /**
-   * Returns the path of the file this object contains information about.
-   * The returned path is {@link Path#isAbsolute() absolute} and {@link Path#normalize() normalized}.
+   * Returns the path of the file this object contains information about. The returned path is
+   * {@link Path#isAbsolute() absolute} and {@link Path#normalize() normalized}.
    */
   abstract Path path();
 
@@ -41,8 +42,8 @@ abstract class FileInfo {
   abstract FileState state();
 
   /**
-   * Returns true if and only if {@code this} FileInfo represents the file at
-   * a strictly later point in time than the given FileInfo.
+   * Returns true if and only if {@code this} FileInfo represents the file at a strictly later point
+   * in time than the given FileInfo.
    *
    * @throws IllegalArgumentException if {@code other} represents a different file
    */

@@ -21,8 +21,8 @@ class FileInfoEncoder {
   private final Path basePath; // absolute and normalized
 
   /**
-   * Constructs a new {@link FileInfoEncoder} that encodes a {@link FileInfo}'s path to
-   * a unix path string that is relative to {@code basePath}.
+   * Constructs a new {@link FileInfoEncoder} that encodes a {@link FileInfo}'s path to a unix path
+   * string that is relative to {@code basePath}.
    *
    * @throws IOError if {@code basePath} is not absolute and {@link Path#toAbsolutePath()} fails
    */

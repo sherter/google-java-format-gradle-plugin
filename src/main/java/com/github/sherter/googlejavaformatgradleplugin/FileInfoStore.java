@@ -46,11 +46,12 @@ class FileInfoStore {
   }
 
   /**
-   * Reads serialized {@link FileInfo} objects from this {@link FileInfoStore}'s backing file
-   * and returns deserialized {@link FileInfo} objects.
+   * Reads serialized {@link FileInfo} objects from this {@link FileInfoStore}'s backing file and
+   * returns deserialized {@link FileInfo} objects.
    *
-   * The method succeeds if the backing file can be accessed as required and the file's general format is intact.
-   * Decoding errors for single elements are logged, but don't prevent the method from succeeding.
+   * The method succeeds if the backing file can be accessed as required and the file's general
+   * format is intact. Decoding errors for single elements are logged, but don't prevent the method
+   * from succeeding.
    *
    * @throws IOException if an I/O error occurs
    */
@@ -87,9 +88,9 @@ class FileInfoStore {
   /**
    * Insert the given {@link FileInfo}'s into the persistent fileInfoStore.
    *
-   * If the fileInfoStore already contains information about a path that is referenced in an element in {@code updates},
-   * then this information is replaced. If {@code updates} contain multiple {@link FileInfo} objects for the
-   * same path, the last one in iteration order is inserted.
+   * If the fileInfoStore already contains information about a path that is referenced in an element
+   * in {@code updates}, then this information is replaced. If {@code updates} contain multiple
+   * {@link FileInfo} objects for the same path, the last one in iteration order is inserted.
    *
    * @throws IOException if an I/O error occurs
    */
