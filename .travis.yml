@@ -8,6 +8,7 @@ cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
+  - "$HOME/.groovy/grapes/"
 
 jdk:
   - openjdk7
