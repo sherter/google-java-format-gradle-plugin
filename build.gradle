@@ -72,12 +72,24 @@ task shadedJar(type: ShadowJar) {
 
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
-    if (System.env.TRAVIS == 'true') {
-        maxParallelForks = 1 // seems to prevent Travis from killing processes
-        testLogging {
-            events 'passed', 'skipped', 'failed'
-        }
+}
+
+if (System.env.TRAVIS == 'true') {
+  allprojects {
+    tasks.withType(GroovyCompile) {
+      groovyOptions.fork = false
     }
+    tasks.withType(Test) {
+      // containers (currently) have 2 dedicated cores and 4GB of memory
+      maxParallelForks = 2
+      minHeapSize = '128m'
+      testLogging {
+        events 'passed', 'skipped', 'failed'
+        showStackTraces true
+        exceptionFormat 'full'
+      }
+    }
+  }
 }
 
 def integTestGradleVersion = System.getenv('GRADLE_VERSION') ?: '2.0'
