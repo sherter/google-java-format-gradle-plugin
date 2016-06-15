@@ -1,7 +1,7 @@
 = google-java-format-gradle-plugin
-:release-version: 0.2
-:default-google-java-format-version: 0.1-alpha
-:snapshot-version: 0.3-SNAPSHOT
+:release-version: 0.3
+:default-google-java-format-version: 1.0
+:snapshot-version: 0.4-SNAPSHOT
 
 
 A https://github.com/gradle/gradle[Gradle] plugin that utilizes
@@ -55,11 +55,20 @@ $ ./gradlew verGJF
 [subs="attributes"]
 ----
 googleJavaFormat {
-  toolVersion '0.1-SNAPSHOT'
+  toolVersion '1.1-SNAPSHOT'
 }
 ----
 
-* The predefined tasks `googleJavaFormat` and `verifyGoogleJavaFormat` by default process all `*.java` files found in the project or any subproject (except for files in a `buildDir`). If you want to exclude specific files from a predefined task you can use https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/util/PatternFilterable.html[Ant-style exclude patterns].
+* Choose betweeen `'GOOGLE'` (default) and `'AOSP'` style by setting the style option (not supported in conjunction with `toolVersion` `v0.1-alpha`):
++
+[source,groovy]
+----
+googleJavaFormat {
+  options style: 'AOSP'
+}
+----
+
+* The predefined tasks `googleJavaFormat` and `verifyGoogleJavaFormat` by default process all `*.java` files found in the project or any subproject (except for files in a `buildDir`). They are of type `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/SourceTask.html[SourceTask]` and can be configured accordingly. For example, if you want to exclude specific files from a predefined task you can use https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/util/PatternFilterable.html[Ant-style exclude patterns].
 +
 [source,groovy]
 [subs="attributes"]
@@ -69,8 +78,19 @@ tasks.googleJavaFormat {
   exclude 'src/test/template_*'
 }
 ----
++
+You can also overwrite the default inputs and use your own rules (see `https://docs.gradle.org/current/userguide/working_with_files.html[Working With Files]`)
++
+[source,groovy]
+[subs="attributes"]
+----
+tasks.verifyGoogleJavaFormat {
+  setSource fileTree('subprojects')
+  include '**/*.java'
+}
+----
 
-* Define your own format or verification tasks, if the predefined ones don't suite you needs. Both task types `GoogleJavaFormat` and `VerifyGoogleJavaFormat` are subtypes of `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/SourceTask.html[SourceTask]` and can be configured accordingly. The task type `VerifyGoogleJavaFormat` also implements the interface `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/VerificationTask.html[VerificationTask]`.
+* Define your own format or verification tasks, if you need more than the predefined ones. The task type `VerifyGoogleJavaFormat` also implements the interface `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/VerificationTask.html[VerificationTask]`.
 +
 [source,groovy]
 ----
@@ -90,6 +110,8 @@ task verifyFormatting(type: VerifyGoogleJavaFormat) {
   ignoreFailures true
 }
 ----
+
+
 
 == Snapshots
 On every push to the master branch https://travis-ci.org/[Travis] runs
@@ -113,20 +135,3 @@ buildscript {
 }
 
 apply plugin: 'com.github.sherter.google-java-format'
-----
-
-=== New Features
-* Support for options:
-+
-[source,groovy]
-----
-googleJavaFormat {
-  options <type>: <value>, <type>: <value>, ... // e.g. options style: 'AOSP'
-}
-----
-|===
-|option | possible values
-
-|style
-|'GOOGLE', 'AOSP'
-|===
