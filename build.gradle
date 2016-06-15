@@ -70,24 +70,13 @@ task shadedJar(type: ShadowJar) {
     exclude('META-INF/maven/**/*')
 }
 
-tasks.withType(Test) {
-    maxParallelForks = Runtime.runtime.availableProcessors()
-}
-
-if (System.env.TRAVIS == 'true') {
-  allprojects {
-    tasks.withType(GroovyCompile) {
-      groovyOptions.fork = false
-    }
-    tasks.withType(Test) {
-      // containers (currently) have 2 dedicated cores and 4GB of memory
-      maxParallelForks = 2
-      minHeapSize = '128m'
-      testLogging {
-        events 'passed', 'skipped', 'failed'
-        showStackTraces true
-        exceptionFormat 'full'
-      }
+allprojects {
+  tasks.withType(Test) {
+    maxParallelForks = System.env.TRAVIS == 'true' ? 2 : Runtime.runtime.availableProcessors()
+    testLogging {
+      events 'passed', 'skipped', 'failed'
+      showStackTraces true
+      exceptionFormat 'full'
     }
   }
 }

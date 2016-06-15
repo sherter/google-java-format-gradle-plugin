@@ -17,13 +17,13 @@ jdk:
 
 env:
   global:
+    - JAVA_TOOL_OPTIONS="-Xms128m"
     - secure: pIqlMA953ID3FDiRIzCgtOzCi1wM+JN1X67JoaEoaWZcK9/5UdojyERxbJQb2VwE8jdaRUxJmLIm2RCPiG5JLnDtFBP9y0I5zKfsMYYGqwxX8vj8OwDL5Uvxh20SmpTihPBMJy23pG8urJoenhUO5DFP3qvpv2MpXlENfuCllvCDlV9bIYectnyAfwtbFAZA+DxLfF7LDCfB7lxJZNWoVuFg3Ribc8z/iVlGZ/C0hVBGUR9L1CCKNSbplhXaFrsiRu+p1fCgVYXVuTWrVwjTtd8DKbY6atbakcy8r4EYIg9Acq4vOIY1f9ePQGNE5QqZqeQE9hd5hBChUdH/lnq9+XWsRlU+Q1/gJMoiH3/aNT/gx4wJ7hbijAtKQ63AZcavxqgffVCX+jxvTV+hsN//jLm96FLBuSTkqlu/RF/m/2ZfIqQrv/rf2qrRmT4ygKmQrSfL/55sVnTAD5g8Ss9jHJyBP4YqMCDKm1uHcWIiyqUxtOS+SseOOXadQzoHA5Pb/L7aA001H5o8+hdkY56/7ILDjaqwCyI31TdXlSeELDS6YYMOdUq3Jc79Al0b15xQIHy/tKXy7B+h7U7VP1rL4RaHr605JSUdHuhMCP5PdxjS45ldPkwNLQUt90MGtRl7229PUdgSLt8O17bpnCR4Dhs1SzDH5UeBv9y5bGEY3N0=
     - secure: Oq15JlYDBG3Z0YoxKAsaQlvakzzi5O/MqndVsYBKiro1xgBKiiyTo9pAdOHsyIuVOlzZZhlTyNSdcKDpjzN05HbcRvMo3zd/BigwesO6Rm02lPY4JpR9oxYa3pRHR+hcNBYoErkMNzwr5glRHZISuT8MTTBBKKzt/ltaPNkbvDMlIkNWLLqjTH+csJechsZ+Q8LAZYlRsTkEWjKI8COAnyYBaJJE4dPTa7TYm4eDwNaDWSumoPy8Xh7SwhyKGMSWhDTIMiboGUuF+qSl6RGoSxmHoMmEDuOp4JlVfQ+XsSBHdKFrjkSfW07nTQw2wSiHj4Jv2+g7PhMh6vLbsHWER0oUxLX6SfgZmyzyds501s+WCM7lHjf+CrXbNTg4b7LnI+YQog+LVJW/7HJwmwCOWENriFOQSsKuWG59lTh2fa3AzC22c/RcvJ+Ed/aZ2DBVtj5XavjhTI5C2K0W48ljX9GcKuNgawvMAOBUpmWDHcg7zLviMTVh3fpdTjMJZmfRiwH5Rh+FmsyWPdSrquDrdWQZ25UcP8OBVmlDdFhoyoJhdsVsKXP4DEFs7JoQi+GEy/PBloZgukjGifrnEXbv5CFSs8NozPqMk7170ts7ra7/vN9EP/DSkR/7z6//RINdmhh3KscAU2Ib58jqltK58/KqFYV1/iabeLJKVpkpVjg=
     - secure: DRVGtaHlV11hRFbfLVueXiQovFUmcBd92sI7Ot9HLVM8yZY1N7GzN4f9cr/OLm4a0ROUOaOa05j/dqL/7zkoG2rSPfOWcBNDvxEiIarVFh393zs3kbn+Qk8OLVF5jg7WHGV5PM/9gjJAdAnr3/IySweXHinhuoRP8/hZhIx56C3v9mq22xHvD8T+Nnm9x13AwNYd48uw1OyDBO1XdGMXEIfPrRFcDyRxokd/FxbryX6kkl5LFjoYY2F12m+LgeZsORVQ5zwHIhqZQ0SFruAy1zsXivEtAc5E8zgIHnI+8HbMq/vUNyvkfciyb4ajg1WW7N4o1A38fHgMLzcDCbcFHDr/sh4uupOraaz7mhsDXIDBj5y24L0nEKmV57trVis8BFIflkA/S7cGO+sYNvRVM/Xzow+xPeKUm9iwke6tzAn71Y0Z2lWaXipvGiYfi3VMTzwTJiR2zTnTlgx1yIydG8+RTd1AOmq4AHpmu2zifY15YGm2VGTO87TMfo1ZWMP9rC5vsmndgnYcdZmFXnmdtmN7k2N1w/XrQ+Ef9fcc7jLorWH4ZcaNtFtlL/GEYj0PMozPceRdT+pi9m9yW+g7Uvrvj2qeKtOtMTK3r7NSAB+dBhaDt9xtyC1qfNUfoxAynF7oO0XkMlouUU4uBQzQ9illKKqsZCk6wmxQi4JDqWk=
     - secure: PZCOTXWpKcTUEFvxWArVBHfJLA3ncArVJVmeWqGEe3f1SH3rDbtnHwAK9MZ+qfQvtmfP5KrsXbechosRGxmY4NzGTuxupzYIeNq3x73RFLYmhDNaf3yIHx5KbLsKm+/y7X11ORKEWTX0Ub68CAc8dyV5iV2CR/1gPpBcL2L7s4xqS9aeeVJj9C2fIOY9uLaCA4g5Vx3opBVLsh7kmBuOgl8ajg24hI4oajQmEatKfxIqZp892cPvOVZgsmR9Y83z6ZL48tmPKsttB5utBe8AQY7TnKwKqo3tFDvTFgO4Vkv+plTJQHU3mULoG7WixL+AvWS6+jhyl2pzhEovDYMHkWi4ozxbO87ZdZp9GIxLihsXmxIunwz7mBolZ1XE6vEwWoVhlWXuZ/fO1udi8UIvcxr01jZwYzVrhvpnpoT/j2goZr+V2kuVXEghm50saRDIP5rAPk4hLj9Q8G3SKObNU0xj8lN/fLM4XIvaZV26kFbDfREBfoV3GL7tHvEdg0gAyjO9d9VIJsomj+/K/e6L1GZCwiN2VgHPJWzgmNMofCFNF7GusA8gju6mO5qWxYZxq0y28p93uE4QJvxZUV9gNZ8fvDrK6xDylB06SDXQqyTxf+GnOv2bRYTTap2PSBgcFScr/Q7jTB65h/e0KlFle8dOEwDMm9E62r4WfS2E6sY=
     - ALL_GRADLE_VERSIONS=2.0,2.1,2.2,2.2.1,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14,3.0-milestone-1
     - PARALLEL_INTEG_TEST_COUNT=4
-    - GRADLE_OPTS="-Xms128m"
   matrix:
     - TEST=units
     - TEST=integration INDEX=0
@@ -71,13 +71,13 @@ before_deploy:
 
 deploy:
   - provider: script
-    script: ./gradlew --no-daemon publish
+    script: ./gradlew publish
     skip_cleanup: true
     on:
       condition: $TRAVIS_AFTER_ALL_EXIT_CODE = 0
       branch: master
   - provider: script
-    script: ./gradlew --no-daemon publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET
+    script: ./gradlew publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET
     skip_cleanup: true
     on:
       condition: $TRAVIS_AFTER_ALL_EXIT_CODE = 0
