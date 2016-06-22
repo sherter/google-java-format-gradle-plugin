@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.sherter.googlejavaformatgradleplugin:google-java-format-gradle-plugin:0.3-SNAPSHOT'
+        classpath 'com.github.sherter.googlejavaformatgradleplugin:google-java-format-gradle-plugin:0.4-SNAPSHOT'
     }
 }
 
@@ -34,40 +34,30 @@ sourceSets {
 }
 
 configurations {
-    integTestCompile.extendsFrom testCompile
     bundle
+    compile.extendsFrom bundle
+    integTestCompile.extendsFrom testCompile
 }
 
 dependencies {
     compile gradleApi()
-    compile localGroovy()
-    compile (project(':format')) {
+    bundle(project(':format')) {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
-    bundle      'com.google.dagger:dagger:2.3'
-    compile     'com.google.dagger:dagger:2.3'
-    apt         'com.google.guava:guava:19.0' // workaround https://github.com/tbroyer/gradle-apt-plugin/issues/22
     bundle      'com.google.guava:guava:19.0'
-    apt         'com.google.dagger:dagger-compiler:2.3'
-    compileOnly 'com.google.auto.value:auto-value:1.2'
+    bundle      'com.google.dagger:dagger:2.5'
+    apt         'com.google.dagger:dagger-compiler:2.5'
     apt         'com.google.auto.value:auto-value:1.2'
+    compileOnly 'com.google.auto.value:auto-value:1.2'
+
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
-        // gradle always loads its own groovy version, which leads to conflicts
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
     testCompile 'com.google.jimfs:jimfs:1.1'
+
     integTestCompile project(':test')
     integTestCompile gradleTestKit()
     integTestCompile sourceSets.main.output
-}
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-task shadedJar(type: ShadowJar) {
-    configurations = [project.configurations.bundle]
-    relocate('dagger', 'com.github.sherter.googlejavaformat.dagger')
-    relocate('com.google.common', 'com.github.sherter.googlejavaformatgradleplugin.com.google.common')
-    from(sourceSets.main.output, 'subprojects/format/build/classes/main')
-    exclude('META-INF/maven/**/*')
 }
 
 tasks.withType(Test) {
@@ -101,16 +91,21 @@ task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
     systemProperty 'GRADLE_VERSION', integTestGradleVersion
     reports.html.destination = new File(reportsDir, 'integrationTest' + File.separator + integTestGradleVersion)
 }
-
-tasks.googleJavaFormat {
-    exclude 'src/integTest/resources'
-}
-
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
+
+tasks.shadowJar {
+  classifier = null // necessary for com.gradle.plugin-publish to pick this artifact up
+  configurations = [project.configurations.bundle]
+  relocate('dagger', 'com.github.sherter.googlejavaformat.dagger')
+  relocate('com.google.common', 'com.github.sherter.googlejavaformatgradleplugin.com.google.common')
+  exclude('META-INF/maven/**/*')
+}
+// force com.gradle.plugin-publish to publish the correct artifact
+configurations.archives.artifacts.removeAll {it.extension.equals('jar')}
 artifacts {
-    archives tasks.shadedJar
+  archives tasks.shadowJar
 }
 
 pluginBundle {
@@ -125,11 +120,7 @@ pluginBundle {
             displayName = 'google-java-format gradle plugin'
         }
     }
-    withDependencies { dependencies ->
-        dependencies.clear()
-    }
 }
-
 
 publishing {
     publications {
@@ -137,7 +128,7 @@ publishing {
             groupId 'com.github.sherter.googlejavaformatgradleplugin'
             artifactId 'google-java-format-gradle-plugin'
 
-            artifact tasks.shadedJar
+            from components.shadow
         }
     }
     if (version.endsWith('-SNAPSHOT')) {
