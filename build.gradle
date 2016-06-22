@@ -102,8 +102,9 @@ tasks.shadowJar {
   relocate('com.google.common', 'com.github.sherter.googlejavaformatgradleplugin.com.google.common')
   exclude('META-INF/maven/**/*')
 }
-// force com.gradle.plugin-publish to publish the correct artifact
-configurations.archives.artifacts.removeAll {it.extension.equals('jar')}
+// removes the dependsOn relation between "publishPlugins" and "jar" and forces
+// the correct (the shadowed) artifact to be uploaded to the plugin portal
+configurations.archives.artifacts.clear()
 artifacts {
   archives tasks.shadowJar
 }
