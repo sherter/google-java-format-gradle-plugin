@@ -53,9 +53,9 @@ class FormatterFactory {
 
     @PackageScope
     static ImmutableSet<FormatterOption> mapOptions(Map<String, Object> optionsInDsl) {
-        Set<FormatterOption> mapped = new HashSet<>(optionsInDsl.size())
+        Set<FormatterOption> mapped = new HashSet<FormatterOption>(optionsInDsl.size())
         for (Map.Entry<String, Object> entry : optionsInDsl) {
-            def option = optionMapping.get(entry.key, entry.value)
+            def option = (FormatterOption) optionMapping.get(entry.key, entry.value)
             if (option == null) {
                 throw new IllegalArgumentException("invalid option: $entry")
             }
