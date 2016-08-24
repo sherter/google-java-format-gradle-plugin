@@ -121,4 +121,11 @@ class FileInfoStore {
     channel.truncate(0);
     channel.force(false);
   }
+
+  void close() throws IOException {
+    if (channel == null) {
+      return;
+    }
+    channel.close();
+  }
 }

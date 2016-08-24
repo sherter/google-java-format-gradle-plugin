@@ -93,4 +93,11 @@ class FormatterOptionsStore {
             });
     return Joiner.on(",").join(names);
   }
+
+  void close() throws IOException {
+    if (channel == null) {
+      return;
+    }
+    channel.close();
+  }
 }

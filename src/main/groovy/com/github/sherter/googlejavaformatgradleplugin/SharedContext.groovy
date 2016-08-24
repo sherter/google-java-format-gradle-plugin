@@ -65,7 +65,11 @@ class SharedContext {
             def extension = project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
             def options = FormatterOptions.create(extension.toolVersion,
                     FormatterFactory.mapOptions(extension.getOptions()))
-            optionsStore.write(options);
+            try {
+                optionsStore.write(options);
+            } finally {
+                optionsStore.close();
+            }
         }
         return optionsStore
     }
@@ -76,6 +80,8 @@ class SharedContext {
                 store.update(mapper)
             } catch (IOException e) {
                 project.getLogger().error("Failed to write formatting states to disk", e)
+            } finally {
+                store.close()
             }
         }
         return store
