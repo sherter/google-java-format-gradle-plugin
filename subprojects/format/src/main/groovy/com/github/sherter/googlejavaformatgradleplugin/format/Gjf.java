@@ -52,6 +52,19 @@ public class Gjf {
     }
   }
 
+  public static Formatter newFormatter(ClassLoader classLoader, Configuration config) throws ReflectiveOperationException {
+    return newFormatterFactory(classLoader, config).create();
+  }
+
+  private static FormatterFactory newFormatterFactory(ClassLoader classLoader, Configuration config) {
+    switch (config.version) {
+      case "1.0":
+        return new OneDotZeroFactory(classLoader, config);
+      default:
+        return new OneDotZeroFactory(classLoader, config);
+    }
+  }
+
   private static void checkClassLoader(ClassLoader classLoader, String version) {
     switch (version) {
       case "0.1-alpha":

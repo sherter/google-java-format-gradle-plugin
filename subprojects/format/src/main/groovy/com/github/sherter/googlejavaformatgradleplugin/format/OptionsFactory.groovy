@@ -48,6 +48,11 @@ class OptionsFactory implements FormatterFactory {
         }
     }
 
+    @Override
+    public Formatter create() throws ReflectiveOperationException {
+        return null
+    }
+
     private static void validateOptions(FormatterOption[] options) {
         for (FormatterOption option : options) {
             if (!optionConflicts.containsKey(option)) {

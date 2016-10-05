@@ -33,4 +33,9 @@ class NoOptionsFactory implements FormatterFactory {
             }
         }
     }
+
+    @Override
+    public Formatter create() throws ReflectiveOperationException {
+        return null
+    }
 }
