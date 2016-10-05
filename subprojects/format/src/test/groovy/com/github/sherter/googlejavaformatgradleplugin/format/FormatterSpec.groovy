@@ -13,7 +13,26 @@ class FormatterSpec extends Specification {
         formatter.format('class Test {}') == 'class Test {}' + System.lineSeparator()
 
         where:
-        version << ['1.0']
+        version << Gjf.SUPPORTED_VERSIONS
+    }
+
+    def 'formatter formats javadoc'() {
+        given:
+        def conf = new Configuration(version, Style.GOOGLE)
+        def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
+        def javadoc = '''/**  This is (was) malformed javadoc.
+                        |*      <pre>
+                        |*System.err.println
+                        |*   </pre>
+                        |   */
+                        |'''.stripMargin()
+        expect:
+        formatter.format(javadoc).startsWith(
+                '/**' + System.lineSeparator() +
+                ' * This is (was) malformed javadoc.')
+
+        where:
+        version << Gjf.SUPPORTED_VERSIONS
     }
 
     def 'formatter orders imports'() {
@@ -40,6 +59,20 @@ class FormatterSpec extends Specification {
         formatter.format(unordered) == ordered
 
         where:
-        version << ['1.0']
+        version << Gjf.SUPPORTED_VERSIONS
+    }
+
+    def 'formatter throws when given invalid source code'() {
+        given:
+        def conf = new Configuration(version, Style.GOOGLE)
+        def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
+
+        when:
+        formatter.format('Hello World!')
+        then:
+        thrown(FormatterException)
+
+        where:
+        version << Gjf.SUPPORTED_VERSIONS
     }
 }
