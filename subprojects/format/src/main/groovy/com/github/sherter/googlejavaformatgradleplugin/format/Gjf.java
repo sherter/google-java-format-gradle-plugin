@@ -14,8 +14,7 @@ public class Gjf {
   public static final String GROUP_ID = "com.google.googlejavaformat";
   public static final String ARTIFACT_ID = "google-java-format";
 
-  public static final ImmutableList<String> SUPPORTED_VERSIONS =
-      ImmutableList.of("0.1-alpha", "1.0");
+  public static final ImmutableList<String> SUPPORTED_VERSIONS = ImmutableList.of("1.0");
 
   /**
    * Constructs a new formatter that delegates to <a
