@@ -23,12 +23,6 @@ abstract class AbstractFormatterFactory implements FormatterFactory {
         this.config = config;
     }
 
-    // to be removed from interface after transition to version specific formatter factories
-    @Override
-    public Formatter create(FormatterOption[] options) {
-        return null;
-    }
-
     /**
      * <ul>
      *     <li>v1.0: <a href="https://github.com/google/google-java-format/blob/google-java-format-1.0/core/src/main/java/com/google/googlejavaformat/java/Formatter.java#L92">com.google.googlejavaformat.java.Formatter</a>
