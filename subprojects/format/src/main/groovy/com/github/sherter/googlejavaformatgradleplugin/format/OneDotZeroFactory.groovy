@@ -8,28 +8,14 @@ import groovy.transform.TypeCheckingMode
 
 @CompileStatic
 @PackageScope
-final class OneDotZeroFactory implements FormatterFactory {
+final class OneDotZeroFactory extends AbstractFormatterFactory {
 
-    private static final String formatterClassName = 'com.google.googlejavaformat.java.Formatter'
-    private static final String javaFormatterOptionsClassName = 'com.google.googlejavaformat.java.JavaFormatterOptions'
     private static final String javadocFormatterEnumName = 'com.google.googlejavaformat.java.JavaFormatterOptions$JavadocFormatter'
-    private static final String styleEnumName = 'com.google.googlejavaformat.java.JavaFormatterOptions$Style'
     private static final String sortImportsEnumName = 'com.google.googlejavaformat.java.JavaFormatterOptions$SortImports'
-    private static final String importOrdererClassName = 'com.google.googlejavaformat.java.ImportOrderer'
-
-    private final ClassLoader classLoader
-    private final Configuration config
 
     // @PackageScope not available for constructors in Gradle's (v2.0) groovy version (v2.3.2)
     protected OneDotZeroFactory(ClassLoader classLoader, Configuration config) {
-        this.classLoader = classLoader
-        this.config = config
-    }
-
-    // to be removed from interface after transition to version specific formatter factories
-    @Override
-    Formatter create(FormatterOption[] options) {
-        return null
+        super(classLoader, config)
     }
 
     @Override
@@ -47,15 +33,9 @@ final class OneDotZeroFactory implements FormatterFactory {
         }
     }
 
-    /** See <a href="https://github.com/google/google-java-format/blob/google-java-format-1.0/core/src/main/java/com/google/googlejavaformat/java/Formatter.java#L92">com.google.googlejavaformat.java.Formatter</a> */
-    private Object constructFormatter() {
-        def options = constructJavaFormatterOptions()
-        def clazz = classLoader.loadClass(formatterClassName)
-        return clazz.newInstance(options)
-    }
-
     /** See <a href="https://github.com/google/google-java-format/blob/google-java-format-1.0/core/src/main/java/com/google/googlejavaformat/java/JavaFormatterOptions.java#L90">com.google.googlejavaformat.java.JavaFormatterOptions</a> */
-    private Object constructJavaFormatterOptions() {
+    @Override
+    Object constructJavaFormatterOptions() {
         def javadocFormatter = constructJavadocFormatter()
         def style = constructStyle()
         def sortImports = constructSortImports()
@@ -67,20 +47,6 @@ final class OneDotZeroFactory implements FormatterFactory {
     private Object constructJavadocFormatter() {
         def clazz = classLoader.loadClass(javadocFormatterEnumName)
         return Enum.valueOf(clazz, 'ECLIPSE')
-    }
-
-    /** See <a href="https://github.com/google/google-java-format/blob/google-java-format-1.0/core/src/main/java/com/google/googlejavaformat/java/JavaFormatterOptions.java#L50">com.google.googlejavaformat.java.JavaFormatterOptions$Style</a> */
-    private Object constructStyle() {
-        def clazz = classLoader.loadClass(styleEnumName)
-        switch (config.style) {
-            case Style.GOOGLE:
-                return Enum.valueOf(clazz, 'GOOGLE')
-            case Style.AOSP:
-                return Enum.valueOf(clazz, 'AOSP')
-            default:
-                // if we end up here: shame on the person who added the unknown style and didn't update all the cases!
-                throw new AssertionError()
-        }
     }
 
     /** See <a href="https://github.com/google/google-java-format/blob/google-java-format-1.0/core/src/main/java/com/google/googlejavaformat/java/JavaFormatterOptions.java#L44">com.google.googlejavaformat.java.JavaFormatterOptions$SortImports</a> */

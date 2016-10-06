@@ -14,7 +14,7 @@ public class Gjf {
   public static final String GROUP_ID = "com.google.googlejavaformat";
   public static final String ARTIFACT_ID = "google-java-format";
 
-  public static final ImmutableList<String> SUPPORTED_VERSIONS = ImmutableList.of("1.0");
+  public static final ImmutableList<String> SUPPORTED_VERSIONS = ImmutableList.of("1.0", "1.1");
 
   /**
    * Constructs a new formatter that delegates to <a
@@ -59,8 +59,10 @@ public class Gjf {
     switch (config.version) {
       case "1.0":
         return new OneDotZeroFactory(classLoader, config);
+      case "1.1":
+        return new OneDotOneFactory(classLoader, config);
       default:
-        return new OneDotZeroFactory(classLoader, config);
+        return new OneDotOneFactory(classLoader, config);
     }
   }
 

@@ -62,6 +62,30 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
+    def 'formatter removes unused imports'() {
+        given:
+        def conf = new Configuration(version, Style.GOOGLE)
+        def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
+
+        expect:
+        formatter.format('''import z.Z;
+                           |import a.A;
+                           |
+                           |class C {
+                           |  A a;
+                           |}
+                           |'''.stripMargin()) == '''import a.A;
+                                                    |
+                                                    |class C {
+                                                    |  A a;
+                                                    |}
+                                                    |'''.stripMargin()
+
+
+        where:
+        version << Gjf.SUPPORTED_VERSIONS - ['1.0']
+    }
+
     def 'formatter throws when given invalid source code'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
