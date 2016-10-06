@@ -1,16 +1,11 @@
 package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.google.common.collect.ImmutableSet;
-import org.gradle.api.logging.Logger;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,11 +13,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.gradle.api.logging.Logger;
 
 /**
  * Persistent fileInfoStore for {@link FileInfo} objects.
  *
- * It's not safe to use instances of this class concurrently in multiple threads.
+ * <p>It's not safe to use instances of this class concurrently in multiple threads.
  */
 class FileInfoStore {
 
@@ -49,7 +47,7 @@ class FileInfoStore {
    * Reads serialized {@link FileInfo} objects from this {@link FileInfoStore}'s backing file and
    * returns deserialized {@link FileInfo} objects.
    *
-   * The method succeeds if the backing file can be accessed as required and the file's general
+   * <p>The method succeeds if the backing file can be accessed as required and the file's general
    * format is intact. Decoding errors for single elements are logged, but don't prevent the method
    * from succeeding.
    *
@@ -88,9 +86,10 @@ class FileInfoStore {
   /**
    * Insert the given {@link FileInfo}'s into the persistent fileInfoStore.
    *
-   * If the fileInfoStore already contains information about a path that is referenced in an element
-   * in {@code updates}, then this information is replaced. If {@code updates} contain multiple
-   * {@link FileInfo} objects for the same path, the last one in iteration order is inserted.
+   * <p>If the fileInfoStore already contains information about a path that is referenced in an
+   * element in {@code updates}, then this information is replaced. If {@code updates} contain
+   * multiple {@link FileInfo} objects for the same path, the last one in iteration order is
+   * inserted.
    *
    * @throws IOException if an I/O error occurs
    */

@@ -2,13 +2,7 @@ package com.github.sherter.googlejavaformatgradleplugin.format;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.Arrays;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-/**
- * Static factory method for creating new {@link Formatter}s.
- */
+/** Static factory method for creating new {@link Formatter}s. */
 public class Gjf {
 
   public static final String GROUP_ID = "com.google.googlejavaformat";
@@ -22,14 +16,15 @@ public class Gjf {
    *
    * @param classLoader load {@code google-java-format} classes from this {@code ClassLoader}
    * @param config configure the formatter according to this configuration
-   *
    * @throws ReflectiveOperationException if the requested {@code Formatter} cannot be constructed
    */
-  public static Formatter newFormatter(ClassLoader classLoader, Configuration config) throws ReflectiveOperationException {
+  public static Formatter newFormatter(ClassLoader classLoader, Configuration config)
+      throws ReflectiveOperationException {
     return newFormatterFactory(classLoader, config).create();
   }
 
-  private static FormatterFactory newFormatterFactory(ClassLoader classLoader, Configuration config) {
+  private static FormatterFactory newFormatterFactory(
+      ClassLoader classLoader, Configuration config) {
     switch (config.version) {
       case "1.0":
         return new OneDotZeroFactory(classLoader, config);

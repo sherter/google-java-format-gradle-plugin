@@ -2,7 +2,6 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter;
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;

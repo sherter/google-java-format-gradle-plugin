@@ -6,9 +6,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -19,6 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Properties;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 class FormatterOptionsStore {
 

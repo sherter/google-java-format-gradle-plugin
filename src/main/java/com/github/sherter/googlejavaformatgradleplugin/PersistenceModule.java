@@ -4,16 +4,15 @@ import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import dagger.Module;
 import dagger.Provides;
-import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
-
-import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.inject.Named;
+import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 
 @Module
 class PersistenceModule {
