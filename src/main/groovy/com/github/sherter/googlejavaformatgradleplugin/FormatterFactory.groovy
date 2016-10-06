@@ -3,7 +3,7 @@ package com.github.sherter.googlejavaformatgradleplugin
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption
 import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
-import com.google.common.collect.ImmutableList
+import com.github.sherter.googlejavaformatgradleplugin.format.Style
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import groovy.transform.CompileStatic
@@ -42,12 +42,13 @@ class FormatterFactory {
                     'google-java-format. This should not be a problem if the task is executed without failures.',
                     GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }
-        if (toolVersion.equals('0.1-alpha')) {
-            return Gjf.newFormatter(classLoader, toolVersion, options as FormatterOption[])
+
+        if (options.contains(FormatterOption.AOSP_STYLE)) {
+            return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
+                    toolVersion, Style.AOSP))
         } else {
-            return Gjf.newFormatter(classLoader, toolVersion,
-                    (options as FormatterOption[]) + [FormatterOption.ECLIPSE_JAVADOC_FORMATTER,
-                            FormatterOption.SORT_IMPORTS])
+            return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
+                    toolVersion, Style.GOOGLE))
         }
     }
 
