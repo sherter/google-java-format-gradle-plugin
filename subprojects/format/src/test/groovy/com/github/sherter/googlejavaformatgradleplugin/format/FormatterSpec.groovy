@@ -4,13 +4,33 @@ import spock.lang.Specification
 
 class FormatterSpec extends Specification {
 
-    def 'formatter formats valid source code'() {
+    def 'AOSP-style formatting'() {
+        given:
+        def conf = new Configuration(version, Style.AOSP)
+        def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
+
+        expect:
+        formatter.format('class Test { public   static void    main(String[] args) {     }   }') ==
+                '''class Test {
+                  |    public static void main(String[] args) {}
+                  |}
+                  |'''.stripMargin()
+
+        where:
+        version << Gjf.SUPPORTED_VERSIONS
+    }
+
+    def 'GOOGLE-style formatting'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
 
         expect:
-        formatter.format('class Test {}') == 'class Test {}' + System.lineSeparator()
+        formatter.format('class Test { public   static void    main(String[] args) {     }   }') ==
+                '''class Test {
+                  |  public static void main(String[] args) {}
+                  |}
+                  |'''.stripMargin()
 
         where:
         version << Gjf.SUPPORTED_VERSIONS
