@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class GoogleJavaFormatExtension {
 
-    static final String DEFAULT_TOOL_VERSION = '1.0'
+    static final String DEFAULT_TOOL_VERSION = '1.1'
 
     private String toolVersion = null
     private Map<String, Object> options = null
