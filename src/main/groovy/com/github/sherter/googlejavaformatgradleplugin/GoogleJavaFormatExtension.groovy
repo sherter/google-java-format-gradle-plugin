@@ -58,12 +58,6 @@ class GoogleJavaFormatExtension {
             if (option == null) {
                 throw new ConfigurationException("Unsupported value '${entry.value}' for option '${entry.key}'")
             }
-            // if toolVersion is officially supported we can do further validation and
-            // check if specific options are available for that version
-            if (getToolVersion() in Gjf.SUPPORTED_VERSIONS && !(getToolVersion() in option.supportedVersions)) {
-                throw new ConfigurationException("Option '${entry.key}: ${entry.value}' is not supported " +
-                        "by version '${getToolVersion()}' of googel-java-format")
-            }
         }
         options.putAll(newOptions)
     }
