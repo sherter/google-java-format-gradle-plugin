@@ -129,7 +129,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
             |$applyPlugin
             |$defaultRepositories
             |googleJavaFormat {
-            |  toolVersion = '0.1-alpha'
+            |  toolVersion = '1.1'
             |}
             |""".stripMargin())
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()

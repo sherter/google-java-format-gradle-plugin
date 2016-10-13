@@ -3,9 +3,6 @@ package com.github.sherter.googlejavaformatgradleplugin;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOError;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -16,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-/**
- * Immutable and therefore thread safe.
- */
+/** Immutable and therefore thread safe. */
 class FileInfoDecoder {
   private final Path basePath; // absolute and normalized
 
   /**
-   * Constructs a new {@link FileInfoDecoder} that resolves serialized path strings against
-   * {@code basePath}.
+   * Constructs a new {@link FileInfoDecoder} that resolves serialized path strings against {@code
+   * basePath}.
    *
    * @throws IOError if {@code basePath} is not absolute and {@link Path#toAbsolutePath()} fails
    */
@@ -38,7 +35,7 @@ class FileInfoDecoder {
    * Deserialize the given {@code serializedFileInfo}.
    *
    * @throws IllegalArgumentException if {@code serializedFileInfo} is not a valid serialization of
-   * a {@link FileInfo} object according to {@link FileInfoEncoder}
+   *     a {@link FileInfo} object according to {@link FileInfoEncoder}
    */
   FileInfo decode(CharSequence serializedFileInfo) {
     String[] elements = Iterables.toArray(Splitter.on(',').split(serializedFileInfo), String.class);

@@ -4,9 +4,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multimaps;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,10 +11,10 @@ import java.nio.file.attribute.FileTime;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
-/**
- * Map files to their {@link FileState}. Designed for concurrent use in multiple threads.
- */
+/** Map files to their {@link FileState}. Designed for concurrent use in multiple threads. */
 class FileToStateMapper implements Iterable<FileInfo> {
 
   private static final Logger log = Logging.getLogger(FileToStateMapper.class);
@@ -43,14 +40,13 @@ class FileToStateMapper implements Iterable<FileInfo> {
   }
 
   /**
-   * Checks if we have information about the given {@code file} and returns the associated
-   * {@link FileState} if this information is still valid. Otherwise returns
-   * {@link FileState#UNKNOWN}.
+   * Checks if we have information about the given {@code file} and returns the associated {@link
+   * FileState} if this information is still valid. Otherwise returns {@link FileState#UNKNOWN}.
    *
-   * The information is valid if {@link FileInfo#lastModified()} and {@link FileInfo#size()} equals
-   * the {@code file}'s current size and last modified time. This method always tries to access the
-   * file system to verify this. Returns {@link FileState#UNKNOWN} if accessing the file system
-   * fails.
+   * <p>The information is valid if {@link FileInfo#lastModified()} and {@link FileInfo#size()}
+   * equals the {@code file}'s current size and last modified time. This method always tries to
+   * access the file system to verify this. Returns {@link FileState#UNKNOWN} if accessing the file
+   * system fails.
    */
   FileState map(Path file) {
     file = file.toAbsolutePath().normalize();
@@ -110,9 +106,9 @@ class FileToStateMapper implements Iterable<FileInfo> {
   }
 
   /**
-   * Returns a "weakly consistent", unmodifiable iterator that will never throw
-   * {@link ConcurrentModificationException}, and guarantees to traverse elements as they existed
-   * upon construction of the iterator, and may (but is not guaranteed to) reflect any modifications
+   * Returns a "weakly consistent", unmodifiable iterator that will never throw {@link
+   * ConcurrentModificationException}, and guarantees to traverse elements as they existed upon
+   * construction of the iterator, and may (but is not guaranteed to) reflect any modifications
    * subsequent to construction.
    */
   @Override

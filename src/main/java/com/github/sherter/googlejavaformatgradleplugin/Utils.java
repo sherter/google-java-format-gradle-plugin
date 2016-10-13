@@ -2,7 +2,6 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-
 import java.io.File;
 import java.nio.file.Path;
 

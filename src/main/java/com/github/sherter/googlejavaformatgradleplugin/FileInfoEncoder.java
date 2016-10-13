@@ -1,9 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.google.common.base.Joiner;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOError;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -13,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-/**
- * Immutable and therefore thread safe.
- */
+/** Immutable and therefore thread safe. */
 class FileInfoEncoder {
   private final Path basePath; // absolute and normalized
 

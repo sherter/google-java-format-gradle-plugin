@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class GoogleJavaFormatExtension {
 
-    static final String DEFAULT_TOOL_VERSION = '1.0'
+    static final String DEFAULT_TOOL_VERSION = '1.1'
 
     private String toolVersion = null
     private Map<String, Object> options = null
@@ -57,12 +57,6 @@ class GoogleJavaFormatExtension {
             FormatterOption option = (FormatterOption) FormatterFactory.optionMapping.get(entry.key, entry.value)
             if (option == null) {
                 throw new ConfigurationException("Unsupported value '${entry.value}' for option '${entry.key}'")
-            }
-            // if toolVersion is officially supported we can do further validation and
-            // check if specific options are available for that version
-            if (getToolVersion() in Gjf.SUPPORTED_VERSIONS && !(getToolVersion() in option.supportedVersions)) {
-                throw new ConfigurationException("Option '${entry.key}: ${entry.value}' is not supported " +
-                        "by version '${getToolVersion()}' of googel-java-format")
             }
         }
         options.putAll(newOptions)

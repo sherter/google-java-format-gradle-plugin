@@ -2,9 +2,7 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import groovy.transform.Immutable;
 import org.gradle.api.Nullable;
 
 @AutoValue

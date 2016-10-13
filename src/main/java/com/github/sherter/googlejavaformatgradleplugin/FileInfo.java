@@ -1,7 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.google.auto.value.AutoValue;
-
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 
@@ -15,8 +14,8 @@ abstract class FileInfo {
   /**
    * Constructs a new object of type {@link FileInfo} storing the given values.
    *
-   * If {@code path} is not already absolute and normalized, an absolute and normalized path that is
-   * equivalent to {@code path} is stored instead.
+   * <p>If {@code path} is not already absolute and normalized, an absolute and normalized path that
+   * is equivalent to {@code path} is stored instead.
    *
    * @throws IllegalArgumentException if {@code state} == {@link FileState#UNKNOWN}
    */

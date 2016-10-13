@@ -2,14 +2,13 @@ package com.github.sherter.googlejavaformatgradleplugin;
 
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter;
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 class FormatFileCallable implements Callable<FileInfo> {
 

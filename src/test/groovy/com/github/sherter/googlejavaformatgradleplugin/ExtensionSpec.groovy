@@ -110,18 +110,6 @@ class ExtensionSpec extends Specification {
         e.message.contains("value 'FOO'")
     }
 
-    def 'option not supported by toolVersion'() {
-        when:
-        extClosure {
-            toolVersion = '0.1-alpha'
-            options style: 'GOOGLE'
-        }
-
-        then:
-        ConfigurationException e = thrown()
-        e.message.matches(/.*style.*GOOGLE.*not supported.*0.1-alpha.*/)
-    }
-
     def 'options are accepted for unsupported toolVersion'() {
         when:
         extClosure {
