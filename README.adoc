@@ -59,7 +59,7 @@ googleJavaFormat {
 }
 ----
 
-* Choose betweeen `'GOOGLE'` (default) and `'AOSP'` style by setting the style option (not supported in conjunction with `toolVersion` `v0.1-alpha`):
+* Choose betweeen `'GOOGLE'` (default) and `'AOSP'` style by setting the style option:
 +
 [source,groovy]
 ----
