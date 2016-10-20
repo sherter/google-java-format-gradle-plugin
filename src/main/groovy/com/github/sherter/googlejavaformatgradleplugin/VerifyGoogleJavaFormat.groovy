@@ -25,6 +25,10 @@ class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, Con
     @Override
     void configure(SharedContext context) {
         this.sharedContext = context
+        List<Object> ownSources = super.@source
+        if (ownSources.isEmpty()) {
+            setSource(context.extension.getSource())
+        }
     }
 
     @TaskAction

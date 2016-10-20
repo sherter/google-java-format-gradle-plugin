@@ -26,6 +26,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
 
     private Project project
+    private GoogleJavaFormatExtension extension
 
     @Override
     void apply(Project project) {
@@ -33,7 +34,7 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         createExtension()
         createDefaultTasks()
 
-        SharedContext context = new SharedContext(project)
+        SharedContext context = new SharedContext(project, extension)
         project.gradle.taskGraph.beforeTask { Task task ->
             if (task instanceof ConfigurableTask) {
                 ((ConfigurableTask) task).configure(context)
@@ -41,17 +42,14 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
         }
     }
 
-
     private void createExtension() {
-        this.project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension)
+        extension = project.extensions.create(EXTENSION_NAME, GoogleJavaFormatExtension, project)
     }
 
 
     private void createDefaultTasks() {
-        FileTree defaultInputs = defaultInputs()
-        this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat).setSource(defaultInputs)
+        this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
         def defaultVerifyTask = this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
-        defaultVerifyTask.setSource(defaultInputs)
         makeCheckTaskDependOn(defaultVerifyTask)
     }
 
@@ -66,13 +64,5 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
                 }
             }
         }
-    }
-
-    private FileTree defaultInputs() {
-        ConfigurableFileTree javaFiles = project.fileTree(dir: project.projectDir, includes: ['**/*.java'])
-        project.allprojects { Project p ->
-            javaFiles.exclude p.buildDir.path.substring(project.projectDir.path.length() + 1)
-        }
-        return javaFiles
     }
 }

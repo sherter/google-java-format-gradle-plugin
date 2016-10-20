@@ -1,10 +1,11 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
 class ExtensionSpec extends Specification {
 
-    def ext = new GoogleJavaFormatExtension()
+    def ext = new GoogleJavaFormatExtension(ProjectBuilder.builder().build())
     def extClosure = ext.&with
 
     def 'default tool version is returned if none is set explicitly'() {

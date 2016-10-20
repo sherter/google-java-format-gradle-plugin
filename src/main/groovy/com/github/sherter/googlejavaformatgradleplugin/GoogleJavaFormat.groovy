@@ -26,6 +26,10 @@ class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
   @Override
   public void configure(SharedContext context) {
     this.sharedContext = context
+    List<Object> ownSources = super.@source
+    if (ownSources.isEmpty()) {
+      setSource(context.extension.getSource())
+    }
     def mapping = context.mapper().reverseMap(Utils.toPaths(getSource().files))
     def formattedFiles = mapping.get(FileState.FORMATTED)
     for (Path file : formattedFiles) {

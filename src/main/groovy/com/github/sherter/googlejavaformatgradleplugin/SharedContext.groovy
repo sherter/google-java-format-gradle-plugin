@@ -13,9 +13,11 @@ class SharedContext {
     private ExecutorService executor
     private Formatter formatter
     private FileToStateMapper mapper
+    GoogleJavaFormatExtension extension
 
-    SharedContext(Project project) {
+    SharedContext(Project project, GoogleJavaFormatExtension extension) {
         this.project = Objects.requireNonNull(project)
+        this.extension = extension
     }
 
     synchronized ExecutorService executor() {
