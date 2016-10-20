@@ -68,29 +68,21 @@ googleJavaFormat {
 }
 ----
 
-* The predefined tasks `googleJavaFormat` and `verifyGoogleJavaFormat` by default process all `*.java` files found in the project or any subproject (except for files in a `buildDir`). They are of type `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/SourceTask.html[SourceTask]` and can be configured accordingly. For example, if you want to exclude specific files from a predefined task you can use https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/util/PatternFilterable.html[Ant-style exclude patterns].
+* The extension object allows you to configure the default inputs for all tasks related to this plugin. It provides the same methods as a `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/SourceTask.html[SourceTask]` to set these inputs. Initially, a `https://docs.gradle.org/current/javadoc/org/gradle/api/file/FileTree.html[FileTree]` that contains all `*.java` files in the project directory (and recursivly all subdirectories, excluding files in a (sub)project's `buildDir`) is added with one `source` method call. However, this initial value for the default inputs can be overwritten (using `setSource`), extended (using additional `source` calls) and/or further filtered (using `include` and/or `exclude` patterns, see https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/util/PatternFilterable.html[Ant-style exclude patterns]). The chapter about `https://docs.gradle.org/current/userguide/working_with_files.html[Working With Files]` in the Gradle user guide might be worth reading.
 +
 [source,groovy]
 [subs="attributes"]
 ----
-tasks.googleJavaFormat {
+googleJavaFormat {
+  setSource sourceSets*.java
+  source 'src/special_dir'
+  include '**/*.java'
   exclude '**/*Template.java'
   exclude 'src/test/template_*'
 }
 ----
-+
-You can also overwrite the default inputs and use your own rules (see `https://docs.gradle.org/current/userguide/working_with_files.html[Working With Files]`)
-+
-[source,groovy]
-[subs="attributes"]
-----
-tasks.verifyGoogleJavaFormat {
-  setSource fileTree('subprojects')
-  include '**/*.java'
-}
-----
 
-* Define your own format or verification tasks, if you need more than the predefined ones. The task type `VerifyGoogleJavaFormat` also implements the interface `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/VerificationTask.html[VerificationTask]`.
+* All tasks are of type `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/SourceTask.html[SourceTask]` and can be configured accordingly. In addition to the default tasks `googleJavaFormat` and `verifyGoogleJavaFormat` you can define custom tasks if you like. The task type `VerifyGoogleJavaFormat` also implements the interface `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/VerificationTask.html[VerificationTask]`.
 +
 [source,groovy]
 ----
@@ -110,7 +102,7 @@ task verifyFormatting(type: VerifyGoogleJavaFormat) {
   ignoreFailures true
 }
 ----
-
+If you set sources in a task (by calling `setSource` and/or `source`), the default inputs from the extension object are *not* added to the final set of sources to process. However, if you don't modify the sources in the task and only add `include` and/or `exclude` patterns, the default inputs are first added and then further filtered according the the patterns.
 
 
 == Snapshots
