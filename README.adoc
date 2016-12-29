@@ -74,7 +74,7 @@ googleJavaFormat {
 [subs="attributes"]
 ----
 googleJavaFormat {
-  setSource sourceSets*.java
+  source = sourceSets*.allJava
   source 'src/special_dir'
   include '**/*.java'
   exclude '**/*Template.java'
