@@ -15,21 +15,14 @@ import static com.github.sherter.googlejavaformatgradleplugin.FileState.*
 import static com.github.sherter.googlejavaformatgradleplugin.Utils.toPaths
 
 @CompileStatic
-class VerifyGoogleJavaFormat extends SourceTask implements VerificationTask, ConfigurableTask {
-
-    boolean ignoreFailures = false
-
-    SharedContext sharedContext
-
+class VerifyGoogleJavaFormat extends FormatTask implements VerificationTask {
 
     @Override
-    void configure(SharedContext context) {
-        this.sharedContext = context
-        List<Object> ownSources = super.@source
-        if (ownSources.isEmpty()) {
-            setSource(context.extension.getSource())
-        }
+    void accept(TaskConfigurator configurator) {
+        configurator.configure(this)
     }
+
+    boolean ignoreFailures = false
 
     @TaskAction
     void verifySources() {

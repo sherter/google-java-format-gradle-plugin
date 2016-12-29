@@ -15,36 +15,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 @CompileStatic
-class GoogleJavaFormat extends SourceTask implements ConfigurableTask {
+class GoogleJavaFormat extends FormatTask {
 
   private static final Logger logger = Logging.getLogger(GoogleJavaFormat.class)
 
-  private SharedContext sharedContext
-  private Iterable<Path> filteredSources
-  private List<Path> invalidSources
-
   @Override
-  public void configure(SharedContext context) {
-    this.sharedContext = context
-    List<Object> ownSources = super.@source
-    if (ownSources.isEmpty()) {
-      setSource(context.extension.getSource())
-    }
-    def mapping = context.mapper().reverseMap(Utils.toPaths(getSource().files))
-    def formattedFiles = mapping.get(FileState.FORMATTED)
-    for (Path file : formattedFiles) {
+  void accept(TaskConfigurator configurator) {
+    configurator.configure(this)
+    for (Path file : formattedSources) {
       logger.info("{}: UP-TO-DATE", file)
     }
-    invalidSources = new ArrayList<>(mapping.get(FileState.INVALID))
-    def unformatted = mapping.get(FileState.UNFORMATTED)
-    def unknown = mapping.get(FileState.UNKNOWN);
-    if (Iterables.size(invalidSources) + Iterables.size(unformatted) + Iterables.size(unknown) == 0) {
-      // task is up-to-date, make sure it is skipped
-      setSource(Collections.emptyList())
-    } else {
-      filteredSources = Iterables.concat(unformatted, unknown);
-    }
   }
+
+  List<Path> formattedSources
+  Iterable<Path> filteredSources
+  List<Path> invalidSources
 
   @TaskAction
   void formatSources() {
