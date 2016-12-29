@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# An example hook script to verify proper formatting.
+
+files=$(git diff --cached --name-only --diff-filter=ACM | paste -s -d",")
+# this only works if ignoreFailures is set to false (which it is by default)
+./gradlew verifyGJF -DverifyGoogleJavaFormat.include="$files" &>/dev/null && exit 0
+
+echo "Some files are not formatted properly. Please run:"
+echo "./gradlew gJF -DgoogleJavaFormat.include=\"$files\""
+exit 1
