@@ -104,6 +104,13 @@ task verifyFormatting(type: VerifyGoogleJavaFormat) {
 ----
 If you set sources in a task (by calling `setSource` and/or `source`), the default inputs from the extension object are *not* added to the final set of sources to process. However, if you don't modify the sources in the task and only add `include` and/or `exclude` patterns, the default inputs are first added and then further filtered according the the patterns.
 
+* An additional include filter can be applied on the command line at execution time by setting the `<taskName>.include` system property. All input files that remain after applying the filters in `build.gradle` also have to match at least one of the patterns in the comma separated list in order to be eventually processed by the task. Note that this only allows you to further _reduce_ the number of processed files. You _can not_ use this to add another `include` method call to a task. (See https://github.com/sherter/google-java-format-gradle-plugin/blob/runtime-filter/contrib/pre-commit[contrib/pre-commit] for a useful application of this feature).
++
+[source,shell]
+----
+$ ./gradlew verGJF -DverifyGoogleJavaFormat.include="*Foo.java,bar/Baz.java"
+----
+
 
 == Snapshots
 On every push to the master branch https://travis-ci.org/[Travis] runs
