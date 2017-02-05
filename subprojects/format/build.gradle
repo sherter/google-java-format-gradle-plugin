@@ -12,3 +12,8 @@ dependencies {
   testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
   testCompile 'org.apache.ivy:ivy:2.4.0' // required by Grape (in Resolver)
 }
+
+test {
+  // download google-java-format and transitive dependencies to $buildDir/grapes
+  systemProperty 'grape.root', buildDir
+}
