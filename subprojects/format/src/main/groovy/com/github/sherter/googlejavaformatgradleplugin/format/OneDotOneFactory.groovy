@@ -31,6 +31,8 @@ final class OneDotOneFactory extends AbstractFormatterFactory {
                 return formatter.formatSource(tmp)
             } catch (e) {
                 throw new FormatterException()
+            } catch (Error e) {
+                throw new FormatterException()
             }
         }
     }
