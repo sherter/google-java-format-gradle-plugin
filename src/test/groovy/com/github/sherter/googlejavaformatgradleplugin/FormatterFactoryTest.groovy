@@ -7,9 +7,11 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.logging.Logger
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 import spock.lang.Unroll
 
+@IgnoreIf({ javaVersion < 1.8 })
 class FormatterFactoryTest extends Specification {
 
     def 'fail to create a formatter'() {
