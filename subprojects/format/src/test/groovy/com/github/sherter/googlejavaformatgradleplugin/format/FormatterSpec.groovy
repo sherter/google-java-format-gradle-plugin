@@ -1,7 +1,9 @@
 package com.github.sherter.googlejavaformatgradleplugin.format
 
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 
+@IgnoreIf({ javaVersion < 1.8 })
 class FormatterSpec extends Specification {
 
     def 'AOSP-style formatting'() {
