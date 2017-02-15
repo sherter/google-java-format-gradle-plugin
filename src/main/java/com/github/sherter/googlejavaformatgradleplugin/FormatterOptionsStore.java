@@ -1,11 +1,7 @@
 package com.github.sherter.googlejavaformatgradleplugin;
 
-import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.github.sherter.googlejavaformatgradleplugin.format.Style;
+import com.google.common.base.Enums;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -37,25 +33,12 @@ class FormatterOptionsStore {
     Reader reader = Channels.newReader(channel, StandardCharsets.UTF_8.name());
     Properties properties = new Properties();
     properties.load(reader);
-    return FormatterOptions.create(
-        properties.getProperty("toolVersion"), parseOptions(properties.getProperty("options")));
-  }
-
-  private ImmutableSet<FormatterOption> parseOptions(String optionList) {
-    if (optionList == null || optionList.equals("")) {
-      return ImmutableSet.of();
+    String styleProperty = properties.getProperty("style");
+    Style style = null;
+    if (styleProperty != null) {
+      style = Enums.getIfPresent(Style.class, styleProperty).orNull();
     }
-    Iterable<String> options = Splitter.on(',').split(optionList);
-    Iterable<FormatterOption> parsed =
-        Iterables.transform(
-            options,
-            new Function<String, FormatterOption>() {
-              @Override
-              public FormatterOption apply(String s) {
-                return Enum.valueOf(FormatterOption.class, s);
-              }
-            });
-    return ImmutableSet.copyOf(parsed);
+    return FormatterOptions.create(properties.getProperty("toolVersion"), style);
   }
 
   private void init() throws IOException {
@@ -76,21 +59,8 @@ class FormatterOptionsStore {
     Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8.name());
     Properties properties = new Properties();
     properties.setProperty("toolVersion", options.version());
-    properties.setProperty("options", serialize(options.options()));
+    properties.setProperty("style", options.style().name());
     properties.store(writer, "Generated; DO NOT CHANGE!!!");
-  }
-
-  private String serialize(ImmutableSet<FormatterOption> options) {
-    Iterable<String> names =
-        Iterables.transform(
-            options,
-            new Function<FormatterOption, String>() {
-              @Override
-              public String apply(FormatterOption formatterOption) {
-                return formatterOption.name();
-              }
-            });
-    return Joiner.on(",").join(names);
   }
 
   void close() throws IOException {

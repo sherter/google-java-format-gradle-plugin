@@ -1,6 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
-import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption
+import com.github.sherter.googlejavaformatgradleplugin.format.Style
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileTree
@@ -76,7 +76,7 @@ class GoogleJavaFormatExtension {
             if(!FormatterFactory.optionMapping.containsRow(entry.key)) {
                 throw new ConfigurationException("Unsupported option '${entry.key}'")
             }
-            FormatterOption option = (FormatterOption) FormatterFactory.optionMapping.get(entry.key, entry.value)
+            Style option = (Style) FormatterFactory.optionMapping.get(entry.key, entry.value)
             if (option == null) {
                 throw new ConfigurationException("Unsupported value '${entry.value}' for option '${entry.key}'")
             }

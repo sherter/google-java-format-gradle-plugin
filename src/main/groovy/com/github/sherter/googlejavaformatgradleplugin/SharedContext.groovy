@@ -41,7 +41,7 @@ class SharedContext {
                 def options = optionsStore.read()
                 def extension = project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
                 if ((options.version() != extension.toolVersion) ||
-                        (!options.options().equals(FormatterFactory.mapOptions(extension.getOptions())))) {
+                        (options.style() != FormatterFactory.mapOptions(extension.getOptions()))) {
                     project.logger.info("Formatter options changed; invalidating saved file states")
                     fileInfoStore.clear()
                 } else {

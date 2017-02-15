@@ -1,11 +1,11 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
-import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption
 import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
 import com.github.sherter.googlejavaformatgradleplugin.format.Style
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
+import com.google.common.collect.Iterables
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.gradle.api.Project
@@ -16,10 +16,10 @@ import org.gradle.api.logging.Logger
 @CompileStatic
 class FormatterFactory {
 
-    static final ImmutableTable<String, Object, FormatterOption> optionMapping =
-            ImmutableTable.<String, Object, FormatterOption>builder()
-                    .put('style', 'GOOGLE', FormatterOption.GOOGLE_STYLE)
-                    .put('style', 'AOSP', FormatterOption.AOSP_STYLE)
+    static final ImmutableTable<String, Object, Style> optionMapping =
+            ImmutableTable.<String, Object, Style>builder()
+                    .put('style', 'GOOGLE', Style.GOOGLE)
+                    .put('style', 'AOSP', Style.AOSP)
                     .build()
 
 
@@ -31,48 +31,28 @@ class FormatterFactory {
         this.logger = Objects.requireNonNull(logger)
     }
 
-    Formatter create(String toolVersion, ImmutableSet<FormatterOption> options) throws ResolveException {
-        Objects.requireNonNull(toolVersion)
-        def configuration = setupConfiguration(toolVersion)
-        def classpath = configuration.resolve()
-        def classLoader = new URLClassLoader(classpath.collect { it.toURI().toURL() } as URL[], (ClassLoader)null)
+    Formatter create(String toolVersion, Style style) {
+        def classLoader = new ArtifactResolver(project).resolve(toolVersion)
         boolean versionIsSupported = toolVersion in Gjf.SUPPORTED_VERSIONS
         if (!versionIsSupported) {
             logger.warn('Version {} of google-java-format-gradle-plugin is not tested against version {} of ' +
                     'google-java-format. This should not be a problem if the task is executed without failures.',
                     GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }
-
-        if (options.contains(FormatterOption.AOSP_STYLE)) {
-            return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
-                    toolVersion, Style.AOSP))
-        } else {
-            return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
-                    toolVersion, Style.GOOGLE))
-        }
+        return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
+                    toolVersion, style))
     }
 
     @PackageScope
-    static ImmutableSet<FormatterOption> mapOptions(Map<String, Object> optionsInDsl) {
-        Set<FormatterOption> mapped = new HashSet<FormatterOption>(optionsInDsl.size())
+    static Style mapOptions(Map<String, Object> optionsInDsl) {
+        Set<Style> styles = new HashSet<Style>(optionsInDsl.size())
         for (Map.Entry<String, Object> entry : optionsInDsl) {
-            def option = (FormatterOption) optionMapping.get(entry.key, entry.value)
+            def option = (Style) optionMapping.get(entry.key, entry.value)
             if (option == null) {
                 throw new IllegalArgumentException("invalid option: $entry")
             }
-            mapped.add(option)
+            styles.add(option)
         }
-        return ImmutableSet.copyOf(mapped);
-    }
-
-    private Configuration setupConfiguration(String toolVersion) {
-        def configuration = project.configurations.maybeCreate("googleJavaFormat$toolVersion");
-        def dependency = project.dependencies.create(
-                group: Gjf.GROUP_ID,
-                name: Gjf.ARTIFACT_ID,
-                version: toolVersion
-        )
-        configuration.dependencies.add(dependency)
-        return configuration
+        return styles.isEmpty() ? Style.GOOGLE : Iterables.getOnlyElement(styles)
     }
 }

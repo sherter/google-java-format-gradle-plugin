@@ -2,6 +2,7 @@ package com.github.sherter.googlejavaformatgradleplugin
 
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterException
 import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
+import com.github.sherter.googlejavaformatgradleplugin.format.Style
 import com.google.common.collect.ImmutableSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
@@ -20,19 +21,13 @@ class FormatterFactoryTest extends Specification {
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
         when:
-        factory.create(null, ImmutableSet.of())
-
-        then:
-        thrown NullPointerException
-
-        when:
-        factory.create('this-version-is-not-in-any-repository', ImmutableSet.of())
+        factory.create('this-version-is-not-in-any-repository', Style.GOOGLE)
 
         then:
         thrown ResolveException
 
         when: 'a version is used that was actually released'
-        factory.create('0.1-alpha', ImmutableSet.of())
+        factory.create('0.1-alpha', Style.GOOGLE)
 
         then: 'resolution fails nevertheless since no repository was defined'
         thrown ResolveException
@@ -56,7 +51,7 @@ class FormatterFactoryTest extends Specification {
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
         when:
-        def formatter = factory.create(version, ImmutableSet.of())
+        def formatter = factory.create(version, Style.AOSP)
 
         then:
         formatter != null
@@ -91,14 +86,14 @@ class FormatterFactoryTest extends Specification {
         def factory = new FormatterFactory(project, logger)
 
         when:
-        factory.create(Gjf.SUPPORTED_VERSIONS.first(), ImmutableSet.of())
+        factory.create(Gjf.SUPPORTED_VERSIONS.first(), Style.GOOGLE)
 
         then:
         0 * logger._
 
         when:
         try {
-            factory.create(unsupportedVersion, ImmutableSet.of())
+            factory.create(unsupportedVersion, Style.GOOGLE)
         } catch (any) {}
 
         then:
