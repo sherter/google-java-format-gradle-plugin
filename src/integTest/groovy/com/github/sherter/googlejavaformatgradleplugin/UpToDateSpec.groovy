@@ -18,7 +18,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
 
     def "format task is up-to-date in an empty project"() {
         expect:
-        runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build().output =~ /UP-TO-DATE/
+        runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build().output =~ /(UP-TO-DATE|NO-SOURCE)/
     }
 
     def "format task is up-to-date when executed the second time"() {
@@ -28,13 +28,13 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
 
         when:
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
     }
 
     def "format task is up-to-date when verification task succeeded before"() {
@@ -50,7 +50,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
     }
 
     def "format task is not up-to-date anymore, if a new file was added"() {
@@ -61,14 +61,14 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
 
         when:
         project.createFile(['Bar.java'], 'class Bar {}\n')
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
     }
 
     def "format task is not up-to-date anymore, if a file was modified"() {
@@ -79,14 +79,14 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
 
         when:
         foo.write('class Foo { void bar() {} }')
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
     }
 
     def "format task is still up-to-date after removing a file"() {
@@ -97,14 +97,14 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
 
         when:
         foo.delete()
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
     }
 
     def "format task is not up-to-date anymore, if the toolVersion has changed"() {
@@ -122,7 +122,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
 
         when:
         buildfile.write("""\
@@ -135,7 +135,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
     }
 
     def "format task is not up-to-date anymore, if the style option has changed"() {
@@ -153,7 +153,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        result.output =~ /UP-TO-DATE/
+        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
 
         when:
         buildfile.write("""\
@@ -166,7 +166,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
     }
 
     def "verify task is not up-to-date when executed a second time"() {
@@ -176,13 +176,13 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         def result = runner.withArguments(DEFAULT_VERIFY_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
 
         when:
         result = runner.withArguments(DEFAULT_VERIFY_TASK_NAME).build()
 
         then:
-        !(result.output =~ /UP-TO-DATE/)
+        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
     }
 
     def "format task doesn't modify a file, if it is already formatted correctly"() {

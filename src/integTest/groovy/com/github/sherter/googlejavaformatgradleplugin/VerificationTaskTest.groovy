@@ -15,7 +15,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         def result = runner.withArguments(customTaskName).build()
 
         then:
-        result.output.contains(":$customTaskName UP-TO-DATE")
+        result.output =~ /:$customTaskName (UP-TO-DATE|NO-SOURCE)/
     }
 
     def 'dependency resolution failure'() {
@@ -94,7 +94,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
     def 'check task (if present) depends on default verification task'() {
         when:
         def buildFile = project.createFile(['build.gradle'], applyPlugin)
-        def result = runner.withArguments('tasks').build()
+        def result = runner.withArguments('tasks', '--all').build()
 
         then:
         result.output.readLines().find { s -> s.matches(~/^verifyGoogleJavaFormat$/) }
@@ -106,10 +106,10 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
             |apply plugin: JavaBasePlugin
             |apply plugin: 'com.github.sherter.google-java-format'
             |""".stripMargin())
-        result = runner.withArguments('tasks', '--all').build()
+        result = runner.withArguments('check').build()
 
         then:
-        result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
+        result.output =~ /(?s):verifyGoogleJavaFormat.*:check/
 
         when: 'before base plugin'
         buildFile.write("""\
@@ -117,9 +117,9 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
             |apply plugin: 'com.github.sherter.google-java-format'
             |apply plugin: JavaBasePlugin
             |""".stripMargin())
-        result = runner.withArguments('tasks', '--all').build()
+        result = runner.withArguments('check').build()
 
         then:
-        result.output.contains('check - Runs all checks.\n    verifyGoogleJavaFormat')
+        result.output =~ /(?s):verifyGoogleJavaFormat.*:check/
     }
 }
