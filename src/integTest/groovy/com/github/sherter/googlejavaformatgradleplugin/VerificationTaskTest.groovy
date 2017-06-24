@@ -31,7 +31,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         def result = runner.withArguments(customTaskName).buildAndFail()
 
         then:
-        result.output.contains("Could not resolve all dependencies for configuration ':googleJavaFormat")
+        result.output =~ /Could not resolve all (files|dependencies) for configuration ':googleJavaFormat/
     }
 
     def 'no reports for correctly formatted input source file'() {
@@ -51,7 +51,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
 
         then:
         result.output.contains(":$customTaskName\n")
-        result.output.contains('BUILD SUCCESSFUL\n')
+        result.output =~ /BUILD SUCCESSFUL.*\n/
     }
 
     def 'report badly formatted input source file'() {
