@@ -55,7 +55,7 @@ $ ./gradlew verGJF
 [subs="attributes"]
 ----
 googleJavaFormat {
-  toolVersion '1.1-SNAPSHOT'
+  toolVersion = '1.1-SNAPSHOT'
 }
 ----
 
