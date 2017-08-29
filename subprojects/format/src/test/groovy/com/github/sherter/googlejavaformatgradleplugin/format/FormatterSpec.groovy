@@ -2,11 +2,13 @@ package com.github.sherter.googlejavaformatgradleplugin.format
 
 import spock.lang.IgnoreIf
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @IgnoreIf({ javaVersion < 1.8 })
+@Unroll
 class FormatterSpec extends Specification {
 
-    def 'AOSP-style formatting'() {
+    def 'AOSP-style formatting v#version'() {
         given:
         def conf = new Configuration(version, Style.AOSP)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
@@ -22,7 +24,7 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
-    def 'GOOGLE-style formatting'() {
+    def 'GOOGLE-style formatting v#version'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
@@ -38,7 +40,7 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
-    def 'formatter formats javadoc'() {
+    def 'formatter formats javadoc v#version'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
@@ -57,7 +59,7 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
-    def 'formatter orders imports'() {
+    def 'formatter orders imports v#version'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
@@ -84,7 +86,7 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
-    def 'formatter removes unused imports'() {
+    def 'formatter removes unused imports v#version'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
@@ -108,7 +110,7 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS - ['1.0']
     }
 
-    def 'formatter throws when given invalid source code'() {
+    def 'formatter throws when given invalid source code v#version'() {
         given:
         def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
