@@ -9,7 +9,7 @@ public class Gjf {
   public static final String ARTIFACT_ID = "google-java-format";
 
   public static final ImmutableList<String> SUPPORTED_VERSIONS =
-      ImmutableList.of("1.0", "1.1", "1.2", "1.3");
+      ImmutableList.of("1.0", "1.1", "1.2", "1.3", "1.4");
 
   /**
    * Constructs a new formatter that delegates to <a
