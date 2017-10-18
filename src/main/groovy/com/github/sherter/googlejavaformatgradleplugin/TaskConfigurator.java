@@ -20,13 +20,18 @@ class TaskConfigurator {
   void configureFormatTask(FormatTask task) {
     task.sharedContext = context;
     if (!task.hasSources()) {
-      task.setSource(context.getExtension().getSource());
+      // TODO Remove cast to Object when dropping support for Gradle versions below 4.0
+      // Gradle 4.0 introduced 'void setSource(FileTree source)' in addition
+      // to 'void setSource(Object source)'.
+      // Casting to Object makes sure that we can run on Gradle versions < 4.0
+      task.setSource((Object) context.getExtension().getSource());
     }
     String value = System.getProperty(task.getName() + ".include");
     if (value != null) {
       String[] patterns = value.split(",");
       FileTree filteredSources = task.getSource().matching(new PatternSet().include(patterns));
-      task.setSource(filteredSources);
+      // TODO Remove cast to Object when dropping support for Gradle versions below 4.0
+      task.setSource((Object) filteredSources);
     }
   }
 

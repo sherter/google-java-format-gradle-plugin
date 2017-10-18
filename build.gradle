@@ -74,7 +74,7 @@ def integTestGradleVersion = System.getenv('GRADLE_VERSION') ?: '2.0'
 
 task integrationTest(type: Test, dependsOn: publishToMavenLocal) {
     group 'Verification'
-    testClassesDir = sourceSets.integTest.output.classesDir
+    testClassesDirs = sourceSets.integTest.output.classesDirs
     classpath = sourceSets.integTest.runtimeClasspath
     systemProperty 'GRADLE_VERSION', integTestGradleVersion
     reports.html.destination = new File(reportsDir, 'integrationTest' + File.separator + integTestGradleVersion)

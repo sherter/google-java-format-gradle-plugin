@@ -3,7 +3,7 @@ package com.github.sherter.googlejavaformatgradleplugin;
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.gradle.api.Nullable;
+import javax.annotation.Nullable;
 
 @AutoValue
 abstract class FormatterOptions {
