@@ -20,19 +20,19 @@ class FormatterFactoryTest extends Specification {
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
         when:
-        factory.create(null, ImmutableSet.of())
+        factory.create(null, ImmutableSet.of(), true)
 
         then:
         thrown NullPointerException
 
         when:
-        factory.create('this-version-is-not-in-any-repository', ImmutableSet.of())
+        factory.create('this-version-is-not-in-any-repository', ImmutableSet.of(), true)
 
         then:
         thrown ResolveException
 
         when: 'a version is used that was actually released'
-        factory.create('0.1-alpha', ImmutableSet.of())
+        factory.create('0.1-alpha', ImmutableSet.of(), true)
 
         then: 'resolution fails nevertheless since no repository was defined'
         thrown ResolveException
@@ -56,7 +56,7 @@ class FormatterFactoryTest extends Specification {
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
         when:
-        def formatter = factory.create(version, ImmutableSet.of())
+        def formatter = factory.create(version, ImmutableSet.of(), true)
 
         then:
         formatter != null
@@ -91,14 +91,14 @@ class FormatterFactoryTest extends Specification {
         def factory = new FormatterFactory(project, logger)
 
         when:
-        factory.create(Gjf.SUPPORTED_VERSIONS.first(), ImmutableSet.of())
+        factory.create(Gjf.SUPPORTED_VERSIONS.first(), ImmutableSet.of(), true)
 
         then:
         0 * logger._
 
         when:
         try {
-            factory.create(unsupportedVersion, ImmutableSet.of())
+            factory.create(unsupportedVersion, ImmutableSet.of(), true)
         } catch (any) {}
 
         then:
