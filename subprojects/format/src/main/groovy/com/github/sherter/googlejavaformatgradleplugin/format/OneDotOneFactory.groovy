@@ -51,7 +51,7 @@ final class OneDotOneFactory extends AbstractFormatterFactory {
     Closure<String> constructReorderImportsClosure() {
         def clazz = classLoader.loadClass(importOrdererClassName)
         return { String text ->
-            if (config.sortImports) {
+            if (config.orderImports) {
               clazz.reorderImports(text)
             } else {
               text

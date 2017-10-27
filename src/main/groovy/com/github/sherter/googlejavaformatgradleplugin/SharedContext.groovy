@@ -93,7 +93,7 @@ class SharedContext {
         if (formatter == null) {
             GoogleJavaFormatExtension extension = (GoogleJavaFormatExtension) project.getExtensions().getByName(GoogleJavaFormatPlugin.getEXTENSION_NAME())
             formatter = new FormatterFactory(project, project.logger).create(extension.toolVersion,
-                    FormatterFactory.mapOptions(extension.getOptions()), extension.sortImports)
+                    FormatterFactory.mapOptions(extension.getOptions()), extension.orderImports)
         }
         return formatter
     }

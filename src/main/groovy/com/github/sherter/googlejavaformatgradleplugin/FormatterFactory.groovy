@@ -31,7 +31,7 @@ class FormatterFactory {
         this.logger = Objects.requireNonNull(logger)
     }
 
-    Formatter create(String toolVersion, ImmutableSet<FormatterOption> options, boolean sortImports) throws ResolveException {
+    Formatter create(String toolVersion, ImmutableSet<FormatterOption> options, boolean orderImports) throws ResolveException {
         Objects.requireNonNull(toolVersion)
         def configuration = setupConfiguration(toolVersion)
         def classpath = configuration.resolve()
@@ -45,10 +45,10 @@ class FormatterFactory {
 
         if (options.contains(FormatterOption.AOSP_STYLE)) {
             return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
-                    toolVersion, Style.AOSP, sortImports))
+                    toolVersion, Style.AOSP, orderImports))
         } else {
             return Gjf.newFormatter(classLoader, new com.github.sherter.googlejavaformatgradleplugin.format.Configuration(
-                    toolVersion, Style.GOOGLE, sortImports))
+                    toolVersion, Style.GOOGLE, orderImports))
         }
     }
 

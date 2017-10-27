@@ -73,7 +73,7 @@ googleJavaFormat {
 [source,groovy]
 ----
 googleJavaFormat {
-  sortImports false
+  orderImports false
 }
 ----
 
