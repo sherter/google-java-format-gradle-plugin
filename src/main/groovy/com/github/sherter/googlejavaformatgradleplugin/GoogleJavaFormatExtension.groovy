@@ -35,14 +35,6 @@ class GoogleJavaFormatExtension {
         return javaFiles
     }
 
-    void setSortImports(boolean sortImports) {
-        this.sortImports = sortImports
-    }
-
-    boolean getSortImports() {
-      return sortImports
-    }
-
     void setToolVersion(String version) {
         if (options != null) {
             throw new ConfigurationException('toolVersion must be set before configuring options ' +
