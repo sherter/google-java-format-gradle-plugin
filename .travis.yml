@@ -11,8 +11,7 @@ cache:
   - "$HOME/.groovy/grapes/"
 
 jdk:
-  - openjdk7
-  - oraclejdk7
+  - openjdk8
   - oraclejdk8
 
 env:
@@ -33,11 +32,8 @@ env:
 
 matrix:
   exclude:
-    - jdk: oraclejdk7
     - jdk: oraclejdk8
   include:
-    - jdk: oraclejdk7
-      env: TEST=integration GRADLE_VERSIONS=2.0
     - jdk: oraclejdk8
       env: TEST=integration GRADLE_VERSIONS=2.0
 
@@ -48,7 +44,7 @@ install:
   # make sure we run integration tests against the artifact we deploy eventually
   - |
       if [[ "$TEST" == "integration" ]]; then
-        jdk_switcher use openjdk7 && ./gradlew --no-daemon publishToMavenLocal && jdk_switcher use $TRAVIS_JDK_VERSION
+        jdk_switcher use openjdk8 && ./gradlew --no-daemon publishToMavenLocal && jdk_switcher use $TRAVIS_JDK_VERSION
       fi
 
 script:
@@ -67,7 +63,7 @@ after_success:
 
 before_deploy:
   # make sure we publish what we actually tested
-  - jdk_switcher use openjdk7
+  - jdk_switcher use openjdk8
 
 deploy:
   - provider: script
