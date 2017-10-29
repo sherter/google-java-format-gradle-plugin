@@ -1,18 +1,14 @@
 language: java
 
 before_cache:
-- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-        $HOME/.gradle/caches/*/plugin-resolution/cache.properties
-        $HOME/.gradle/caches/*/plugin-resolution/cache.properties.lock
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
 cache:
   directories:
-  - "$HOME/.gradle/caches/"
-  - "$HOME/.gradle/wrapper/"
-  - "$HOME/.groovy/grapes/"
-
-jdk:
-  - openjdk8
-  - oraclejdk8
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.groovy/grapes/
 
 env:
   global:
@@ -22,59 +18,28 @@ env:
     - secure: PZCOTXWpKcTUEFvxWArVBHfJLA3ncArVJVmeWqGEe3f1SH3rDbtnHwAK9MZ+qfQvtmfP5KrsXbechosRGxmY4NzGTuxupzYIeNq3x73RFLYmhDNaf3yIHx5KbLsKm+/y7X11ORKEWTX0Ub68CAc8dyV5iV2CR/1gPpBcL2L7s4xqS9aeeVJj9C2fIOY9uLaCA4g5Vx3opBVLsh7kmBuOgl8ajg24hI4oajQmEatKfxIqZp892cPvOVZgsmR9Y83z6ZL48tmPKsttB5utBe8AQY7TnKwKqo3tFDvTFgO4Vkv+plTJQHU3mULoG7WixL+AvWS6+jhyl2pzhEovDYMHkWi4ozxbO87ZdZp9GIxLihsXmxIunwz7mBolZ1XE6vEwWoVhlWXuZ/fO1udi8UIvcxr01jZwYzVrhvpnpoT/j2goZr+V2kuVXEghm50saRDIP5rAPk4hLj9Q8G3SKObNU0xj8lN/fLM4XIvaZV26kFbDfREBfoV3GL7tHvEdg0gAyjO9d9VIJsomj+/K/e6L1GZCwiN2VgHPJWzgmNMofCFNF7GusA8gju6mO5qWxYZxq0y28p93uE4QJvxZUV9gNZ8fvDrK6xDylB06SDXQqyTxf+GnOv2bRYTTap2PSBgcFScr/Q7jTB65h/e0KlFle8dOEwDMm9E62r4WfS2E6sY=
     - ALL_GRADLE_VERSIONS=2.0,2.1,2.2.1,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14.1,3.0,3.1,3.2.1,3.3,3.4.1,3.5,4.0
     - PARALLEL_INTEG_TEST_COUNT=4
-    - GRADLE_OPTS="-Xms128m"
-  matrix:
-    - TEST=units
-    - TEST=integration INDEX=0
-    - TEST=integration INDEX=1
-    - TEST=integration INDEX=2
-    - TEST=integration INDEX=3
 
-matrix:
-  exclude:
-    - jdk: oraclejdk8
+jdk: openjdk8
+install: true  # overwrite default install step (./gradlew assemble)
+
+jobs:
   include:
+    - stage: unit tests
+      script: ./gradlew test
+    - stage: integration tests
+      env: INDEX=0
+      script: scripts/travis-integ-tests.sh
+    - env: INDEX=1
+      script: scripts/travis-integ-tests.sh
+    - env: INDEX=2
+      script: scripts/travis-integ-tests.sh
+    - env: INDEX=3
+      script: scripts/travis-integ-tests.sh
     - jdk: oraclejdk8
-      env: TEST=integration GRADLE_VERSIONS=2.0
-
-before_install:
-  - npm install --save-dev travis-after-all
-
-install:
-  # make sure we run integration tests against the artifact we deploy eventually
-  - |
-      if [[ "$TEST" == "integration" ]]; then
-        jdk_switcher use openjdk8 && ./gradlew publishToMavenLocal && jdk_switcher use $TRAVIS_JDK_VERSION
-      fi
-
-script:
-  - |
-      if [[ "$TEST" == "units" ]]; then
-        ./gradlew test
-      else
-        scripts/travis-integ-tests.sh
-      fi
-
-after_success:
-  - |
-      $(npm bin)/travis-after-all
-      export TRAVIS_AFTER_ALL_EXIT_CODE=$?
-
-
-before_deploy:
-  # make sure we publish what we actually tested
-  - jdk_switcher use openjdk8
-
-deploy:
-  - provider: script
-    script: ./gradlew publish
-    skip_cleanup: true
-    on:
-      condition: $TRAVIS_AFTER_ALL_EXIT_CODE = 0
-      branch: master
-  - provider: script
-    script: ./gradlew publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET
-    skip_cleanup: true
-    on:
-      condition: $TRAVIS_AFTER_ALL_EXIT_CODE = 0
-      tags: true
+      env: GRADLE_VERSIONS=2.0,3.0,4.0
+      script: scripts/travis-integ-tests.sh
+    - stage: deploy
+      if: branch = master
+      script: ./gradlew publish
+    - if: tag IS present
+      script: ./gradlew publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET

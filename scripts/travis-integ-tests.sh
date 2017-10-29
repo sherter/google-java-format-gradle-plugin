@@ -21,6 +21,8 @@ else
 	IFS=',' read -r -a versions_array <<< "$GRADLE_VERSIONS"
 fi
 
+(set -x; JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 ./gradlew publishToMavenLocal)
+
 echo
 echo
 echo "*********************************************************************************"
@@ -31,7 +33,6 @@ echo "**************************************************************************
 echo
 echo
 
-set -o xtrace
 for element in "${versions_array[@]}"; do
-	GRADLE_VERSION="$element" ./gradlew integrationTest --exclude-task publishToMavenLocal
+	(set -x; GRADLE_VERSION="$element" ./gradlew integrationTest --exclude-task publishToMavenLocal)
 done
