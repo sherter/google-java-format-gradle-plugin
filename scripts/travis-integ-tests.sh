@@ -33,5 +33,5 @@ echo
 
 set -o xtrace
 for element in "${versions_array[@]}"; do
-	GRADLE_VERSION="$element" ./gradlew --no-daemon integrationTest --exclude-task publishToMavenLocal
+	GRADLE_VERSION="$element" ./gradlew integrationTest --exclude-task publishToMavenLocal
 done

@@ -44,13 +44,13 @@ install:
   # make sure we run integration tests against the artifact we deploy eventually
   - |
       if [[ "$TEST" == "integration" ]]; then
-        jdk_switcher use openjdk8 && ./gradlew --no-daemon publishToMavenLocal && jdk_switcher use $TRAVIS_JDK_VERSION
+        jdk_switcher use openjdk8 && ./gradlew publishToMavenLocal && jdk_switcher use $TRAVIS_JDK_VERSION
       fi
 
 script:
   - |
       if [[ "$TEST" == "units" ]]; then
-        ./gradlew --no-daemon test
+        ./gradlew test
       else
         scripts/travis-integ-tests.sh
       fi
@@ -67,13 +67,13 @@ before_deploy:
 
 deploy:
   - provider: script
-    script: ./gradlew --no-daemon publish
+    script: ./gradlew publish
     skip_cleanup: true
     on:
       condition: $TRAVIS_AFTER_ALL_EXIT_CODE = 0
       branch: master
   - provider: script
-    script: ./gradlew --no-daemon publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET
+    script: ./gradlew publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET
     skip_cleanup: true
     on:
       condition: $TRAVIS_AFTER_ALL_EXIT_CODE = 0
