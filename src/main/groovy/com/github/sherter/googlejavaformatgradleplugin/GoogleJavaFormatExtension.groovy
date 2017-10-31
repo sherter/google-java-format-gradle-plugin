@@ -18,6 +18,7 @@ class GoogleJavaFormatExtension {
     private final Project project
     private String toolVersion = null
     private Map<String, Object> options = null
+    boolean orderImports = true
     private final List<Object> source = new ArrayList<Object>();
     private final PatternFilterable patternSet = new PatternSet();
 
@@ -33,7 +34,6 @@ class GoogleJavaFormatExtension {
         }
         return javaFiles
     }
-
 
     void setToolVersion(String version) {
         if (options != null) {

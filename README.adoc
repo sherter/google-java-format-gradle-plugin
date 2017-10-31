@@ -68,6 +68,15 @@ googleJavaFormat {
 }
 ----
 
+* Turn off import sorting:
++
+[source,groovy]
+----
+googleJavaFormat {
+  orderImports false
+}
+----
+
 * The extension object allows you to configure the default inputs for all tasks related to this plugin. It provides the same methods as a `https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/SourceTask.html[SourceTask]` to set these inputs. Initially, a `https://docs.gradle.org/current/javadoc/org/gradle/api/file/FileTree.html[FileTree]` that contains all `*.java` files in the project directory (and recursivly all subdirectories, excluding files in a (sub)project's `buildDir`) is added with one `source` method call. However, this initial value for the default inputs can be overwritten (using `setSource`), extended (using additional `source` calls) and/or further filtered (using `include` and/or `exclude` patterns, see https://docs.gradle.org/2.0/javadoc/org/gradle/api/tasks/util/PatternFilterable.html[Ant-style exclude patterns]). The chapter about `https://docs.gradle.org/current/userguide/working_with_files.html[Working With Files]` in the Gradle user guide might be worth reading.
 +
 [source,groovy]
