@@ -44,9 +44,6 @@ abstract class AbstractIntegrationSpec extends Specification {
                 .withGradleVersion(System.properties['GRADLE_VERSION'])
                 .withProjectDir(temporaryFolder.root)
         project = new Project(temporaryFolder.root)
-        // workaround for dying Gradle daemons on Travis
-        // see https://discuss.gradle.org/t/gradle-travis-ci/11928/9
-        project.createFile(['gradle.properties'], 'org.gradle.daemon=false\n')
         additionalSetup()
     }
 
