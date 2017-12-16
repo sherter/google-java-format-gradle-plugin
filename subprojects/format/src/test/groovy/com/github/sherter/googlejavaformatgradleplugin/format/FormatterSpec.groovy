@@ -8,7 +8,7 @@ class FormatterSpec extends Specification {
 
     def 'AOSP-style formatting'() {
         given:
-        def conf = new Configuration(version, Style.AOSP, true)
+        def conf = new Configuration(version, Style.AOSP)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
 
         expect:
@@ -24,7 +24,7 @@ class FormatterSpec extends Specification {
 
     def 'GOOGLE-style formatting'() {
         given:
-        def conf = new Configuration(version, Style.GOOGLE, true)
+        def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
 
         expect:
@@ -40,7 +40,7 @@ class FormatterSpec extends Specification {
 
     def 'formatter formats javadoc'() {
         given:
-        def conf = new Configuration(version, Style.GOOGLE, true)
+        def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
         def javadoc = '''/**  This is (was) malformed javadoc.
                         |*      <pre>
@@ -57,9 +57,9 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
-    def 'formatter orders imports when asked'() {
+    def 'formatter orders imports'() {
         given:
-        def conf = new Configuration(version, Style.GOOGLE, true)
+        def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
         def unordered = '''import z.Z;
                           |import a.A;
@@ -84,38 +84,9 @@ class FormatterSpec extends Specification {
         version << Gjf.SUPPORTED_VERSIONS
     }
 
-    def 'formatter leaves imports alone when asked'() {
-        given:
-        def conf = new Configuration(version, Style.GOOGLE, false)
-        def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
-        def unordered = '''import z.Z;
-                          |import a.A;
-                          |
-                          |class C {
-                          |  A a;
-                          |  Z z;
-                          |}
-                          |'''.stripMargin()
-        def ordered = '''import z.Z;
-                        |import a.A;
-                        |
-                        |class C {
-                        |  A a;
-                        |  Z z;
-                        |}
-                        |'''.stripMargin()
-        expect:
-        if (version != '1.0') {
-          formatter.format(unordered) == ordered
-        }
-
-        where:
-        version << Gjf.SUPPORTED_VERSIONS
-    }
-
     def 'formatter removes unused imports'() {
         given:
-        def conf = new Configuration(version, Style.GOOGLE, true)
+        def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
 
         expect:
@@ -139,7 +110,7 @@ class FormatterSpec extends Specification {
 
     def 'formatter throws when given invalid source code'() {
         given:
-        def conf = new Configuration(version, Style.GOOGLE, true)
+        def conf = new Configuration(version, Style.GOOGLE)
         def formatter = Gjf.newFormatter(Resolver.resolve(version), conf)
 
         when:

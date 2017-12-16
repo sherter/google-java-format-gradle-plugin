@@ -41,8 +41,7 @@ class SharedContext {
                 def options = optionsStore.read()
                 def extension = project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
                 if ((options.version() != extension.toolVersion) ||
-                        (!options.options().equals(FormatterFactory.mapOptions(extension.getOptions()))) ||
-                        (options.orderImports() != extension.orderImports)) {
+                        (!options.options().equals(FormatterFactory.mapOptions(extension.getOptions())))) {
                     project.logger.info("Formatter options changed; invalidating saved file states")
                     fileInfoStore.clear()
                 } else {
@@ -67,7 +66,7 @@ class SharedContext {
          project.gradle.buildFinished {
             def extension = project.extensions.getByName(GoogleJavaFormatPlugin.EXTENSION_NAME)
             def options = FormatterOptions.create(extension.toolVersion,
-                    FormatterFactory.mapOptions(extension.getOptions()), extension.orderImports)
+                    FormatterFactory.mapOptions(extension.getOptions()))
             try {
                 optionsStore.write(options);
             } finally {
@@ -94,7 +93,7 @@ class SharedContext {
         if (formatter == null) {
             GoogleJavaFormatExtension extension = (GoogleJavaFormatExtension) project.getExtensions().getByName(GoogleJavaFormatPlugin.getEXTENSION_NAME())
             formatter = new FormatterFactory(project, project.logger).create(extension.toolVersion,
-                    FormatterFactory.mapOptions(extension.getOptions()), extension.orderImports)
+                    FormatterFactory.mapOptions(extension.getOptions()))
         }
         return formatter
     }

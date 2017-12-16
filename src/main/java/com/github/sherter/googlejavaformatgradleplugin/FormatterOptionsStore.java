@@ -37,11 +37,8 @@ class FormatterOptionsStore {
     Reader reader = Channels.newReader(channel, StandardCharsets.UTF_8.name());
     Properties properties = new Properties();
     properties.load(reader);
-
     return FormatterOptions.create(
-        properties.getProperty("toolVersion"),
-        parseOptions(properties.getProperty("options")),
-        parseOrderImports(properties.getProperty("orderImports")));
+        properties.getProperty("toolVersion"), parseOptions(properties.getProperty("options")));
   }
 
   private ImmutableSet<FormatterOption> parseOptions(String optionList) {
@@ -59,10 +56,6 @@ class FormatterOptionsStore {
               }
             });
     return ImmutableSet.copyOf(parsed);
-  }
-
-  private boolean parseOrderImports(String orderImportsString) {
-    return orderImportsString == null ? true : Boolean.parseBoolean(orderImportsString);
   }
 
   private void init() throws IOException {
@@ -84,7 +77,6 @@ class FormatterOptionsStore {
     Properties properties = new Properties();
     properties.setProperty("toolVersion", options.version());
     properties.setProperty("options", serialize(options.options()));
-    properties.setProperty("orderImports", Boolean.toString(options.orderImports()));
     properties.store(writer, "Generated; DO NOT CHANGE!!!");
   }
 

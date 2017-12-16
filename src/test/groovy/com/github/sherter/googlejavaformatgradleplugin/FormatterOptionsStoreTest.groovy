@@ -46,9 +46,9 @@ class FormatterOptionsStoreTest extends Specification {
         store.read() == option
 
         where:
-        option << [FormatterOptions.create('0.1-alpha', ImmutableSet.of(), true),
-                   FormatterOptions.create('1.0', ImmutableSet.of(), false),
-                   FormatterOptions.create('-123', ImmutableSet.of(), true)]
+        option << [FormatterOptions.create('0.1-alpha', ImmutableSet.of()),
+                   FormatterOptions.create('1.0', ImmutableSet.of()),
+                   FormatterOptions.create('-123', ImmutableSet.of())]
     }
 
 }

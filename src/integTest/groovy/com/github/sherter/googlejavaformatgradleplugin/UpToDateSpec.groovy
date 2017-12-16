@@ -169,37 +169,6 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
     }
 
-    def "format task is not up-to-date anymore, if the orderImports option has changed"() {
-        project.createFile(['Foo.java'], '\nimport java.util.List;\nimport java.util.ArrayList;\n\nclass Foo {\n  List<String> a = new ArrayList<>();\n}\n')
-        buildfile.write("""\
-            |$applyPlugin
-            |$defaultRepositories
-            |googleJavaFormat {
-            |  orderImports = false
-            |}
-            |""".stripMargin())
-
-        when:
-        runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
-        def result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
-
-        then:
-        result.output =~ /(UP-TO-DATE|NO-SOURCE)/
-
-        when:
-        buildfile.write("""\
-            |$applyPlugin
-            |$defaultRepositories
-            |googleJavaFormat {
-            |  orderImports = true
-            |}
-            |""".stripMargin())
-        result = runner.withArguments(DEFAULT_FORMAT_TASK_NAME).build()
-
-        then:
-        !(result.output =~ /(UP-TO-DATE|NO-SOURCE)/)
-    }
-
     def "verify task is not up-to-date when executed a second time"() {
         project.createFile(['Foo.java'], 'class Foo {}\n')
 
