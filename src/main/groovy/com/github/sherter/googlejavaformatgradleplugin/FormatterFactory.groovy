@@ -38,7 +38,7 @@ class FormatterFactory {
         def classLoader = new URLClassLoader(classpath.collect { it.toURI().toURL() } as URL[], ClassLoader.getSystemClassLoader())
         boolean versionIsSupported = toolVersion in Gjf.SUPPORTED_VERSIONS
         if (!versionIsSupported) {
-            logger.warn('Version {} of google-java-format-gradle-plugin is not tested against version {} of ' +
+            logger.info('Version {} of google-java-format-gradle-plugin is not tested against version {} of ' +
                     'google-java-format. This should not be a problem if the task is executed without failures.',
                     GoogleJavaFormatPlugin.PLUGIN_VERSION, toolVersion)
         }

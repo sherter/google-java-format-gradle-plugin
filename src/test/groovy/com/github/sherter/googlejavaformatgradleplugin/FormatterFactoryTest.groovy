@@ -102,7 +102,7 @@ class FormatterFactoryTest extends Specification {
         } catch (any) {}
 
         then:
-        1 * logger.warn(*_)
+        1 * logger.info(*_)
 
         where:
         unsupportedVersion = '0.1-SNAPSHOT'
