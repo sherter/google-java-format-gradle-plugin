@@ -44,7 +44,7 @@ jobs:
       env: GRADLE_VERSIONS=4.2.1,4.3.1,4.4.1,4.5.1,4.6
       script: scripts/travis-integ-tests.sh
     - stage: deploy
-      if: branch = master
+      if: (branch = master) AND (NOT (type = pull_request))
       script: ./gradlew publish
     - if: tag IS present
       script: ./gradlew publishPlugins -Dgradle.publish.key=$PLUGIN_PORTAL_KEY -Dgradle.publish.secret=$PLUGIN_PORTAL_SECRET
