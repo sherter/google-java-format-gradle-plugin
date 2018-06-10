@@ -18,7 +18,7 @@ env:
     - secure: Oq15JlYDBG3Z0YoxKAsaQlvakzzi5O/MqndVsYBKiro1xgBKiiyTo9pAdOHsyIuVOlzZZhlTyNSdcKDpjzN05HbcRvMo3zd/BigwesO6Rm02lPY4JpR9oxYa3pRHR+hcNBYoErkMNzwr5glRHZISuT8MTTBBKKzt/ltaPNkbvDMlIkNWLLqjTH+csJechsZ+Q8LAZYlRsTkEWjKI8COAnyYBaJJE4dPTa7TYm4eDwNaDWSumoPy8Xh7SwhyKGMSWhDTIMiboGUuF+qSl6RGoSxmHoMmEDuOp4JlVfQ+XsSBHdKFrjkSfW07nTQw2wSiHj4Jv2+g7PhMh6vLbsHWER0oUxLX6SfgZmyzyds501s+WCM7lHjf+CrXbNTg4b7LnI+YQog+LVJW/7HJwmwCOWENriFOQSsKuWG59lTh2fa3AzC22c/RcvJ+Ed/aZ2DBVtj5XavjhTI5C2K0W48ljX9GcKuNgawvMAOBUpmWDHcg7zLviMTVh3fpdTjMJZmfRiwH5Rh+FmsyWPdSrquDrdWQZ25UcP8OBVmlDdFhoyoJhdsVsKXP4DEFs7JoQi+GEy/PBloZgukjGifrnEXbv5CFSs8NozPqMk7170ts7ra7/vN9EP/DSkR/7z6//RINdmhh3KscAU2Ib58jqltK58/KqFYV1/iabeLJKVpkpVjg=
     - secure: DRVGtaHlV11hRFbfLVueXiQovFUmcBd92sI7Ot9HLVM8yZY1N7GzN4f9cr/OLm4a0ROUOaOa05j/dqL/7zkoG2rSPfOWcBNDvxEiIarVFh393zs3kbn+Qk8OLVF5jg7WHGV5PM/9gjJAdAnr3/IySweXHinhuoRP8/hZhIx56C3v9mq22xHvD8T+Nnm9x13AwNYd48uw1OyDBO1XdGMXEIfPrRFcDyRxokd/FxbryX6kkl5LFjoYY2F12m+LgeZsORVQ5zwHIhqZQ0SFruAy1zsXivEtAc5E8zgIHnI+8HbMq/vUNyvkfciyb4ajg1WW7N4o1A38fHgMLzcDCbcFHDr/sh4uupOraaz7mhsDXIDBj5y24L0nEKmV57trVis8BFIflkA/S7cGO+sYNvRVM/Xzow+xPeKUm9iwke6tzAn71Y0Z2lWaXipvGiYfi3VMTzwTJiR2zTnTlgx1yIydG8+RTd1AOmq4AHpmu2zifY15YGm2VGTO87TMfo1ZWMP9rC5vsmndgnYcdZmFXnmdtmN7k2N1w/XrQ+Ef9fcc7jLorWH4ZcaNtFtlL/GEYj0PMozPceRdT+pi9m9yW+g7Uvrvj2qeKtOtMTK3r7NSAB+dBhaDt9xtyC1qfNUfoxAynF7oO0XkMlouUU4uBQzQ9illKKqsZCk6wmxQi4JDqWk=
     - secure: PZCOTXWpKcTUEFvxWArVBHfJLA3ncArVJVmeWqGEe3f1SH3rDbtnHwAK9MZ+qfQvtmfP5KrsXbechosRGxmY4NzGTuxupzYIeNq3x73RFLYmhDNaf3yIHx5KbLsKm+/y7X11ORKEWTX0Ub68CAc8dyV5iV2CR/1gPpBcL2L7s4xqS9aeeVJj9C2fIOY9uLaCA4g5Vx3opBVLsh7kmBuOgl8ajg24hI4oajQmEatKfxIqZp892cPvOVZgsmR9Y83z6ZL48tmPKsttB5utBe8AQY7TnKwKqo3tFDvTFgO4Vkv+plTJQHU3mULoG7WixL+AvWS6+jhyl2pzhEovDYMHkWi4ozxbO87ZdZp9GIxLihsXmxIunwz7mBolZ1XE6vEwWoVhlWXuZ/fO1udi8UIvcxr01jZwYzVrhvpnpoT/j2goZr+V2kuVXEghm50saRDIP5rAPk4hLj9Q8G3SKObNU0xj8lN/fLM4XIvaZV26kFbDfREBfoV3GL7tHvEdg0gAyjO9d9VIJsomj+/K/e6L1GZCwiN2VgHPJWzgmNMofCFNF7GusA8gju6mO5qWxYZxq0y28p93uE4QJvxZUV9gNZ8fvDrK6xDylB06SDXQqyTxf+GnOv2bRYTTap2PSBgcFScr/Q7jTB65h/e0KlFle8dOEwDMm9E62r4WfS2E6sY=
-    - ALL_GRADLE_VERSIONS=2.0,2.1,2.2.1,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14.1,3.0,3.1,3.2.1,3.3,3.4.1,3.5.1,4.0.2,4.1,4.2.1,4.3.1,4.4.1,4.5.1,4.6
+    - ALL_GRADLE_VERSIONS=2.0,2.1,2.2.1,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14.1,3.0,3.1,3.2.1,3.3,3.4.1,3.5.1,4.0.2,4.1,4.2.1,4.3.1,4.4.1,4.5.1,4.6,4.7,4.8
     - PARALLEL_INTEG_TEST_COUNT=3
 
 jdk: openjdk8
@@ -41,7 +41,10 @@ jobs:
     - jdk: oraclejdk9
       # Gradle has runtime support for Java 9 since v4.2.1
       # (see https://blog.gradle.org/java-9-support-update)
-      env: GRADLE_VERSIONS=4.2.1,4.3.1,4.4.1,4.5.1,4.6
+      env: GRADLE_VERSIONS=4.2.1,4.3.1,4.4.1,4.5.1,4.6,4.7,4.8
+      script: scripts/travis-integ-tests.sh
+    - jdk: openjdk10
+      env: GRADLE_VERSIONS=4.2.1,4.3.1,4.4.1,4.5.1,4.6,4.7,4.8
       script: scripts/travis-integ-tests.sh
     - stage: deploy
       if: (branch = master) AND (NOT (type = pull_request))
