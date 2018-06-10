@@ -1,6 +1,6 @@
 = google-java-format-gradle-plugin
-:release-version: 0.6
-:default-google-java-format-version: 1.1
+:release-version: 0.7
+:default-google-java-format-version: 1.6
 :snapshot-version: 0.7-SNAPSHOT
 
 
