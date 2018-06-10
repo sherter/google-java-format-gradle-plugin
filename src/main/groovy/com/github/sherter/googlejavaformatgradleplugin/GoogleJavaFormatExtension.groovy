@@ -1,6 +1,7 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import com.github.sherter.googlejavaformatgradleplugin.format.FormatterOption
+import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileTree
@@ -13,7 +14,7 @@ import org.gradle.api.tasks.util.PatternSet
 @CompileStatic
 class GoogleJavaFormatExtension {
 
-    static final String DEFAULT_TOOL_VERSION = '1.1'
+    static final String DEFAULT_TOOL_VERSION = Gjf.SUPPORTED_VERSIONS.last()
 
     private final Project project
     private String toolVersion = null
