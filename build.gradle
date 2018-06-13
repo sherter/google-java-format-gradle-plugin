@@ -1,7 +1,7 @@
 plugins {
     id 'groovy'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.9.4'
+    id 'com.gradle.plugin-publish' version '0.9.10'
     id 'net.ltgt.apt' version '0.6'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     id "com.github.sherter.google-java-format" version "0.6"
@@ -86,6 +86,10 @@ pluginBundle {
             id = 'com.github.sherter.google-java-format'
             displayName = 'google-java-format gradle plugin'
         }
+    }
+
+    withDependencies { List<Dependency> list ->
+        list.clear()
     }
 }
 
