@@ -1,3 +1,5 @@
 include 'format', 'test'
 project(':format').projectDir = new File(settingsDir, 'subprojects/format')
 project(':test').projectDir = new File(settingsDir, 'subprojects/test')
+
+enableFeaturePreview('STABLE_PUBLISHING')
