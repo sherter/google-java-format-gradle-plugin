@@ -4,8 +4,8 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.ConfigurableFileTree
-import org.gradle.api.file.FileTree
+import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.util.GradleVersion
 
 @CompileStatic
 class GoogleJavaFormatPlugin implements Plugin<Project> {
@@ -24,6 +24,8 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
     static final String EXTENSION_NAME = 'googleJavaFormat'
     static final String DEFAULT_FORMAT_TASK_NAME = 'googleJavaFormat'
     static final String DEFAULT_VERIFY_TASK_NAME = 'verifyGoogleJavaFormat'
+
+    static final boolean SUPPORTS_LAZY_TASKS = GradleVersion.current() >= GradleVersion.version("4.9")
 
     private Project project
     private GoogleJavaFormatExtension extension
@@ -49,19 +51,33 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
 
     private void createDefaultTasks() {
-        this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
-        def defaultVerifyTask = this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+        def defaultVerifyTask
+        if (SUPPORTS_LAZY_TASKS) {
+            this.project.tasks.register(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
+            defaultVerifyTask = this.project.tasks.register(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+        } else {
+            this.project.tasks.create(DEFAULT_FORMAT_TASK_NAME, GoogleJavaFormat)
+            defaultVerifyTask = this.project.tasks.create(DEFAULT_VERIFY_TASK_NAME, VerifyGoogleJavaFormat)
+        }
         makeCheckTaskDependOn(defaultVerifyTask)
     }
 
-    private void makeCheckTaskDependOn(Task task) {
-        def checkTask = project.tasks.findByName('check')
-        if (checkTask != null) {
-            checkTask.dependsOn(task)
+    private void makeCheckTaskDependOn(Object task) {
+        if (SUPPORTS_LAZY_TASKS) {
+            project.plugins.withType(LifecycleBasePlugin) {
+                project.tasks.named('check').configure {
+                    it.dependsOn(task)
+                }
+            }
         } else {
-            project.tasks.whenTaskAdded { Task t ->
-                if (t.name == 'check') {
-                    t.dependsOn(task)
+            def checkTask = project.tasks.findByName('check')
+            if (checkTask != null) {
+                checkTask.dependsOn(task)
+            } else {
+                project.tasks.whenTaskAdded { Task t ->
+                    if (t.name == 'check') {
+                        t.dependsOn(task)
+                    }
                 }
             }
         }
