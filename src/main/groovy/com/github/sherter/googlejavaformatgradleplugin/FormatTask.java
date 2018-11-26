@@ -9,6 +9,6 @@ abstract class FormatTask extends SourceTask {
   abstract void accept(TaskConfigurator configurator);
 
   boolean hasSources() {
-    return !source.isEmpty();
+    return !getSource().isEmpty();
   }
 }
