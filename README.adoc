@@ -1,7 +1,7 @@
 = google-java-format-gradle-plugin
-:release-version: 0.7.1
+:release-version: 0.8
 :default-google-java-format-version: 1.6
-:snapshot-version: 0.8-SNAPSHOT
+:snapshot-version: 0.9-SNAPSHOT
 
 
 A https://github.com/gradle/gradle[Gradle] plugin that utilizes
