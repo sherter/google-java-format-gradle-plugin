@@ -1,7 +1,6 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
 import com.google.common.base.Joiner
-import groovy.transform.CompileStatic
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
@@ -14,7 +13,6 @@ import java.util.concurrent.Future
 import static com.github.sherter.googlejavaformatgradleplugin.FileState.*
 import static com.github.sherter.googlejavaformatgradleplugin.Utils.toPaths
 
-@CompileStatic
 class VerifyGoogleJavaFormat extends FormatTask implements VerificationTask {
 
     @Override

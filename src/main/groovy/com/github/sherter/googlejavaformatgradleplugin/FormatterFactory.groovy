@@ -6,14 +6,12 @@ import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
 import com.github.sherter.googlejavaformatgradleplugin.format.Style
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
-import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.logging.Logger
 
-@CompileStatic
 class FormatterFactory {
 
     static final ImmutableTable<String, Object, FormatterOption> optionMapping =
