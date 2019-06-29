@@ -6,7 +6,7 @@ repositories {
   jcenter()
 }
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
 dependencies {
   implementation 'org.codehaus.groovy:groovy-all:2.3.10' // 2.3.10 ships with Gradle 2.6
