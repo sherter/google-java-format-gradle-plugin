@@ -10,6 +10,9 @@ import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.environment.Jvm
+
+import static org.junit.Assume.assumeTrue
 
 @IgnoreIf({ javaVersion < 1.8 })
 class FormatterFactoryTest extends Specification {
@@ -47,6 +50,8 @@ class FormatterFactoryTest extends Specification {
 
     @Unroll
     def 'create and use formatter (v#version)'() {
+        assumeTrue(Gjf.SUPPORTED_VERSIONS.indexOf(version) < Gjf.SUPPORTED_VERSIONS.indexOf('1.8') ||
+                new BigDecimal(Jvm.current.javaSpecificationVersion) >= BigInteger.valueOf(11))
         given:
         Project project = ProjectBuilder.builder().build()
         project.repositories {

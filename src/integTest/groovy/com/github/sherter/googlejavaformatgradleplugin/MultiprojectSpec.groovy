@@ -16,6 +16,7 @@ class MultiprojectSpec extends AbstractIntegrationSpec {
             |subprojects {
             |  apply plugin: 'com.github.sherter.google-java-format'
             |  $defaultRepositories
+            |  $downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |  tasks.verifyGoogleJavaFormat.ignoreFailures = true
             |}
             |""".stripMargin())

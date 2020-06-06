@@ -13,6 +13,7 @@ class IntegrationTest extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |tasks.$DEFAULT_FORMAT_TASK_NAME {
             |  exclude '**/Bar.java'
             |}
@@ -42,6 +43,7 @@ class IntegrationTest extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task customFormatTask(type: $GoogleJavaFormat.name) {
             |  source 'src/Foo.java'
             |}
@@ -64,6 +66,7 @@ class IntegrationTest extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |""".stripMargin())
         project.createFile(['Foo.java'], 'class Foo {}\n')
         project.createFile(['Bar.java'], 'class    Bar   {  }')

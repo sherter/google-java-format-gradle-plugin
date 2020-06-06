@@ -13,6 +13,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         buildfile = project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |""".stripMargin())
     }
 
@@ -143,6 +144,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         buildfile.write("""\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |googleJavaFormat {
             |  options style: 'GOOGLE'
             |}
@@ -159,6 +161,7 @@ class UpToDateSpec extends AbstractIntegrationSpec {
         buildfile.write("""\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |googleJavaFormat {
             |  options style: 'AOSP'
             |}

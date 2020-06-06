@@ -10,6 +10,7 @@ class OptionsSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |$extension
             |""".stripMargin())
 
@@ -32,6 +33,7 @@ class OptionsSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task myFormat(type: ${GoogleJavaFormat.name}) {
             |  source 'Foo.java'
             |}
@@ -57,6 +59,7 @@ class OptionsSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |$extension
             |""".stripMargin())
 
@@ -79,6 +82,7 @@ class OptionsSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |$extension
             |task myVerify(type: ${VerifyGoogleJavaFormat.name}) {
             |  source 'Foo.java'

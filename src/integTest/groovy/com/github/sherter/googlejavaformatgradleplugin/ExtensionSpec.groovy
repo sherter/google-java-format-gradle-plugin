@@ -14,6 +14,7 @@ class ExtensionSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |$extension
             |""".stripMargin())
 
@@ -39,6 +40,7 @@ class ExtensionSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |tasks.googleJavaFormat {
             |$task
             |}
@@ -69,6 +71,7 @@ class ExtensionSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |tasks.verifyGoogleJavaFormat {
             |$task
             |}

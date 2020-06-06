@@ -8,9 +8,9 @@ import groovy.transform.TypeCheckingMode
 
 @CompileStatic
 @PackageScope
-final class OneDotOneFactory extends AbstractFormatterFactory {
+class OneDotOneFactory extends AbstractFormatterFactory {
 
-    private static final String removeUnusedImportsClassName = 'com.google.googlejavaformat.java.RemoveUnusedImports'
+    protected static final String removeUnusedImportsClassName = 'com.google.googlejavaformat.java.RemoveUnusedImports'
     private static final String javadocOnlyImportsEnumName = removeUnusedImportsClassName + '$JavadocOnlyImports'
 
     // @PackageScope not available for constructors in Gradle's (v2.0) groovy version (v2.3.2)
@@ -39,10 +39,12 @@ final class OneDotOneFactory extends AbstractFormatterFactory {
 
     /** See <a href="https://github.com/google/google-java-format/blob/google-java-format-1.1/core/src/main/java/com/google/googlejavaformat/java/JavaFormatterOptions.java#L65">com.google.googlejavaformat.java.JavaFormatterOptions</a> */
     @Override
+    @CompileStatic(TypeCheckingMode.SKIP)
     Object constructJavaFormatterOptions() {
         def style = constructStyle()
         def clazz = classLoader.loadClass(javaFormatterOptionsClassName)
-        return clazz.newInstance(style)
+        def builder = clazz.builder();
+        return builder.style(style).build();
     }
 
 
@@ -57,7 +59,7 @@ final class OneDotOneFactory extends AbstractFormatterFactory {
 
     /** See <a href="https://github.com/google/google-java-format/blob/google-java-format-1.1/core/src/main/java/com/google/googlejavaformat/java/RemoveUnusedImports.java#L167">com.google.googlejavaformat.java.RemoveUnusedImports</a> */
     @CompileStatic(TypeCheckingMode.SKIP)
-    private Closure<String> constructRemoveUnusedImportsClosure() {
+    protected Closure<String> constructRemoveUnusedImportsClosure() {
         def clazz = classLoader.loadClass(removeUnusedImportsClassName)
         def remover = clazz.newInstance()
         def javadocOnlyImports = constructJavadocOnlyImports()

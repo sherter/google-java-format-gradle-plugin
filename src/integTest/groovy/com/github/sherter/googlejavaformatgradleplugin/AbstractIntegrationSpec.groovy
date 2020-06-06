@@ -1,10 +1,12 @@
 package com.github.sherter.googlejavaformatgradleplugin
 
+import com.github.sherter.googlejavaformatgradleplugin.format.Gjf
 import com.github.sherter.googlejavaformatgradleplugin.test.Project
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.util.environment.Jvm
 
 abstract class AbstractIntegrationSpec extends Specification {
 
@@ -35,7 +37,15 @@ abstract class AbstractIntegrationSpec extends Specification {
         |}
         |'''.stripMargin()
 
-    @Rule TemporaryFolder temporaryFolder
+    // google-java-format targets Java 11 since version 1.8
+    static final String downgradeToolVersionIfLatestNotSupportedOnCurrentJvm = new BigDecimal(Jvm.current.javaSpecificationVersion) < BigDecimal.valueOf(11) ? """\
+        |googleJavaFormat {
+        |  toolVersion = '${Gjf.SUPPORTED_VERSIONS.get(Gjf.SUPPORTED_VERSIONS.indexOf('1.8') - 1)}'
+        |}
+        |""".stripMargin() : ''
+
+    @Rule
+    TemporaryFolder temporaryFolder
     GradleRunner runner
     Project project
 

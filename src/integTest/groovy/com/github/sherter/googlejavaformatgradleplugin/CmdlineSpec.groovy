@@ -11,6 +11,7 @@ class CmdlineSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |""".stripMargin())
         def foo = project.createFile(['Foo.java'], 'class  Foo  {   }')
         def bar = project.createFile(['Bar.java'], 'class  Bar  {   }')

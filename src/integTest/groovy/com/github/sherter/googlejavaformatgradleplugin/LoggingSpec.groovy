@@ -9,6 +9,7 @@ class LoggingSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |""".stripMargin())
         project.createFile(['src', 'main', 'java', 'Foo.java'], 'class    Foo  {  }')
         project.createFile(['Bar.java'], 'class Bar {}\n')
@@ -26,6 +27,7 @@ class LoggingSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |""".stripMargin())
         project.createFile(['src', 'main', 'java', 'Foo.java'], 'class    Foo  {  }')
         project.createFile(['Bar.java'], 'class Bar {}\n')
@@ -50,6 +52,7 @@ class LoggingSpec extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |""".stripMargin())
         project.createFile(['src', 'main', 'java', 'Foo.java'], 'class    Foo  {  }')
         project.createFile(['Baz.java'], 'this is not Java')

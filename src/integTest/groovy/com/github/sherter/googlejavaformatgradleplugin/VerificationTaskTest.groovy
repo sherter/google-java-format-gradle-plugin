@@ -8,6 +8,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         given:
         project.createFile(['build.gradle'], """\
             |$applyPlugin
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name})
             |""".stripMargin())
 
@@ -22,6 +23,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         given:
         project.createFile(['build.gradle'], """\
             |$applyPlugin
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
             |  source 'build.gradle'
             |}
@@ -40,6 +42,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'],  """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
             |  source 'Foo.java'
             |}
@@ -60,6 +63,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
             |  source 'Foo.java'
             |}
@@ -78,6 +82,7 @@ class VerificationTaskTest extends AbstractIntegrationSpec {
         project.createFile(['build.gradle'], """\
             |$applyPlugin
             |$defaultRepositories
+            |$downgradeToolVersionIfLatestNotSupportedOnCurrentJvm
             |task $customTaskName(type: ${VerifyGoogleJavaFormat.name}) {
             |  source 'Foo.java'
             |  ignoreFailures true
