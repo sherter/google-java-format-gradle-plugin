@@ -35,7 +35,7 @@ class Resolver {
         URL[] artifactLocations = artifactResults.collect {
             result -> result.getArtifact().getFile().toURI().toURL()
         }
-        URLClassLoader classLoader = new URLClassLoader(artifactLocations, (ClassLoader) null)
+        URLClassLoader classLoader = new URLClassLoader(artifactLocations, ClassLoader.getSystemClassLoader())
         return classLoader
     }
 
