@@ -3,10 +3,10 @@ package com.github.sherter.googlejavaformatgradleplugin
 import com.github.sherter.googlejavaformatgradleplugin.format.Formatter
 import com.google.common.collect.Iterables
 import groovy.transform.CompileStatic
+import groovy.transform.PackageScope
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.file.Path
@@ -27,9 +27,29 @@ class GoogleJavaFormat extends FormatTask {
     }
   }
 
-  List<Path> formattedSources
-  Iterable<Path> filteredSources
-  List<Path> invalidSources
+  private List<Path> formattedSources
+  private Iterable<Path> filteredSources
+  private List<Path> invalidSources
+
+  @PackageScope
+  void setFormattedSources(List<Path> formattedSources) {
+    this.formattedSources = formattedSources
+  }
+
+  @PackageScope
+  void setFilteredSources(Iterable<Path> filteredSources) {
+    this.filteredSources = filteredSources
+  }
+
+  @PackageScope
+  List<Path> invalidSources() {
+    return invalidSources
+  }
+
+  @PackageScope
+  void setInvalidSources(List<Path> invalidSources) {
+    this.invalidSources = invalidSources
+  }
 
   @TaskAction
   void formatSources() {

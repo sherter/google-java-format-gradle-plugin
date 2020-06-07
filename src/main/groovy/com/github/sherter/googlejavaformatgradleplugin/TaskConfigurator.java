@@ -43,7 +43,7 @@ class TaskConfigurator {
     task.setInvalidSources(new ArrayList<>(mapping.get(FileState.INVALID)));
     ImmutableList<Path> unformatted = mapping.get(FileState.UNFORMATTED);
     ImmutableList<Path> unknown = mapping.get(FileState.UNKNOWN);
-    if (Iterables.size(task.getInvalidSources())
+    if (Iterables.size(task.invalidSources())
             + Iterables.size(unformatted)
             + Iterables.size(unknown)
         == 0) {
