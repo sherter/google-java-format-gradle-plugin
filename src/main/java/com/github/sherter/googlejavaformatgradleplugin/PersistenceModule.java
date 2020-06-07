@@ -1,6 +1,5 @@
 package com.github.sherter.googlejavaformatgradleplugin;
 
-import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import dagger.Module;
 import dagger.Provides;
@@ -34,7 +33,7 @@ class PersistenceModule {
     try (InputStream is = getClass().getResourceAsStream("/VERSION")) {
       return CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8)).trim();
     } catch (IOException e) {
-      throw Throwables.propagate(e);
+      throw new RuntimeException(e);
     }
   }
 
