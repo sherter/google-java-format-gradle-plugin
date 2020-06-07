@@ -20,7 +20,15 @@ class VerifyGoogleJavaFormat extends FormatTask implements VerificationTask {
         configurator.configure(this)
     }
 
-    boolean ignoreFailures = false
+    private boolean ignoreFailures = false
+
+    boolean getIgnoreFailures() {
+        return ignoreFailures
+    }
+
+    void setIgnoreFailures(boolean ignoreFailures) {
+        this.ignoreFailures = ignoreFailures
+    }
 
     @TaskAction
     void verifySources() {
