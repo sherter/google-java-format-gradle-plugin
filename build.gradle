@@ -100,24 +100,22 @@ pluginBundle {
 }
 
 publishing {
+    repositories{
+        maven {
+            name = 'Jfrog'
+            url System.getenv("ARTIFACT_MAVEN_REPO")
+            credentials {
+                username System.getenv("ARTIFACTORY_USER")
+                password System.getenv("ARTIFACTORY_PASSWORD")
+            }
+        }
+    }
     publications {
         maven(MavenPublication) {
-            groupId 'com.github.sherter.googlejavaformatgradleplugin'
+            groupId 'com.tinder.labs'
             artifactId 'google-java-format-gradle-plugin'
 
             project.shadow.component(it)
-        }
-    }
-    if (version.endsWith('-SNAPSHOT')) {
-        repositories {
-            maven {
-                name = 'SonatypeSnapshot'
-                url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                credentials {
-                    username System.env.SONATYPE_SNAPSHOTS_USERNAME
-                    password System.env.SONATYPE_SNAPSHOTS_PASSWORD
-                }
-            }
         }
     }
 }

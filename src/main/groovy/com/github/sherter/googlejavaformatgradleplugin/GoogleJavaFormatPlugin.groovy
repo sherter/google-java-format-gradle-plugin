@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.util.GradleVersion
 
@@ -38,9 +39,15 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
         SharedContext context = new SharedContext(project, extension)
         TaskConfigurator configurator = new TaskConfigurator(context)
-        project.gradle.taskGraph.beforeTask { Task task ->
-            if (task.project == this.project && task instanceof FormatTask) {
-                task.accept(configurator)
+        project.afterEvaluate {
+            project.gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+                graph.getAllTasks().stream().filter {
+                    it instanceof FormatTask
+                }.map{
+                    if(it instanceof FormatTask){
+                        it.accept(configurator)
+                    }
+                }
             }
         }
     }
