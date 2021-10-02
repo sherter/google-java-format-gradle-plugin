@@ -35,7 +35,9 @@ class FileInfoEncoder {
         + ','
         + fileInfo.size()
         + ','
-        + fileInfo.state().name();
+        + fileInfo.state().name()
+        + ','
+        + fileInfo.error();
   }
 
   private String encodePath(Path p) {

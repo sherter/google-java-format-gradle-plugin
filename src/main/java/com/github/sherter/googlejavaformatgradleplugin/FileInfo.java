@@ -20,12 +20,25 @@ abstract class FileInfo {
    * @throws IllegalArgumentException if {@code state} == {@link FileState#UNKNOWN}
    */
   static FileInfo create(Path path, FileTime lastModified, long size, FileState state) {
+    return create(path, lastModified, size, state, "");
+  }
+
+  /**
+   * Constructs a new object of type {@link FileInfo} storing the given values.
+   *
+   * <p>If {@code path} is not already absolute and normalized, an absolute and normalized path that
+   * is equivalent to {@code path} is stored instead.
+   *
+   * @throws IllegalArgumentException if {@code state} == {@link FileState#UNKNOWN}
+   */
+  static FileInfo create(
+      Path path, FileTime lastModified, long size, FileState state, String error) {
     if (state == FileState.UNKNOWN) {
       throw new IllegalArgumentException(
           "constructing file info with state UNKNOWN is not allowed");
     }
     Path modifiedPath = path.toAbsolutePath().normalize();
-    return new AutoValue_FileInfo(modifiedPath, lastModified, size, state);
+    return new AutoValue_FileInfo(modifiedPath, lastModified, size, state, error);
   }
 
   /**
@@ -39,6 +52,8 @@ abstract class FileInfo {
   abstract long size();
 
   abstract FileState state();
+
+  abstract String error();
 
   /**
    * Returns true if and only if {@code this} FileInfo represents the file at a strictly later point

@@ -38,8 +38,9 @@ class FormatFileCallable implements Callable<FileInfo> {
       try {
         formatted = formatter.format(utf8Decoded);
       } catch (FormatterException e) {
+        String error = e.getMessage();
         return FileInfo.create(
-            file, Files.getLastModifiedTime(file), content.length, FileState.INVALID);
+            file, Files.getLastModifiedTime(file), content.length, FileState.INVALID, error);
       }
       if (utf8Decoded.equals(formatted)) {
         logger.info("{}: UP-TO-DATE", file);

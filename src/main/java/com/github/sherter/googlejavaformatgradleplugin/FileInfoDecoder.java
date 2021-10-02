@@ -39,14 +39,15 @@ class FileInfoDecoder {
    */
   FileInfo decode(CharSequence serializedFileInfo) {
     String[] elements = Iterables.toArray(Splitter.on(',').split(serializedFileInfo), String.class);
-    if (elements.length != 4) {
+    if (elements.length != 5) {
       throw new IllegalArgumentException("Invalid number of elements");
     }
     return FileInfo.create(
         decodePath(elements[0]),
         FileTime.from(decodeLong(elements[1]), TimeUnit.NANOSECONDS),
         decodeLong(elements[2]),
-        decodeState(elements[3]));
+        decodeState(elements[3]),
+        elements[4]);
   }
 
   private Path decodePath(CharSequence path) {
