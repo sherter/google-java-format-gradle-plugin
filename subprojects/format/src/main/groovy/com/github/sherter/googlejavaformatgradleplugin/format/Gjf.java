@@ -9,7 +9,7 @@ public class Gjf {
   public static final String ARTIFACT_ID = "google-java-format";
 
   public static final ImmutableList<String> SUPPORTED_VERSIONS =
-      ImmutableList.of("1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8");
+      ImmutableList.of("1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10.0", "1.11.0");
 
   /**
    * Constructs a new formatter that delegates to <a
@@ -37,6 +37,10 @@ public class Gjf {
       case "1.6":
       case "1.7":
         return new OneDotOneFactory(classLoader, config);
+      case "1.8":
+      case "1.9":
+      case "1.10.0":
+      case "1.11.0":
       default:
         return new OneDotEightFactory(classLoader, config);
     }
