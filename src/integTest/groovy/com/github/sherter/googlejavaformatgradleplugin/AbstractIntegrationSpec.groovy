@@ -33,7 +33,7 @@ abstract class AbstractIntegrationSpec extends Specification {
     static final String defaultRepositories = '''\
         |repositories {
         |  mavenLocal()
-        |  jcenter()
+        |  mavenCentral()
         |}
         |'''.stripMargin()
 
