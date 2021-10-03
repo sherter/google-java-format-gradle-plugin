@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +38,7 @@ class FileInfoEncoder {
         + ','
         + fileInfo.state().name()
         + ','
-        + fileInfo.error();
+        + encodeError(fileInfo.error());
   }
 
   private String encodePath(Path p) {
@@ -53,5 +54,10 @@ class FileInfoEncoder {
       }
     }
     return Joiner.on('/').join(urlEncodedElements);
+  }
+
+  /* Encode the error string as base64 to make sure that there are no commas in the text. */
+  private String encodeError(String error) {
+    return Base64.getEncoder().encodeToString(error.getBytes(StandardCharsets.UTF_8));
   }
 }

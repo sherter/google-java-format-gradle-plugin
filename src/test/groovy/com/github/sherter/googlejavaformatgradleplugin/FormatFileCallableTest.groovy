@@ -35,7 +35,7 @@ class FormatFileCallableTest extends Specification {
         def result = task.call()
 
         then:
-        1 * formatter.format('Hello World!') >> { throw new FormatterException() }
+        1 * formatter.format('Hello World!') >> { throw new FormatterException("", new Exception()) }
         result.path() == file
         result.state() == FileState.INVALID
         result.lastModified() == modifiedTime

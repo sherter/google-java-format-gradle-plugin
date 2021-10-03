@@ -34,7 +34,7 @@ class VerifyFileCallableTest extends Specification {
         def result = task.call()
 
         then:
-        1 * formatter.format('foo') >> { throw new FormatterException() }
+        1 * formatter.format('foo') >> { throw new FormatterException("error", new Exception()) }
         result.state() == FileState.INVALID
         result.lastModified() == modified
         result.size() == Files.size(file)

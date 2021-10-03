@@ -19,9 +19,9 @@ class FileInfoDecoderTest extends Specification {
 
         where:
         encoded | decoded
-        'foo,13000000,10,UNFORMATTED' | create(Paths.get('foo'), FileTime.fromMillis(13), 10, UNFORMATTED)
-        'b%2Cr,-231000000,0,INVALID' | create(Paths.get('b,r'), FileTime.fromMillis(-231), 0, INVALID)
-        '../foo/bar,0,0,FORMATTED' | create(Paths.get('../foo/bar'), FileTime.fromMillis(0), 0, FORMATTED)
+        'foo,13000000,10,UNFORMATTED,' | create(Paths.get('foo'), FileTime.fromMillis(13), 10, UNFORMATTED)
+        'b%2Cr,-231000000,0,INVALID,ZXJyb3I=' | create(Paths.get('b,r'), FileTime.fromMillis(-231), 0, INVALID, "error")
+        '../foo/bar,0,0,FORMATTED,' | create(Paths.get('../foo/bar'), FileTime.fromMillis(0), 0, FORMATTED)
     }
 
     def 'decode invalid'() {
@@ -37,9 +37,9 @@ class FileInfoDecoderTest extends Specification {
 
         where:
         encoded | errorMessage
-        'b,r,-231,0,UNKNOWN' | 'Invalid number of elements'
-        'b%r,231,0,UNKNOWN' | 'URLDecoder: Incomplete trailing escape (%) pattern'
-        'foo,0,0,STATE' | 'Not a valid state: STATE'
-        'foo,abc,0,STATE' | 'Not a valid long value: abc'
+        'b,r,t,-231,0,UNKNOWN,' | 'Invalid number of elements'
+        'b%r,231,0,UNKNOWN,' | 'URLDecoder: Incomplete trailing escape (%) pattern'
+        'foo,0,0,STATE,' | 'Not a valid state: STATE'
+        'foo,abc,0,STATE,' | 'Not a valid long value: abc'
     }
 }

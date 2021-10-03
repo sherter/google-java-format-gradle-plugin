@@ -7,6 +7,7 @@ import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 
 import static com.github.sherter.googlejavaformatgradleplugin.FileInfo.create
+import static com.github.sherter.googlejavaformatgradleplugin.FileState.INVALID
 import static com.github.sherter.googlejavaformatgradleplugin.FileState.UNFORMATTED
 
 class FileInfoEncoderTest extends Specification {
@@ -19,9 +20,11 @@ class FileInfoEncoderTest extends Specification {
 
         where:
         info | serialized
-        create(Paths.get('foo'), FileTime.fromMillis(0), 0, UNFORMATTED) | 'foo,0,0,UNFORMATTED'
+
+        create(Paths.get('foo'), FileTime.fromMillis(0), 0, INVALID, "error") | 'foo,0,0,INVALID,ZXJyb3I='
+        create(Paths.get('foo'), FileTime.fromMillis(0), 0, UNFORMATTED) | 'foo,0,0,UNFORMATTED,'
         create(Paths.get('/foo'), FileTime.fromMillis(0), 0, UNFORMATTED) |
                 (1..encoder.basePath.nameCount).inject('') {result, i -> result + '../'} +
-                'foo,0,0,UNFORMATTED'
+                'foo,0,0,UNFORMATTED,'
     }
 }
