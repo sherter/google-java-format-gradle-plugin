@@ -66,7 +66,7 @@ class LoggingSpec extends AbstractIntegrationSpec {
         result.output =~ /Foo\.java: formatted successfully/
         result.output =~ /Bar\.java: UP-TO-DATE/
         // (?s) makes the regex match newlines with . (dot) operators
-        result.output =~ /(?s)Detected Java syntax errors in the following files.*Baz\.java/
-        result.output =~ /(?s)Detected Java syntax errors in the following files.*OtherNon\.java/
+        result.output =~ /(?s)Failed to format the following files.*Baz\.java/
+        result.output =~ /(?s)Failed to format the following files.*OtherNon\.java/
     }
 }

@@ -49,7 +49,7 @@ class VerifyGoogleJavaFormat extends FormatTask implements VerificationTask {
             }
         }
         if (invalid.size() > 0) {
-            logger.lifecycle('\n\nDetected Java syntax errors in the following files ({} "{}" {}):\n',
+            logger.lifecycle('\n\nFailed to verify format of the following files ({} "{}" {}):\n',
                     'you can configure this task to exclude them, see',
                     'https://github.com/sherter/google-java-format-gradle-plugin',
                     'for details')
