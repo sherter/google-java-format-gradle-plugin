@@ -24,12 +24,21 @@ final class OneDotZeroFactory extends AbstractFormatterFactory {
         def formatter = constructFormatter()
         def reorderImports = constructReorderImportsClosure()
         return { String source ->
+            Error cause;
             try {
                 def importOrderedSource = reorderImports.call(source)
                 return formatter.formatSource(importOrderedSource)
             } catch (e) {
-                throw new FormatterException()
+                if ("com.google.googlejavaformat.java.FormatterException".equals(e.getClass().getCanonicalName())) {
+                    String error = "Google Java Formatter error: " + e.getMessage()
+                    throw new FormatterException(error, e)
+                }
+                cause = e; // Unknown error
+            } catch (Error e) {
+                cause = e; // Unknown error
             }
+            String error = "An unexpected error happened: " + cause.toString()
+            throw new FormatterException(error, cause)
         }
     }
 

@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -39,14 +40,15 @@ class FileInfoDecoder {
    */
   FileInfo decode(CharSequence serializedFileInfo) {
     String[] elements = Iterables.toArray(Splitter.on(',').split(serializedFileInfo), String.class);
-    if (elements.length != 4) {
+    if (elements.length != 5) {
       throw new IllegalArgumentException("Invalid number of elements");
     }
     return FileInfo.create(
         decodePath(elements[0]),
         FileTime.from(decodeLong(elements[1]), TimeUnit.NANOSECONDS),
         decodeLong(elements[2]),
-        decodeState(elements[3]));
+        decodeState(elements[3]),
+        decodeError(elements[4]));
   }
 
   private Path decodePath(CharSequence path) {
@@ -79,5 +81,9 @@ class FileInfoDecoder {
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("Not a valid long value: " + number);
     }
+  }
+
+  private String decodeError(String error) {
+    return new String(Base64.getDecoder().decode(error));
   }
 }

@@ -53,6 +53,7 @@ class GoogleJavaFormat extends FormatTask {
 
   @TaskAction
   void formatSources() {
+    Map<String, String> errors = [:]
     boolean successful = true
     if (!Iterables.isEmpty(filteredSources)) {
       Formatter formatter = sharedContext.formatter()
@@ -70,6 +71,7 @@ class GoogleJavaFormat extends FormatTask {
           mapper.putIfNewer(info);
           if (info.state() == FileState.INVALID) {
             invalidSources.add(info.path())
+            errors.put(info.path().toString(), info.error());
           }
         } catch (ExecutionException e) {
           def pathException = e.getCause() as PathException
@@ -80,12 +82,12 @@ class GoogleJavaFormat extends FormatTask {
     }
     if (Iterables.size(invalidSources) > 0) {
       successful = false
-      logger.error('\n\nDetected Java syntax errors in the following files ({} "{}" {}):\n',
+      logger.error('\n\nFailed to format the following files ({} "{}" {}):\n',
               'you can exclude them from this task, see',
               'https://github.com/sherter/google-java-format-gradle-plugin',
               'for details')
       for (Path file : invalidSources) {
-        logger.error(file.toString())
+        logger.error("{}\n > Reason: {}\n", file.toString(), errors.get(file.toString()))
       }
     }
     if (!successful) {
