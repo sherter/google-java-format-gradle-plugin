@@ -12,7 +12,7 @@ dependencies {
   implementation 'org.codehaus.groovy:groovy-all:2.5.10' // v2.5.10 is the first version which runs on a Java 14 JVM.
                                                          // At runtime, we must still support v2.3.10 (bundled with
                                                          // Gradle v2.6) on Java < 14 JVMs.
-  implementation 'com.google.guava:guava:28.0-jre'
+  implementation 'com.google.guava:guava:30.0-jre'
   testImplementation('org.spockframework:spock-core:1.3-groovy-2.5') {
      exclude group: 'org.codehaus.groovy', module: 'groovy-all'
   }
