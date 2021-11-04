@@ -56,7 +56,7 @@ class FormatterFactoryTest extends Specification {
         Project project = ProjectBuilder.builder().build()
         project.repositories {
             mavenLocal()
-            jcenter()
+            mavenCentral()
         }
         FormatterFactory factory = new FormatterFactory(project, Mock(Logger))
 
@@ -90,7 +90,7 @@ class FormatterFactoryTest extends Specification {
             maven {
                 url 'https://oss.sonatype.org/content/repositories/snapshots/'
             }
-            jcenter()
+            mavenCentral()
         }
         Logger logger = Mock()
         def factory = new FormatterFactory(project, logger)

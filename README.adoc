@@ -30,7 +30,7 @@ plugins {
 [source,groovy]
 ----
 repositories {
-  jcenter()  // or mavenCentral()
+  mavenCentral()
 }
 ----
 
