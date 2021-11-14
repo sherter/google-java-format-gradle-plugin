@@ -18,7 +18,26 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.jdk }}
           cache: 'gradle'
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
-      - name: Build with Gradle
-        run: ./gradlew test
+      - uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+      - run: ./gradlew test
+  integrationTest:
+    needs: test
+    name: Run integration tests on OpenJDK ${{ matrix.jdk }}, ${{ matrix.os }} (${{ matrix.index }}/2)
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        jdk: [8]
+        index: [0, 1, 2]
+    runs-on: ${{ matrix.os }}
+    env:
+      INDEX: ${{ matrix.index }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.jdk }}
+          cache: 'gradle'
+      - run: ./scripts/travis-integ-tests.sh
+
