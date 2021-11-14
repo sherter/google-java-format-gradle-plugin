@@ -21,8 +21,6 @@ else
 	IFS=',' read -r -a versions_array <<< "$GRADLE_VERSIONS"
 fi
 
-(set -x; JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 ./gradlew publishToMavenLocal)
-
 echo
 echo
 echo "*********************************************************************************"

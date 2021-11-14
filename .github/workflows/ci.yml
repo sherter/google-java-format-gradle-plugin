@@ -20,6 +20,15 @@ jobs:
           cache: 'gradle'
       - uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - run: ./gradlew test
+      - if: matrix.jdk == '8' && matrix.os == 'ubuntu-latest'
+        run: ./gradlew publishToMavenLocal
+      - if: matrix.jdk == '8' && matrix.os == 'ubuntu-latest'
+        name: Cache local maven repo
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ github.run_number }}-${{github.run_attempt }}
+
   integrationTest:
     needs: test
     name: Run integration tests on OpenJDK ${{ matrix.jdk }}, ${{ matrix.os }} (${{ matrix.index }}/2)
@@ -31,6 +40,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       INDEX: ${{ matrix.index }}
+      PARALLEL_INTEG_TEST_COUNT: 3
 
     steps:
       - uses: actions/checkout@v2
@@ -39,5 +49,16 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.jdk }}
           cache: 'gradle'
+      - name: Cache local maven repo
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ github.run_number }}-${{github.run_attempt }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('Couldn't restore local maven repo containing the published plugin')
       - run: ./scripts/travis-integ-tests.sh
 
