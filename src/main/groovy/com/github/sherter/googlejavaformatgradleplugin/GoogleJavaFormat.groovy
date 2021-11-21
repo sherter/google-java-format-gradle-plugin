@@ -8,6 +8,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.JavaVersion
 
 import java.nio.file.Path
 import java.util.concurrent.ExecutionException;
@@ -53,6 +54,10 @@ class GoogleJavaFormat extends FormatTask {
 
   @TaskAction
   void formatSources() {
+    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+      logger.info("Java 8 not supported, skipping formatting")
+      return;
+    }
     Map<String, String> errors = [:]
     boolean successful = true
     if (!Iterables.isEmpty(filteredSources)) {

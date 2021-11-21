@@ -5,6 +5,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
+import org.gradle.api.JavaVersion
 
 import java.nio.file.Path
 import java.util.concurrent.ExecutionException
@@ -32,6 +33,10 @@ class VerifyGoogleJavaFormat extends FormatTask implements VerificationTask {
 
     @TaskAction
     void verifySources() {
+        if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+            logger.info("Java 8 not supported, skipping formatting")
+            return;
+        }
         def mapping = sharedContext.mapper().reverseMap(toPaths(getSource().files))
 
         def formatted = new ArrayList<Path>(mapping.get(FORMATTED))
