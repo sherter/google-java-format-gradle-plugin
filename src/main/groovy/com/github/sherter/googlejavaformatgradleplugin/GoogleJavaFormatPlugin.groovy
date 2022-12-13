@@ -38,9 +38,15 @@ class GoogleJavaFormatPlugin implements Plugin<Project> {
 
         SharedContext context = new SharedContext(project, extension)
         TaskConfigurator configurator = new TaskConfigurator(context)
-        project.gradle.taskGraph.beforeTask { Task task ->
-            if (task.project == this.project && task instanceof FormatTask) {
+        if (SUPPORTS_LAZY_TASKS) {
+            project.tasks.withType(FormatTask).configureEach { FormatTask task ->
                 task.accept(configurator)
+            }
+        } else {
+            project.gradle.taskGraph.beforeTask { Task task ->
+                if (task.project == this.project && task instanceof FormatTask) {
+                    task.accept(configurator)
+                }
             }
         }
     }
