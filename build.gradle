@@ -1,16 +1,21 @@
+import com.sun.tools.classfile.Dependency
+
 plugins {
     id 'groovy'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.12.0'
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
-    id "com.github.sherter.google-java-format" version '0.8'
+    id 'com.gradle.plugin-publish' version '1.2.1'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.sherter.google-java-format' version '0.9'
 }
 
 
 version = file('src/main/resources/VERSION').text.trim()
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -29,28 +34,28 @@ configurations {
 dependencies {
     implementation gradleApi()
     bundle(project(':format')) {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        exclude group: 'org.apache.groovy', module: 'groovy-all'
     }
-    bundle              'com.google.guava:guava:30.0-jre'
-    bundle              'com.google.dagger:dagger:2.23.2'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.23.2'
-    annotationProcessor 'com.google.auto.value:auto-value:1.6.5'
-    compileOnly         'com.google.auto.value:auto-value-annotations:1.6.5'
+    bundle              'com.google.guava:guava:33.2.1-jre'
+    bundle              'com.google.dagger:dagger:2.51.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.51.1'
+    annotationProcessor 'com.google.auto.value:auto-value:1.11.0'
+    compileOnly         'com.google.auto.value:auto-value-annotations:1.11.0'
 
-    testImplementation('org.spockframework:spock-core:1.3-groovy-2.5') {
+    testImplementation('org.spockframework:spock-core:2.4-M4-groovy-4.0') {
         exclude group: 'org.codehaus.groovy'
     }
-    testImplementation 'com.google.jimfs:jimfs:1.1'
+    testImplementation 'com.google.jimfs:jimfs:1.3.0'
 
     integTestImplementation project(':test')
     integTestImplementation gradleTestKit()
-    integTestImplementation('org.spockframework:spock-core:1.3-groovy-2.5') {
+    integTestImplementation('org.spockframework:spock-core:2.4-M4-groovy-4.0') {
         exclude group: 'org.codehaus.groovy'
     }
     integTestImplementation sourceSets.main.output
 }
 
-def integTestGradleVersion = System.getenv('GRADLE_VERSION') ?: '2.6'
+def integTestGradleVersion = System.getenv('GRADLE_VERSION') ?: '8.8'
 
 tasks.register("integrationTest", Test) {
     dependsOn publishToMavenLocal
@@ -68,7 +73,7 @@ tasks.named("check").configure {
 
 
 tasks.shadowJar {
-  classifier = null // necessary for com.gradle.plugin-publish to pick this artifact up
+  archiveClassifier = null // necessary for com.gradle.plugin-publish to pick this artifact up
   configurations = [project.configurations.bundle]
   relocate('dagger', 'com.github.sherter.googlejavaformat.dagger')
   relocate('com.google.common', 'com.github.sherter.googlejavaformatgradleplugin.com.google.common')
@@ -81,21 +86,18 @@ artifacts {
   archives tasks.shadowJar
 }
 
-pluginBundle {
+gradlePlugin {
     website = 'https://github.com/sherter/google-java-format-gradle-plugin'
     vcsUrl = 'https://github.com/sherter/google-java-format-gradle-plugin.git'
     description = 'Format your Java source files with google-java-format'
-    tags = ['java', 'format', 'style']
 
     plugins {
         googleJavaFormatGradlePlugin {
             id = 'com.github.sherter.google-java-format'
             displayName = 'google-java-format gradle plugin'
+            tags = ['java', 'format', 'style']
+            implementationClass = 'com.github.sherter.googlejavaformatgradleplugin.GoogleJavaFormatPlugin'
         }
-    }
-
-    withDependencies { List<Dependency> list ->
-        list.clear()
     }
 }
 
